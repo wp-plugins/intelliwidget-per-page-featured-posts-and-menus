@@ -1,0 +1,203 @@
+# Copyright (C) 2013 Lilaea Media LLC
+# This file is distributed under the same license as the IntelliWidget package.
+msgid ""
+msgstr ""
+"Project-Id-Version: IntelliWidget 1.0\n"
+"Report-Msgid-Bugs-To: http://wordpress.org/tag/intelliwidget\n"
+"POT-Creation-Date: 2013-04-15 00:00:00:18+00:00\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"PO-Revision-Date: 2010-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+
+#. #-#-#-#-#  intelliwidget.pot (IntelliWidget 1.0)  #-#-#-#-#
+
+#: includes/widget-form.php:61
+msgid "Above Posts"
+msgstr ""
+
+#: includes/widget-form.php:106
+msgid "ASC"
+msgstr ""
+
+#: includes/widget-form.php:148
+msgid "Auto-format Custom Text"
+msgstr ""
+
+#: includes/widget-form.php:169
+msgid "Auto"
+msgstr ""
+
+#: includes/widget-form.php:64
+msgid "Below Posts"
+msgstr ""
+
+#: /widget-form.php:79
+msgid "Category"
+msgstr ""
+
+#: includes/widget-form.php:175
+msgid "Center"
+msgstr ""
+
+#: includes/widget-form.php:159
+msgid "Classes"
+msgstr ""
+
+#: includes/widget-form.php:54
+msgid "Custom Text/HTML:"
+msgstr ""
+
+#: /widget-form.php:89
+msgid "Date"
+msgstr ""
+
+#: includes/widget-form.php:109
+msgid "DESC"
+msgstr ""
+
+#: includes/widget-form.php:135
+msgid "Exclude current post"
+msgstr ""
+
+#: includes/widget-form.php:20
+msgid "Hide if no Page Data is available"
+msgstr ""
+
+#: includes/widget-form.php:165
+msgid "Image Align:"
+msgstr ""
+
+#: includes/widget-form.php:184
+msgid "Image Size:"
+msgstr ""
+
+#: includes/class-intelliwidget.php:125
+msgid "IntelliWidget deleted."
+msgstr ""
+
+#: includes/class-intelliwidget.php:153
+msgid "IntelliWidget Section "
+msgstr ""
+
+#: includes/class-intelliwidget.php:173
+msgid "IntelliWidget"
+msgstr ""
+
+#: includes/widget-form.php:46
+msgid "IntelliWidget(s) (CTRL-Click to select multiple)"
+msgstr ""
+
+#: includes/widget-form.php:197
+msgid "Large"
+msgstr ""
+
+#: includes/widget-form.php:172
+msgid "Left"
+msgstr ""
+
+#: includes/widget-form.php:153
+msgid "Link Text"
+msgstr ""
+
+#: includes/widget-form.php:31
+msgid "Link to Archive"
+msgstr ""
+
+#: includes/widget-form.php:194
+msgid "Medium"
+msgstr ""
+
+#: includes/class-widget-intelliwidget.php:28
+msgid "Menus, Featured Posts, HTML, slideshows, customized per page or site-wide."
+msgstr ""
+
+#: includes/class-intelliwidget.php:137
+msgid "New IntelliWidget added."
+msgstr ""
+
+#: includes/section-form.php:198
+msgid "No Image"
+msgstr ""
+
+#: includes/widget-form.php:188
+msgid "No Thumbnail"
+msgstr ""
+
+#:
+msgid "None"
+msgstr ""
+
+#: includes/widget-form.php:141
+msgid "Only future posts (upcoming events)"
+msgstr ""
+
+#: /widget-form.php:92
+msgid "Order"
+msgstr ""
+
+#: includes/widget-form.php:115
+msgid "Posts per section:"
+msgstr ""
+
+#: /widget-form.php:98
+msgid "Random"
+msgstr ""
+
+#: includes/class-intelliwidget.php:389
+msgid "Read More"
+msgstr ""
+
+#: includes/section-form.php:19
+msgid "Replaces:"
+msgstr ""
+
+#: includes/widget-form.php:178
+msgid "Right"
+msgstr ""
+
+#: includes/section-form.php:35
+msgid "Section"
+msgstr ""
+
+#: includes/widget-form.php:119
+msgid "Show All"
+msgstr ""
+
+#: /widget-form.php:85
+msgid "Sort by:"
+msgstr ""
+
+#: includes/widget-form.php:36
+msgid "Template"
+msgstr ""
+
+#: /widget-form.php:67
+msgid "Text Only-No Posts"
+msgstr ""
+
+#: includes/widget-form.php:191
+msgid "Thumbnail"
+msgstr ""
+
+#: /widget-form.php:95
+msgid "Title"
+msgstr ""
+
+#: includes/widget-form.php:25
+msgid "(Leave blank to omit)"
+msgstr ""
+
+#: includes/page-form.php:8
+msgid "Use settings from:"
+msgstr ""
+
+#: includes/widget-form.php:128
+msgid "Widget"
+msgstr ""
+
+#: includes/widget-form.php:128
+msgid "Words per post:"
+msgstr ""
