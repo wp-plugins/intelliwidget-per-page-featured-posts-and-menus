@@ -4,7 +4,7 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_i
 Tags: custom post types, custom sidebar, featured post, per page menu, plugin, textwidget, widget 
 Requires at least: 3.5
 Tested up to: 3.5.1
-Stable tag: 1.0.0
+Stable tag: 1.0.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -12,15 +12,16 @@ Display featured posts, custom menus, html content and more within a single dyna
 
 == Description ==
 
-Why use IntelliWidget instead of other Featured Post plugins?
+Why use IntelliWidget as your Featured Post plugin?
 
 * Quick Setup
 * No new sidebars necessary--uses the sidebars you already have
 * Displays custom page settings if they exist, main widget if they don't
-* Use as many variations on a single page as you wish
+* Supports Custom Post Types
+* Doubles as a Text Widget--customizable to any page
+* Use as many different instances on a single page as you wish
 * Saves time and leaves a small footprint
 * One lightweight CSS script and no additional JavaScript
-* One widget - hundreds of uses
 * Create your own templates or use ours
 * Set up one page and reuse on other pages
 * No new database tables
@@ -61,6 +62,10 @@ See "Getting Started," below.
 * Combined favorite functionality from different widgets into a single IntelliWidget.
 * Packaged for public consumption
 
+= 1.0.1 =
+* Updated Readme
+* Made form areas collapsible
+
 == Upgrade Notice ==
 
 = 1.0.0 =
@@ -75,7 +80,7 @@ Here is a very simple example of how to use an IntelliWidget titled "My First In
 
 2. Load a page from your site in a browser that uses the sidebar you just modified. You will see a menu of up to five links with the Title, "My First IntelliWidget." This is the default behavior: a menu of page links sorted by title. This is not very useful but it serves to understand the power of IntelliWidgets.
 
-3. In the WordPress Admin, go to Pages and click to edit the page you just viewed. You will now see a new meta box labeled "IntelliWidget." Leave the "Use settings from …" alone and click "Add new section."
+3. In the WordPress Admin, go to Pages and click to edit the page you just viewed. You will now see a new meta box labeled "IntelliWidget." Leave the "Use settings from" alone and click "Add new section."
 
 4. When the page refreshes, you will see a new meta box with settings almost exactly like the ones in the Widgets Admin. Click the "Replaces" dropdown menu and you will see an option for the sidebar where you added the IntelliWidget. Select this option.
 
