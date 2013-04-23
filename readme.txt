@@ -35,7 +35,7 @@ IntelliWidgets can include but are not limited to: custom page menus, featured p
 
 Because the lists are generated using active titles and permalinks, your site is always current with the latest versions of your content.
 
-Combine with custom post types to create unlimited CMS-style content blocks. Combine with your favorite jQuery Slider plugin to display animated slideshows. You can even use the settings from an existing page. Now there is no limit to what you can customize without having a gazillion sidebars on your widgets admin.
+Combine with custom post types to create unlimited CMS-style content blocks. Combine with your favorite jQuery Slider plugin to display animated slideshows. You can even use the settings from an existing page. Now you don't have to add a gazillion sidebars to your widgets admin to have unlimited page-specific content.
 
 == Installation ==
 

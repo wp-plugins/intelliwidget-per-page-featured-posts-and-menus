@@ -32,13 +32,15 @@ global $_wp_additional_image_sizes;
 </p>
 <p>
   <label for="<?php echo $this->get_field_id('template'); ?>">
-    <?php _e('Template', 'intelliwidget'); ?>
-    : </label>
+    <?php _e('Template', 'intelliwidget'); ?>:</label>
   <select name="<?php echo $this->get_field_name('template'); ?>" id="<?php echo $this->get_field_id('template'); ?>">
     <?php foreach ( $intelliwidget->get_widget_templates() as $template => $name ) : ?>
     <option value="<?php echo $template; ?>" <?php selected($instance['template'], $template); ?>><?php echo $name; ?></option>
     <?php endforeach; ?>
   </select>
+  <label for="<?php echo $this->get_field_id('category'); ?>">
+    <?php _e('Category', 'intelliwidget'); ?>:</label>
+  <?php wp_dropdown_categories(array('name' => $this->get_field_name('category'), 'id' => $this->get_field_id('category'), 'show_option_none' => __('None', 'intelliwidget'), 'selected' => $instance['category'] )); ?>
 </p>
 <p>
   <label for="<?php echo $this->get_field_id('page'); ?>">
@@ -73,12 +75,6 @@ name="<?php echo $this->get_field_name('custom_text'); ?>">
 <?php echo esc_textarea($instance['custom_text']); ?></textarea>
 </p>
 <h4>Advanced Options</h4>
-<p>
-  <label for="<?php echo $this->get_field_id('category'); ?>">
-    <?php _e('Category', 'intelliwidget'); ?>
-  </label>
-  <?php wp_dropdown_categories(array('name' => $this->get_field_name('category'), 'id' => $this->get_field_id('category'), 'show_option_none' => __('None', 'intelliwidget'), 'selected' => $instance['category'] )); ?>
-</p>
 <p>
   <label for="<?php echo $this->get_field_id('sortby'); ?>">
     <?php _e( 'Sort by:', 'intelliwidget'); ?>
