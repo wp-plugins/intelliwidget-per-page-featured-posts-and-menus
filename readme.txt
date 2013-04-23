@@ -1,7 +1,7 @@
 === IntelliWidget Per Page Featured Posts and Menus ===
 Contributors: lilaeamedia
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=DE4W9KW7HQJNA
-Tags: widget, plugin, featured post, per page menu, textwidget, custom sidebar, custom post types
+Tags: custom post types, custom sidebar, featured post, per page menu, plugin, textwidget, widget 
 Requires at least: 3.5
 Tested up to: 3.5.1
 Stable tag: 1.0.0
@@ -11,6 +11,22 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Display featured posts, custom menus, html content and more within a single dynamic sidebar that can be customized on a per-page basis or globally.
 
 == Description ==
+
+Why use IntelliWidget instead of other Featured Post plugins?
+
+* Quick Setup
+* No new sidebars necessary--uses the sidebars you already have
+* Displays custom page settings if they exist, main widget if they don't
+* Use as many variations on a single page as you wish
+* Saves time and leaves a small footprint
+* One lightweight CSS script and no additional JavaScript
+* One widget - hundreds of uses
+* Create your own templates or use ours
+* Set up one page and reuse on other pages
+* No new database tables
+* Clean uninstall
+* Keep using all your other widgets
+* Won't hijack your site--use only the features you need
 
 IntelliWidget eliminates the need for multiple sidebars to accommodate page-specific content. Instead, you use one set of dynamic sidebars, load a few IntelliWidgets and then customize on a per-page basis. If you don’t customize a page, the default widget (the one you configured on the widgets page) displays instead.
 
