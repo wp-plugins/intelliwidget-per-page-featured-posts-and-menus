@@ -42,16 +42,16 @@ class IntelliWidget {
         register_activation_hook($file, array(&$this, 'intelliwidget_activate'));
         // these actions only apply to admin users
         if (is_admin()):
-            add_action('admin_init',          array(&$this, 'intelliwidget_admin_init'));
-            add_action('add_meta_boxes',      array(&$this, 'intelliwidget_main_meta_box') );
-            add_action('add_meta_boxes',      array(&$this, 'intelliwidget_section_meta_box') );
-            add_action('save_post',           array(&$this, 'intelliwidget_save_postdata'), 1, 2 );
-            add_action('wp_ajax_iw_save',     array(&$this, 'intelliwidget_ajax_save_postdata' ));
-            add_action('wp_ajax_iw_copy',     array(&$this, 'intelliwidget_ajax_copy_page' ));
-            add_action('wp_ajax_iw_delete',   array(&$this, 'intelliwidget_ajax_delete_meta_box' ));
-            add_action('wp_ajax_iw_add',      array(&$this, 'intelliwidget_ajax_add_meta_box' ));
-            //add_action('admin_print_styles', array(&$this, 'intelliwidget_admin_styles'));
-            add_action('admin_print_scripts', array(&$this, 'intelliwidget_admin_scripts'));
+            add_action('admin_init',          array(&$this, 'admin_init'));
+            add_action('add_meta_boxes',      array(&$this, 'main_meta_box') );
+            add_action('add_meta_boxes',      array(&$this, 'section_meta_box') );
+            add_action('save_post',           array(&$this, 'save_postdata'), 1, 2 );
+            add_action('wp_ajax_iw_save',     array(&$this, 'ajax_save_postdata' ));
+            add_action('wp_ajax_iw_copy',     array(&$this, 'ajax_copy_page' ));
+            add_action('wp_ajax_iw_delete',   array(&$this, 'ajax_delete_meta_box' ));
+            add_action('wp_ajax_iw_add',      array(&$this, 'ajax_add_meta_box' ));
+            //add_action('admin_print_styles', array(&$this, 'admin_styles'));
+            add_action('admin_print_scripts', array(&$this, 'admin_scripts'));
         endif;
         // thanks to woothemes for this
         add_action( 'after_setup_theme', array( &$this, 'ensure_post_thumbnails_support' ) );
@@ -66,7 +66,7 @@ class IntelliWidget {
     /**
      * Stub for registering scripts in future release.
      */
-    function intelliwidget_admin_init() {
+    function admin_init() {
         // we only use session for persisting notices across redirects FIXME: need better way
         //if (!session_id()) session_start();
         //wp_register_style('intelliwidget-admin-css', $this->pluginURL . 'includes/intelliwidget-admin.css');
@@ -76,14 +76,14 @@ class IntelliWidget {
     /**
      * Stub for printing the administration styles.
      */
-    function intelliwidget_admin_styles() {
+    function admin_styles() {
         //wp_enqueue_style('intelliwidget-admin-css');
     }
 
     /**
      * Stub for printing the scripts needed for the admin.
      */
-    function intelliwidget_admin_scripts() {
+    function admin_scripts() {
         wp_enqueue_script('intelliwidget-js');
         wp_localize_script( 'intelliwidget-js', 'IWAjax', array(
             'ajaxurl' => admin_url( 'admin-ajax.php' )
@@ -95,7 +95,7 @@ class IntelliWidget {
      * FIXME: future release
      * @return  void
      */
-    function intelliwidget_display_notice() {
+    function display_notice() {
         if(!empty($_SESSION['message']) && $msg = $_SESSION['intelliwidget_message']):
             unset($_SESSION['intelliwidget_message']);
     ?>
@@ -110,10 +110,10 @@ class IntelliWidget {
      * Generate input form on page edit
      * @return  void
      */
-    function intelliwidget_section_meta_box() {
+    function section_meta_box() {
         global $post;
         // box_map contains map of meta boxes to their related widgets
-        $box_map = $this->intelliwidget_get_box_map($post->ID);
+        $box_map = $this->get_box_map($post->ID);
         if (is_array($box_map)):
             if (array_key_exists('_wpnonce', $_GET)):
                 $nonce = $_GET['_wpnonce'];
@@ -121,17 +121,17 @@ class IntelliWidget {
                 if (array_key_exists('iwdelete', $_GET)):
                     $iwdelete = intval($_GET['iwdelete']);
                     // delete box
-                    $this->intelliwidget_delete_meta_box($post->ID, $iwdelete, $nonce, $box_map);
+                    $this->delete_meta_box($post->ID, $iwdelete, $nonce, $box_map);
                 elseif (array_key_exists('iwadd', $_GET)):
                     // add box
-                    $this->intelliwidget_add_meta_box($post->ID, $nonce, $box_map);
+                    $this->add_meta_box($post->ID, $nonce, $box_map);
                 endif;
                 // redirect so post data is not cached
                 wp_redirect(admin_url('post.php?action=edit&post=' . $post->ID));
                 die();
             else:
                 // display notice from previous update (if exists)
-                add_action('admin_notices', array(&$this, 'intelliwidget_display_notice'));
+                add_action('admin_notices', array(&$this, 'display_notice'));
             endif;
             // refresh the meta box forms on the page
             $count = 1;
@@ -139,7 +139,7 @@ class IntelliWidget {
                 add_meta_box( 
                     'intelliwidget_section_meta_box_' . $box_id,
                     __( 'IntelliWidget Section ', 'intelliwidget') . $count,
-                    array( &$this, 'intelliwidget_section_meta_box_form' ),
+                    array( &$this, 'section_meta_box_form' ),
                     'page',
                     'side',
                     'low',
@@ -154,12 +154,12 @@ class IntelliWidget {
      * Generate input form that applies to entire page (add new, copy settings)
      * @return  void
      */
-    function intelliwidget_main_meta_box() {
+    function main_meta_box() {
         global $post;
         add_meta_box( 
             'intelliwidget_main_meta_box',
             __( 'IntelliWidget', 'intelliwidget'),
-            array( &$this, 'intelliwidget_main_meta_box_form' ),
+            array( &$this, 'main_meta_box_form' ),
             'page',
             'side',
             'low'
@@ -172,7 +172,7 @@ class IntelliWidget {
      * @param <array>  $metabox
      * @return  void
      */
-    function intelliwidget_section_meta_box_form($post, $metabox) {
+    function section_meta_box_form($post, $metabox) {
         $pagesection = $metabox['args']['pagesection'];
         $meta_name = '_intelliwidget_data_' . $pagesection;
         $intelliwidget_data = $this->defaults(unserialize(get_post_meta( $post->ID, $meta_name, true ) ));
@@ -191,7 +191,7 @@ class IntelliWidget {
      * @param <array>  $metabox
      * @return  void
      */
-    function intelliwidget_main_meta_box_form($post, $metabox) {
+    function main_meta_box_form($post, $metabox) {
         $widget_page_id = get_post_meta($post->ID, '_intelliwidget_widget_page_id', true);
         include( $this->pluginPath . 'includes/page-form.php');
     }
@@ -203,7 +203,7 @@ class IntelliWidget {
      * @param <object>  $post -- revision post data
      * @return  void
      */
-    function intelliwidget_save_postdata($id = NULL, $post = NULL) {
+    function save_postdata($id = NULL, $post = NULL) {
         /***
          * Skip auto-save and revisions. wordpress saves each post twice, once for the revision and once to update
          * the actual post record. The parameters passed by the 'save_post' action are for the revision, so 
@@ -219,7 +219,7 @@ class IntelliWidget {
         $prefix    = 'intelliwidget_';
         // since we can now save a single meta box via ajax post, 
         // we need to manipulate the existing boxmap
-        $box_map = $this->intelliwidget_get_box_map($post_ID);
+        $box_map = $this->get_box_map($post_ID);
         
         /***
          * Here is some perlesque string handling. Using grep gives us a subset of relevant data fields
@@ -263,35 +263,35 @@ class IntelliWidget {
         // serialize and save new map
         update_post_meta($post_ID, '_intelliwidget_map', serialize($box_map));
         // save copy page id (i.e., "use settings from ..." ) if it exists
-        $this->intelliwidget_save_copy_page($post_ID);
+        $this->save_copy_page($post_ID);
         return true;
     }
 
-    function intelliwidget_ajax_save_postdata() {
-        if ($this->intelliwidget_save_postdata() === false) die('fail');
+    function ajax_save_postdata() {
+        if ($this->save_postdata() === false) die('fail');
         die('success');
     }
 
-    function intelliwidget_ajax_delete_meta_box() {
+    function ajax_delete_meta_box() {
         if (!array_key_exists('post', $_POST) || !array_key_exists('iwdelete', $_POST) || 
             !array_key_exists('_wpnonce', $_POST)) die('fail');
         // note that the query string version uses "post" instead of "post_ID"
         $post_ID = intval($_POST['post']);
         $box_id = intval($_POST['iwdelete']);
         $nonce = $_POST['_wpnonce'];
-        if ($this->intelliwidget_delete_meta_box($post_ID, $box_id, $nonce, 
-            $this->intelliwidget_get_box_map($post_ID)) === false) die('fail');
+        if ($this->delete_meta_box($post_ID, $box_id, $nonce, 
+            $this->get_box_map($post_ID)) === false) die('fail');
         die('success');
     }
 
-    function intelliwidget_ajax_add_meta_box() {
+    function ajax_add_meta_box() {
         if (!array_key_exists('post', $_POST) || 
             !array_key_exists('_wpnonce', $_POST)) die('fail');
         // note that the query string version uses "post" instead of "post_ID"
         $post_ID = intval($_POST['post']);
         $nonce = $_POST['_wpnonce'];
-        $pagesection = $this->intelliwidget_add_meta_box($post_ID, $nonce, 
-            $this->intelliwidget_get_box_map($post_ID));
+        $pagesection = $this->add_meta_box($post_ID, $nonce, 
+            $this->get_box_map($post_ID));
         if ($pagesection === false) die('fail');
         $intelliwidget_data = $this->defaults();
         $widgets_array = wp_get_sidebars_widgets();
@@ -310,29 +310,29 @@ class IntelliWidget {
         die($form);
     }
     
-    function intelliwidget_get_box_map($post_ID = NULL) {
+    function get_box_map($post_ID = NULL) {
         if (empty($post_ID) || (! $box_map = unserialize(get_post_meta($post_ID, '_intelliwidget_map', true)))) 
             $box_map = array();
         return $box_map;
     }
     
-    function intelliwidget_ajax_copy_page() {
+    function ajax_copy_page() {
         if (!array_key_exists('post_ID', $_POST) || !array_key_exists('iwpage', $_POST))
             die('fail');
         $post_ID   = intval($_POST['post_ID']);
         if (!current_user_can('edit_post', $post_ID) || !wp_verify_nonce($_POST['iwpage'],'iwpage_' . $post_ID)) die('fail');
-        if ($this->intelliwidget_save_copy_page($_POST['post_ID']) === false) die('fail');
+        if ($this->save_copy_page($_POST['post_ID']) === false) die('fail');
         die('success');
     }
     
-    function intelliwidget_save_copy_page($post_ID = NULL) {
+    function save_copy_page($post_ID = NULL) {
         if (empty($post_ID) || !array_key_exists('intelliwidget_widget_page_id', $_POST)) return false;
         // save copy page id (i.e., "use settings from ..." ) if it exists
         $copy_page_id = intval($_POST['intelliwidget_widget_page_id']);
         update_post_meta($post_ID, '_intelliwidget_widget_page_id', $copy_page_id);
     }
     
-    function intelliwidget_delete_meta_box($post_ID = NULL, $box_id = NULL, $nonce = NULL, $box_map = array()) {
+    function delete_meta_box($post_ID = NULL, $box_id = NULL, $nonce = NULL, $box_map = array()) {
         if (empty($post_ID) || empty($nonce) || empty($box_id) || !current_user_can('edit_post', $post_ID)) return false;
         if (!wp_verify_nonce( $nonce, 'iwdelete' ) || !array_key_exists($box_id, $box_map) ) return false; 
         delete_post_meta($post_ID, '_intelliwidget_data_' . $box_id);
@@ -340,7 +340,7 @@ class IntelliWidget {
         update_post_meta($post_ID, '_intelliwidget_map', serialize($box_map));
     }
     
-    function intelliwidget_add_meta_box($post_ID = NULL, $nonce = NULL, $box_map = array()) {
+    function add_meta_box($post_ID = NULL, $nonce = NULL, $box_map = array()) {
         if (empty($post_ID) || empty($nonce)  || !current_user_can('edit_post', $post_ID)) return false;
         if (! wp_verify_nonce( $nonce, 'iwadd' )) return false;
         if (count($box_map)): 
@@ -487,7 +487,7 @@ class IntelliWidget {
             'sortby'        => 'title',
             'sortorder'        => 'ASC',
             'custom_text'    => '',
-            'replace_widget'=> '',
+            'replace_widget'=> 'none',
             'hide_if_empty'    => '',
             'text_position'    => '',
             'filter'        => '',
@@ -499,23 +499,7 @@ class IntelliWidget {
         $merged = wp_parse_args($instance, $defaults);
         return $merged;
     }
-    /*
-    function ajaxResponse(){  
-        try{  
-        $new_term = wp_insert_term( $_POST['slider_name'], 'sliders', $args = array() );  
-        $t_id = $new_term['term_id'];  
-        $term_meta['slider_type'] = $_POST['type'];  
-            // Save the option array.  
-        $term = "taxonomy_".$t_id;  
-        update_option($term, $term_meta );  
-        echo $t_id;  
-     } catch (Exception $e){  
-        exit;  
-     }  
-     exit;  
-     }  
-    add_action('wp_ajax_ak_attach', 'ajaxResponse');  
-    */
+
     /**
      * Stub for plugin activation
      */

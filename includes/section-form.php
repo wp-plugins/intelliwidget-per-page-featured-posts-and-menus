@@ -18,7 +18,7 @@ global $_wp_additional_image_sizes;
     <?php _e( 'Replaces:', 'intelliwidget'); ?>
   </label>
   <select name="<?php echo 'intelliwidget_' . $pagesection . '_replace_widget'; ?>" id="<?php echo 'intelliwidget_' . $pagesection . '_replace_widget'; ?>">
-    <option value=""<?php selected( $intelliwidget_data['replace_widget'], '' ); ?>>No Widget Selected</option>
+    <option value="none"<?php selected( $intelliwidget_data['replace_widget'], 'none' ); ?>>No Widget Selected</option>
     <?php foreach($widgets_array as $sidebar_id => $sidebar_widgets): 
              if (strpos($sidebar_id, 'wp_inactive') === false):
             $count = 1;

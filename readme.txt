@@ -20,7 +20,7 @@ Why use IntelliWidget as your Featured Post plugin?
 * Supports Custom Post Types
 * Doubles as a Text Widget--customizable to any page
 * Use as many different instances on a single page as you wish
-* Saves time and leaves a small footprint
+* Ajax interface designed for quick set up of sites with lots of pages
 * Create your own templates or use ours
 * Set up one page and reuse on other pages
 * No new database tables

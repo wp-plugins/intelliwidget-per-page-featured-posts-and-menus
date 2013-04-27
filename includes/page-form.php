@@ -19,24 +19,24 @@ if ( !defined('ABSPATH')) exit;
     float: right;
 }
 .iw-save-container.success:before, .iw-copy-container.success:before {
-    content: "\2713";
+    content: "";
     display: block;
     position: absolute;
     height: 16px;
     width: 16px;
     top: 8px;
     left: -26px;
-    font-size: 1.5em;
+	background:url(<?php echo admin_url( 'images/yes.png' ); ?>) no-repeat;
 }
 input.iw-save.failure:before, input.iw-copy.failure:before {
-    content: "\2717";
+    content: "";
     display: block;
     position: absolute;
     height: 16px;
     width: 16px;
     top: 8px;
     left: -26px;
-    font-size: 1.5em;
+	background:url(<?php echo admin_url( 'images/no.png') ; ?>) no-repeat;
 }
 </style>
 <p>
