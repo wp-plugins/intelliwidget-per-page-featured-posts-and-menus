@@ -68,7 +68,8 @@
 .widget_intelliwidget .intelliwidget-more-link a {
 }
 .widget_intelliwidget .intelliwidget-more-link a:after {
-    content: ' \00bb';
+/* uncomment below if you want &raquo; after link
+    /* content: ' \00bb'; */
 }
 .widget_intelliwidget ul.intelliwidget-menu, #widgets ul.intelliwidget-menu {
     margin: 0;
@@ -86,7 +87,6 @@
     max-height: 2em;
 }
 .widget_intelliwidget .intelliwidget-menu-item a {
-
 }
 .widget_intelliwidget .intelliwidget-big-date {
     margin: 1em 0;

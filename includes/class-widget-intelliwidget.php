@@ -42,25 +42,25 @@ class IntelliWidget_Widget extends WP_Widget {
      */
     function widget($args, $instance) {
         global $post;
-        	// save global post object for later
+            // save global post object for later
         $old_post = $post;
-		if (is_object($post)):
-        	// if there are page-specific settings for this widget, use them
-        	if ($page_data = $this->get_page_data($post->ID, $args['widget_id'])):
-        	    $this->build_widget($args, $page_data);
-        	    // done -- restore original post object and return
-        	    $post = $old_post;
-        	    return;
-        	// if this page is using another page's settings and they exist for this widget, use them
-        	elseif (($other_page_id = get_post_meta($post->ID, '_intelliwidget_widget_page_id', true))) :
-        	    if ($page_data = $this->get_page_data($other_page_id, $args['widget_id'])):
-        	        $this->build_widget($args, $page_data);
-        	        // done -- restore original post object and return
-        	        $post = $old_post;
-        	        return;
-        	    endif;
-        	endif;
-		endif;
+        if (is_object($post)):
+            // if there are page-specific settings for this widget, use them
+            if ($page_data = $this->get_page_data($post->ID, $args['widget_id'])):
+                $this->build_widget($args, $page_data);
+                // done -- restore original post object and return
+                $post = $old_post;
+                return;
+            // if this page is using another page's settings and they exist for this widget, use them
+            elseif (($other_page_id = get_post_meta($post->ID, '_intelliwidget_widget_page_id', true))) :
+                if ($page_data = $this->get_page_data($other_page_id, $args['widget_id'])):
+                    $this->build_widget($args, $page_data);
+                    // done -- restore original post object and return
+                    $post = $old_post;
+                    return;
+                endif;
+            endif;
+        endif;
         // no page-specific settings, should we hide?
         if ($instance['hide_if_empty']):
             // done -- restore original post object and return
@@ -178,13 +178,13 @@ class IntelliWidget_Widget extends WP_Widget {
             echo $after_widget;
             return;
         endif;
-		// temporarily disable wpautop if it is on
-		if ($has_content_filter = has_filter('the_content', 'wpautop'))
-			remove_filter( 'the_content', 'wpautop' );
+        // temporarily disable wpautop if it is on
+        if ($has_content_filter = has_filter('the_content', 'wpautop'))
+            remove_filter( 'the_content', 'wpautop' );
         include ($intelliwidget->get_template($instance['template']));
-		// restore wpautop if it was on
+        // restore wpautop if it was on
         if ($has_content_filter)
-			add_filter( 'the_content', 'wpautop' );
+            add_filter( 'the_content', 'wpautop' );
         if ($instance['text_position'] == 'below'):
             echo "<div class=\"textwidget\">\n" . ( !empty( $instance['filter'] ) ? 
                 wpautop( $custom_text ) : $custom_text ) . "\n</div>\n";
