@@ -51,7 +51,7 @@ IntelliWidget is flexible and versatile. Please read the documentation to see mo
 
 See the "Getting Started" section.
 
-= Where can I find documentation?
+= Where can I find documentation? =
 
 Docs can be found at http://www.lilaeamedia.com/plugins/intelliwidget/
 
