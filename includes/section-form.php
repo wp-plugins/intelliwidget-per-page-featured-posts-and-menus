@@ -18,7 +18,7 @@ global $_wp_additional_image_sizes;
     <?php _e( 'Replaces:', 'intelliwidget'); ?>
   </label>
   <select name="<?php echo 'intelliwidget_' . $pagesection . '_replace_widget'; ?>" id="<?php echo 'intelliwidget_' . $pagesection . '_replace_widget'; ?>">
-    <option value=""<?php selected( $intelliwidget_data['replace_widget'], '' ); ?>>No Widget Selected</option>
+    <option value="none"<?php selected( $intelliwidget_data['replace_widget'], 'none' ); ?>>No Widget Selected</option>
     <?php foreach($widgets_array as $sidebar_id => $sidebar_widgets): 
              if (strpos($sidebar_id, 'wp_inactive') === false):
             $count = 1;
@@ -40,7 +40,7 @@ global $_wp_additional_image_sizes;
 <p>
   <label for="<?php echo 'intelliwidget_' . $pagesection . '_template'; ?>">
     <?php _e('Template', 'intelliwidget'); ?>
-    : </label>
+    :</label>
   <select name="<?php echo 'intelliwidget_' . $pagesection . '_template'; ?>" id="<?php echo 'intelliwidget_' . $pagesection . '_template'; ?>">
     <?php foreach ( $this->get_widget_templates() as $template => $name ) : ?>
     <option value="<?php echo $template; ?>" <?php selected($intelliwidget_data['template'], $template); ?>><?php echo $name; ?></option>
@@ -50,7 +50,7 @@ global $_wp_additional_image_sizes;
 <p>
   <label for="<?php echo 'intelliwidget_' . $pagesection . '_category'; ?>">
     <?php _e('Category', 'intelliwidget'); ?>
-  </label>
+    :</label>
   <?php wp_dropdown_categories(array('name' => 'intelliwidget_' . $pagesection . '_category', 'id' => 'intelliwidget_' . $pagesection . '_category', 'show_option_none' => __('None', 'intelliwidget'), 'selected' => $intelliwidget_data['category'] )); ?>
 </p>
 <div id="iw-specificposts" class="postbox closed">
@@ -230,14 +230,14 @@ endif;
 ?>
       <?php foreach ( $types as $type ) : ?>
       <label>
-        <input type="checkbox" name="<?php echo 'intelliwidget_' . $pagesection . '_post_types[]'; ?>" value="<?php echo $type; ?>" <?php checked(in_array($type, $intelliwidget_data['post_types']), 1); ?> />
+        <input id="<?php echo 'intelliwidget_' . $pagesection . '_post_types'; ?>" type="checkbox" name="<?php echo 'intelliwidget_' . $pagesection . '_post_types[]'; ?>" value="<?php echo $type; ?>" <?php checked(in_array($type, $intelliwidget_data['post_types']), 1); ?> />
         &nbsp;<?php echo ucfirst($type); ?></label>
       <?php endforeach; ?>
     </p>
   </div>
 </div>
-<div id="publishing-action"> <span style="display: none;" class="spinner"></span>
-  <input name="save" class="button button-primary button-large" id="publish" accesskey="p" value="Save" type="submit">
-</div>
-<a style="float:left;" href="<?php echo wp_nonce_url(admin_url('post.php?action=edit&iwdelete='.$pagesection.'&post=' . $post->ID), 'iwdelete'); ?>">Delete</a>
+<div class="iw-save-container">
+  <input name="save" class="button button-primary button-large iw-save" id="<?php echo 'intelliwidget_' . $pagesection . '_save'; ?>" value="Save" type="button" style="float:right">
+  <span class="spinner" id="<?php echo 'intelliwidget_' . $pagesection . '_spinner'; ?>"></span> </div>
+<a style="float:left;" href="<?php echo wp_nonce_url(admin_url('post.php?action=edit&iwdelete='.$pagesection.'&post=' . $post_ID), 'iwdelete'); ?>" id="iw_delete_<?php echo $pagesection; ?>" class="iw-delete">Delete</a>
 <div style="clear:both"></div>
