@@ -4,7 +4,7 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_i
 Tags: custom post types, custom sidebar, featured post, per page menu, plugin, textwidget, widget 
 Requires at least: 3.5
 Tested up to: 3.5.1
-Stable tag: 1.0.2
+Stable tag: 1.1.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -35,6 +35,8 @@ Because the lists are generated using active titles and permalinks, your site is
 
 Combine with custom post types to create unlimited CMS-style content blocks. Combine with your favorite jQuery Slider plugin to display animated slideshows. You can even use the settings from an existing page. Now you don't have to add a gazillion sidebars to your widgets admin to have unlimited page-specific content.
 
+IntelliWidget is flexible and versatile. Please read the documentation to see more ideas how to use it to its full potential.
+ 
 == Installation ==
 
 1. Download the IntelliWidget plugin archive and unzip it.
@@ -47,7 +49,11 @@ Combine with custom post types to create unlimited CMS-style content blocks. Com
 
 = How do I get started? =
 
-See "Getting Started," below.
+See the "Getting Started" section.
+
+= Where can I find documentation?
+
+Docs can be found at http://www.lilaeamedia.com/plugins/intelliwidget/
 
 == Screenshots ==
 
@@ -55,6 +61,10 @@ See "Getting Started," below.
 2. Screenshot 2 is an example of the Widgets Admin Panel.
 
 == Changelog ==
+
+= 1.1.0
+* Improved the overall interface.
+* Fixed bug in the way IW saves per-page widgets 
 
 = 1.0.2 =
 * Ajax submits on Edit Page
@@ -70,7 +80,7 @@ See "Getting Started," below.
 
 == Upgrade Notice ==
 
-= 1.0.2 =
+= 1.1.0 =
 
 Ajax submits and collapsible form areas greatly improve useability
 
