@@ -62,7 +62,7 @@ Docs can be found at http://www.lilaeamedia.com/plugins/intelliwidget/
 
 == Changelog ==
 
-= 1.1.0
+= 1.1.0 =
 * Improved the overall interface.
 * Fixed bug in the way IW saves per-page widgets 
 
