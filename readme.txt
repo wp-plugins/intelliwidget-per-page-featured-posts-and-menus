@@ -4,7 +4,7 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_i
 Tags: custom post types, custom sidebar, featured post, per page menu, plugin, textwidget, widget 
 Requires at least: 3.5
 Tested up to: 3.5.1
-Stable tag: 1.0.1
+Stable tag: 1.0.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -21,13 +21,11 @@ Why use IntelliWidget as your Featured Post plugin?
 * Doubles as a Text Widget--customizable to any page
 * Use as many different instances on a single page as you wish
 * Saves time and leaves a small footprint
-* One lightweight CSS script and no additional JavaScript
 * Create your own templates or use ours
 * Set up one page and reuse on other pages
 * No new database tables
 * Clean uninstall
 * Keep using all your other widgets
-* Won't hijack your site--use only the features you need
 
 IntelliWidget eliminates the need for multiple sidebars to accommodate page-specific content. Instead, you use one set of dynamic sidebars, load a few IntelliWidgets and then customize on a per-page basis. If you don’t customize a page, the default widget (the one you configured on the widgets page) displays instead.
 
@@ -58,19 +56,23 @@ See "Getting Started," below.
 
 == Changelog ==
 
+= 1.0.2 =
+* Ajax submits on Edit Page
+* Commented out &raquo; on read more link
+
+= 1.0.1 =
+* Form areas collapsible to save space
+
 = 1.0.0 =
 * Combined favorite functionality from different widgets into a single IntelliWidget.
 * Packaged for public consumption
 
-= 1.0.1 =
-* Updated Readme
-* Made form areas collapsible
 
 == Upgrade Notice ==
 
-= 1.0.0 =
+= 1.0.2 =
 
-This is the initial release.
+Ajax submits and collapsible form areas greatly improve useability
 
 == Getting Started ==
 

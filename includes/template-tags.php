@@ -39,7 +39,7 @@ if ( !function_exists('has_intelliwidget_image') ) {
      */
     function has_intelliwidget_image($post_id = NULL) {
         $image = get_the_intelliwidget_image($post_id);
-		return !empty($image);
+        return !empty($image);
     }
 }
 
@@ -101,7 +101,7 @@ if ( !function_exists('get_the_intelliwidget_link') ) {
         if (empty( $link_text )):
             $link_text = get_the_intelliwidget_title($post_ID);
         endif;
-		$url = get_the_intelliwidget_url($post_ID, $category_ID);
+        $url = get_the_intelliwidget_url($post_ID, $category_ID);
         if (! $classes = get_post_meta($post_ID, 'intelliwidget_classes', true) ) $classes = '';
         $classes = ' class="' . $classes . '"';
         if (! $target = get_post_meta($post_ID, 'intelliwidget_target', true) ) $target = '';
@@ -119,7 +119,7 @@ if ( !function_exists('get_the_intelliwidget_url')) {
      * @param <integer> $category_ID (optional) - return category url
      * @return <string>
      */
-	function get_the_intelliwidget_url($post_ID = NULL, $category_ID = NULL) {
+    function get_the_intelliwidget_url($post_ID = NULL, $category_ID = NULL) {
         global $this_instance;
         $post_ID = intval($post_ID) ? $post_ID : get_the_ID();
         if (intval($category_ID) && $category_ID != -1):
@@ -127,8 +127,8 @@ if ( !function_exists('get_the_intelliwidget_url')) {
         else:
             if (! $url = get_post_meta($post_ID, 'intelliwidget_external_url', true) ) $url = get_permalink($post_ID);
         endif;
-		return $url;
-	}
+        return $url;
+    }
 }
 
 if ( !function_exists('the_intelliwidget_link') ) {
@@ -184,6 +184,7 @@ if ( !function_exists('_intelliwidget_trim_excerpt') ) {
         $text = apply_filters('the_content', $text);
         $text = str_replace(']]>', ']]&gt;', $text);
         $text = preg_replace('@<script[^>]*?>
+
 .*?</script>@si', '', $text);
         $text = strip_tags($text);
         $words = preg_split("#\s+#s", $text, $length + 1);
@@ -201,10 +202,15 @@ if ( !function_exists('intelliwidget_shortcode') ) {
     /**
      * Shortcode handler
      *
-     * @global <object> $post
-     * @param <array> $atts
-     * @return <string>
-     */
+     * @global
+        <object>
+$post
+     * @param
+<array>
+$atts
+     * @return
+<string>
+*/
 
     function intelliwidget_shortcode($atts) {
         global $intelliwidget, $post, $this_instance;
@@ -222,13 +228,13 @@ if ( !function_exists('intelliwidget_shortcode') ) {
         $selected = new WP_Query($args);
         // create and return the content
         ob_start();
-		// temporarily disable wpautop if it is on
-		if ($has_content_filter = has_filter('the_content', 'wpautop'))
-			remove_filter( 'the_content', 'wpautop' );
+        // temporarily disable wpautop if it is on
+        if ($has_content_filter = has_filter('the_content', 'wpautop'))
+            remove_filter( 'the_content', 'wpautop' );
         include ($intelliwidget->get_template($atts['template']));
-		// restore wpautop if it was on
+        // restore wpautop if it was on
         if ($has_content_filter)
-			add_filter( 'the_content', 'wpautop' );
+            add_filter( 'the_content', 'wpautop' );
         $content = ob_get_contents();
         ob_end_clean();
         $post = $old_post;
