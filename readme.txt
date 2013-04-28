@@ -8,7 +8,7 @@ Stable tag: 1.1.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Display featured posts, custom menus, html content and more within a single dynamic sidebar that can be customized on a per-page basis or site-wide.
+Display featured posts, custom menus, html content and more within a single dynamic sidebar that can be customized on a per-page or site-wide basis.
 
 == Description ==
 
