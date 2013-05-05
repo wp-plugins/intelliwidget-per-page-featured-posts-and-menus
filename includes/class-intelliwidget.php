@@ -20,6 +20,10 @@ class IntelliWidget {
     var $templatesURL;
     var $dir;
     var $docsLink;
+	var $templates;
+	var $menus;
+	var $post_types;
+	var $taxonomies;
     /**
      * Object constructor
      * @param <string> $file
@@ -42,6 +46,10 @@ class IntelliWidget {
         register_activation_hook($file, array(&$this, 'intelliwidget_activate'));
         // these actions only apply to admin users
         if (is_admin()):
+			$this->menus = get_terms( 'nav_menu', array( 'hide_empty' => false ) );
+			$this->post_types = get_post_types(array('public' => true));
+			$this->taxonomies = get_taxonomies();
+			$this->templates  = $this->get_widget_templates();
             add_action('admin_init',          array(&$this, 'admin_init'));
             add_action('add_meta_boxes',      array(&$this, 'main_meta_box') );
             add_action('add_meta_boxes',      array(&$this, 'section_meta_box') );
@@ -51,7 +59,9 @@ class IntelliWidget {
             add_action('wp_ajax_iw_delete',   array(&$this, 'ajax_delete_meta_box' ));
             add_action('wp_ajax_iw_add',      array(&$this, 'ajax_add_meta_box' ));
             //add_action('admin_print_styles', array(&$this, 'admin_styles'));
-            add_action('admin_print_scripts', array(&$this, 'admin_scripts'));
+			// only show scripts on relevant admin pages
+            add_action('admin_print_scripts-post.php', array(&$this, 'admin_scripts'));
+            add_action('admin_print_scripts-widgets.php', array(&$this, 'admin_scripts'));
         endif;
         // thanks to woothemes for this
         add_action( 'after_setup_theme', array( &$this, 'ensure_post_thumbnails_support' ) );
@@ -384,7 +394,7 @@ class IntelliWidget {
         }
         return $output;
     }
-    
+	
     /**
      * Return a list of template files in the theme folder and plugin folder.
      * Templates actually render the output to the widget based on instance settings
@@ -443,7 +453,7 @@ class IntelliWidget {
         } else {
             $file = $this->templatesPath . $template . $ext;
         }
-        return $file;
+        return file_exists($file) ? $file: false;
     }
 
     /**
@@ -473,27 +483,30 @@ class IntelliWidget {
     public function defaults($instance = array()) {
         //if (empty($instance)) $instance = array();
         $defaults = array(
-            'template'        => 'menu',
-            'title'            => '',
-            'page'            => array(),
-            'category'        => -1,
-            'items'            => 5,
-            'length'        => 15,
-            'link_title'    => '',
-            'link_text'        => __('Read More', 'intelliwidget'),
+            'template'       => 'menu',
+            'title'          => '',
+            'page'           => array(),
+            'category'       => -1,
+            'items'          => 5,
+            'length'         => 15,
+            'link_title'     => 0,
+            'link_text'      => __('Read More', 'intelliwidget'),
             'classes'        => '',
-            'post_types'    => array('page', 'element'),
-            'skip_post'        => '',
-            'sortby'        => 'title',
-            'sortorder'        => 'ASC',
+            'post_types'     => array('page', 'post'),
+            'skip_post'      => 0,
+            'sortby'         => 'title',
+            'sortorder'      => 'ASC',
             'custom_text'    => '',
-            'replace_widget'=> 'none',
-            'hide_if_empty'    => '',
-            'text_position'    => '',
-            'filter'        => '',
-            'future_only'    => '',
-            'imagealign'    => 'auto',
-            'image_size'    => 'none'
+            'replace_widget' => 'none',
+            'hide_if_empty'  => 0,
+            'text_position'  => '',
+            'filter'         => 0,
+            'future_only'    => 0,
+            'imagealign'     => 'auto',
+            'image_size'     => 'none',
+			'nav_menu'       => '',
+			'use_tax'        => array(),
+			'terms'          => array(),
         );
         // standard WP function for merging argument lists
         $merged = wp_parse_args($instance, $defaults);

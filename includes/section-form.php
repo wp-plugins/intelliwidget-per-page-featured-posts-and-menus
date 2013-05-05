@@ -42,7 +42,8 @@ global $_wp_additional_image_sizes;
     <?php _e('Template', 'intelliwidget'); ?>
     :</label>
   <select name="<?php echo 'intelliwidget_' . $pagesection . '_template'; ?>" id="<?php echo 'intelliwidget_' . $pagesection . '_template'; ?>">
-    <?php foreach ( $this->get_widget_templates() as $template => $name ) : ?>
+    <option value="WP_NAV_MENU" <?php selected($intelliwidget_data['template'], 'WP_NAV_MENU'); ?>>WP Nav Menu (no template)</option>
+    <?php foreach ( $this->templates as $template => $name ) : ?>
     <option value="<?php echo $template; ?>" <?php selected($intelliwidget_data['template'], $template); ?>><?php echo $name; ?></option>
     <?php endforeach; ?>
   </select>
@@ -94,6 +95,21 @@ global $_wp_additional_image_sizes;
     <?php _e('Advanced Options', 'intelliwidget'); ?>
     </span></h3>
   <div class="inside">
+		<p>
+			<label for="<?php echo 'intelliwidget_' . $pagesection . '_nav_menu'; ?>"><?php _e('WP Nav Menu:'); ?></label>
+			<select id="<?php echo 'intelliwidget_' . $pagesection . '_nav_menu'; ?>" name="<?php echo 'intelliwidget_' . $pagesection . '_nav_menu'; ?>">
+    <option value="" <?php selected( $intelliwidget_data['nav_menu'], '' ); ?>>None</option>
+		<?php
+			// Get menus
+			foreach ( $intelliwidget->menus as $menu ):
+				echo '<option value="' . $menu->term_id . '"'
+					. selected( $intelliwidget_data['nav_menu'], $menu->term_id, false )
+					. '>'. $menu->name . '</option>';
+			endforeach;
+
+		?>
+			</select>
+		</p>
     <p>
       <label for="<?php echo 'intelliwidget_' . $pagesection . '_sortby'; ?>">
         <?php _e( 'Sort by:', 'intelliwidget'); ?>

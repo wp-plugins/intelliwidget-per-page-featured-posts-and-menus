@@ -21,7 +21,8 @@ class IntelliWidget_Widget extends WP_Widget {
         global $intelliwidget;
         $widget_ops          = array('description' => __('Menus, Featured Posts, HTML and more, customized per page or site-wide.', 'intelliwidget'));
         $control_ops         = array('width' => 400, 'height' => 350);
-        add_action('wp_print_styles', array(&$this, 'wp_print_styles'));
+		if (! is_admin())
+	        add_action('wp_print_styles', array(&$this, 'wp_print_styles'));
         $this->WP_Widget('intelliwidget', $intelliwidget->pluginName, $widget_ops, $control_ops);
     }
     /**
@@ -32,7 +33,7 @@ class IntelliWidget_Widget extends WP_Widget {
         wp_register_style('intelliwidget', $intelliwidget->get_template('intelliwidget', '.css', 'url'));
         wp_enqueue_style('intelliwidget');
     }
-    
+	    
     /**
      * Main widget logic - determine if this is a customized page, copied page or global widget
      *
@@ -116,36 +117,42 @@ class IntelliWidget_Widget extends WP_Widget {
         if (!is_array($instance['page'])) $instance['page'] = array($instance['page']);
         if (!is_array($instance['post_types'])) $instance['post_types'] = array($instance['post_types']);
         extract($args, EXTR_SKIP);
-        /* Remove current page from list of pages if set */
-        if ( $instance['skip_post'] and in_array($post->ID, $instance['page']) ) {
-            $pages = array_flip($instance['page']);
-            unset($pages[$post->ID]);
-            $instance['page'] = array_flip($pages);
-        }
-        $args = array(
-            'posts_per_page'      => intval($instance['items']),
-            'orderby'             => $instance['sortby'],
-            'order'               => $instance['sortorder'],
-            'post_status'         => 'publish',
-            'post_type'           => $instance['post_types'],
-            'ignore_sticky_posts' => true,
-        );
+		
+		/* if this is a nav menu get menu object and skip query */
+		$nav_menu = false;
+		if ($instance['template'] == 'WP_NAV_MENU' && ! empty( $instance['nav_menu'] )) :
+			$nav_menu =  wp_get_nav_menu_object( $instance['nav_menu'] );
+		else:
+        	/* Remove current page from list of pages if set */
+        	if ( $instance['skip_post'] and in_array($post->ID, $instance['page']) ) {
+        	    $pages = array_flip($instance['page']);
+        	    unset($pages[$post->ID]);
+        	    $instance['page'] = array_flip($pages);
+        	}
+        	$args = array(
+        	    'posts_per_page'      => intval($instance['items']),
+        	    'orderby'             => $instance['sortby'],
+        	    'order'               => $instance['sortorder'],
+        	    'post_status'         => 'publish',
+        	    'post_type'           => $instance['post_types'],
+        	    'ignore_sticky_posts' => true,
+        	);
         
-        /* Get the list of pages */
-        if ( $instance['category'] != -1 ) {
-            // get future only if this is event list
-            if ($instance['future_only']):
-                $args['post_status'] = 'future';        
-            endif;
-            $pages = array_flip($instance['post_types']);
-            unset($pages['page']);
-            $instance['post_types'] = array_flip($pages);
-            $args['category__in'] = $instance['category'];
-        } else {
-            $args['post__in'] = $instance['page'];
-        }
-        $selected = new WP_Query($args);
-        
+        	/* Get the list of pages */
+        	if ( $instance['category'] != -1 ):
+        	    // get future only if this is event list
+        	    if ($instance['future_only']):
+        	        $args['post_status'] = 'future';        
+        	    endif;
+        	    $pages = array_flip($instance['post_types']);
+        	    unset($pages['page']);
+        	    $instance['post_types'] = array_flip($pages);
+        	    $args['category__in'] = $instance['category'];
+			else:
+        	    $args['post__in'] = $instance['page'];
+        	endif;
+        	$selected = new WP_Query($args);
+        endif;
         
         /* Output the widget */
         $classes = array();
@@ -178,13 +185,21 @@ class IntelliWidget_Widget extends WP_Widget {
             echo $after_widget;
             return;
         endif;
-        // temporarily disable wpautop if it is on
-        if ($has_content_filter = has_filter('the_content', 'wpautop'))
-            remove_filter( 'the_content', 'wpautop' );
-        include ($intelliwidget->get_template($instance['template']));
-        // restore wpautop if it was on
-        if ($has_content_filter)
-            add_filter( 'the_content', 'wpautop' );
+		
+		// if this is a nav menu, use default WP menu output
+		if ($instance['template'] == 'WP_NAV_MENU' && !empty($nav_menu)):
+		    wp_nav_menu( array( 'fallback_cb' => '', 'menu' => $nav_menu, 'menu_class' => 'iw-menu'));
+		// otherwise load IW template
+		else:
+        	// temporarily disable wpautop if it is on
+        	if ($has_content_filter = has_filter('the_content', 'wpautop'))
+        	    remove_filter( 'the_content', 'wpautop' );
+        	include ($intelliwidget->get_template($instance['template']));
+        	// restore wpautop if it was on
+        	if ($has_content_filter)
+        	    add_filter( 'the_content', 'wpautop' );
+		endif;
+			
         if ($instance['text_position'] == 'below'):
             echo "<div class=\"textwidget\">\n" . ( !empty( $instance['filter'] ) ? 
                 wpautop( $custom_text ) : $custom_text ) . "\n</div>\n";
@@ -206,7 +221,7 @@ class IntelliWidget_Widget extends WP_Widget {
             $instance['custom_text'] = stripslashes( wp_filter_post_kses( addslashes($new_instance['custom_text']) ) ); 
         endif;
         // special handling for checkboxes: //'replace_widget', 
-        foreach(array('skip_post', 'link_title', 'hide_if_empty', 'filter', 'future_only') as $cb):
+        foreach(array('show_counts', 'skip_post', 'link_title', 'hide_if_empty', 'filter', 'future_only') as $cb):
             $instance[$cb] = isset($new_instance[$cb]);
         endforeach;
         return $instance;
