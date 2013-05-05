@@ -16,7 +16,7 @@ if ( $selected->have_posts() ) : while ($selected->have_posts()) : $selected->th
 ?>
 
 <div id="intelliwidget_<?php the_id(); ?>" class="intelliwidget-big-date clearfix">
-  <div class="intelliwidget-date"><span class="intelliwidget-month"> <?php echo get_the_date('M'); ?> </span> <span class="intelliwidget-day"> <?php echo get_the_date('j'); ?> </span></div>
+  <div class="intelliwidget-date"><span class="intelliwidget-month"> <?php echo get_the_intelliwidget_date(get_the_ID(), 'M'); ?> </span> <span class="intelliwidget-day"> <?php echo get_the_intelliwidget_date(get_the_ID(), 'j'); ?> </span></div>
   <div class="intelliwidget-item">
     <?php if ( has_intelliwidget_image() ) : ?>
     <div class="intelliwidget-image-container-<?php echo $instance['image_size'];?> intelliwidget-align-<?php echo $instance['imagealign']; ?>">

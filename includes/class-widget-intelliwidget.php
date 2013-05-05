@@ -116,38 +116,68 @@ class IntelliWidget_Widget extends WP_Widget {
         if (!is_array($instance['page'])) $instance['page'] = array($instance['page']);
         if (!is_array($instance['post_types'])) $instance['post_types'] = array($instance['post_types']);
         extract($args, EXTR_SKIP);
-        /* Remove current page from list of pages if set */
-        if ( $instance['skip_post'] and in_array($post->ID, $instance['page']) ) {
-            $pages = array_flip($instance['page']);
-            unset($pages[$post->ID]);
-            $instance['page'] = array_flip($pages);
-        }
-        $args = array(
-            'posts_per_page'      => intval($instance['items']),
-            'orderby'             => $instance['sortby'],
-            'order'               => $instance['sortorder'],
-            'post_status'         => 'publish',
-            'post_type'           => $instance['post_types'],
-            'ignore_sticky_posts' => true,
-        );
-        
-        /* Get the list of pages */
-        if ( $instance['category'] != -1 ) {
-            // get future only if this is event list
-            if ($instance['future_only']):
-                $args['post_status'] = 'future';        
+		/* if this is a nav menu get menu object and skip query */
+		$nav_menu = false;
+		if ($instance['template'] == 'WP_NAV_MENU' && ! empty( $instance['nav_menu'] )) :
+			$nav_menu =  wp_get_nav_menu_object( $instance['nav_menu'] );
+		else:
+			// we need custom SQL filters to make the expiration dates work
+		    add_filter('posts_join', array(&$this, 'intelliwidget_query_posts_join'), 10, 2);
+			// join returns multiple meta rows for each post, so we need a groupby clause
+		    add_filter('posts_groupby', array(&$this, 'intelliwidget_query_posts_groupby'), 10, 2);
+
+        	/* Remove current page from list of pages if set */
+        	if ( $instance['skip_post'] && !empty($post) && in_array($post->ID, $instance['page']) ) {
+        	    $pages = array_flip($instance['page']);
+        	    unset($pages[$post->ID]);
+        	    $instance['page'] = array_flip($pages);
+        	}
+        	$args = array(
+        	    'posts_per_page'      => $instance['items'],
+        	    'orderby'             => $instance['sortby'],
+        	    'order'               => $instance['sortorder'],
+        	    'post_status'         => 'publish',
+        	    'post_type'           => $instance['post_types'],
+        	    'ignore_sticky_posts' => true,
+        	);
+        	if ($instance['sortby'] == 'meta_value')
+				$args['meta_key'] = 'intelliwidget_event_date';
+				
+        	// use future events only
+			// note postmeta intelliwidget_event_date date format 
+			// MUST be YYYY-MM-DD HH:MM for this to work correctly!
+        	if ($instance['future_only']):
+				$args['meta_query'] = array(
+					array(
+                    	'key'     => 'intelliwidget_event_date',
+                    	'value'   => date('Y-m-d H:i'),
+                    	'compare' => '>',
+					)
+				);
+        	endif;
+        	// skip expired posts
+        	if ($instance['skip_expired']):
+			    // turn off supression if it is on
+				$args['suppress_filters'] = false;
+				// tell filter to do its thing
+				$args['iw_skip_expired'] = true;
+        	endif;
+        	/* Get the list of pages */
+        	if ( $instance['category'] != -1 ):
+        	    $pages = array_flip($instance['post_types']);
+        	    unset($pages['page']);
+        	    $instance['post_types'] = array_flip($pages);
+        	    $args['category__in'] = $instance['category'];
+        	elseif (!empty($instance['page'])):
+        	    $args['post__in'] = $instance['page'];
             endif;
-            $pages = array_flip($instance['post_types']);
-            unset($pages['page']);
-            $instance['post_types'] = array_flip($pages);
-            $args['category__in'] = $instance['category'];
-        } else {
-            $args['post__in'] = $instance['page'];
-        }
-        $selected = new WP_Query($args);
+        	$selected = new WP_Query($args);
+			// clean up the custom SQL filters
+			remove_filter('posts_join', array(&$this, 'intelliwidget_query_posts_join'));
+			remove_filter('posts_groupby', array(&$this, 'intelliwidget_query_posts_groupby'));
+        endif;
         
-        
-        /* Output the widget */
+        // use widget CSS if present
         $classes = array();
         if (!empty($instance['classes'])) :
             $classes = explode("[, ;]", $instance['classes']);
@@ -155,12 +185,13 @@ class IntelliWidget_Widget extends WP_Widget {
         if (!empty($classes)):
             $before_widget = preg_replace('/class="/', 'class="' . implode(" ", $classes) . ' ', $before_widget);
         endif;
+		// use before widget argument
         echo $before_widget;
         // handle title
         $title = apply_filters( 'widget_title', empty( $instance['title'] ) ? '' : $instance['title'], $instance );
         if ( !empty( $title ) ) {
             echo $before_title;
-            if ( $instance['link_title'] ) {
+            if ( $instance['link_title'] && !empty($selected)) {
                 // @params $post_ID, $text, $category_ID
                 the_intelliwidget_link($selected->posts[0]->ID, $title, $instance['category']);
             } else {
@@ -178,19 +209,80 @@ class IntelliWidget_Widget extends WP_Widget {
             echo $after_widget;
             return;
         endif;
-        // temporarily disable wpautop if it is on
-        if ($has_content_filter = has_filter('the_content', 'wpautop'))
-            remove_filter( 'the_content', 'wpautop' );
-        include ($intelliwidget->get_template($instance['template']));
-        // restore wpautop if it was on
-        if ($has_content_filter)
-            add_filter( 'the_content', 'wpautop' );
+		// if this is a nav menu, use default WP menu output
+		if ($instance['template'] == 'WP_NAV_MENU' && !empty($nav_menu)):
+		    wp_nav_menu( array( 'fallback_cb' => '', 'menu' => $nav_menu, 'menu_class' => 'iw-menu'));
+		// otherwise load IW template
+		else:
+			if ($template = $intelliwidget->get_template($instance['template'])):
+	    	    // temporarily disable wpautop if it is on
+	    	    if ($has_content_filter = has_filter('the_content', 'wpautop'))
+	    	        remove_filter( 'the_content', 'wpautop' );	
+	    	    include ($template);
+	    	    // restore wpautop if it was on
+	    	    if ($has_content_filter)
+	    	        add_filter( 'the_content', 'wpautop' );
+			endif;
+		endif;
         if ($instance['text_position'] == 'below'):
             echo "<div class=\"textwidget\">\n" . ( !empty( $instance['filter'] ) ? 
                 wpautop( $custom_text ) : $custom_text ) . "\n</div>\n";
         endif;
         echo $after_widget;
     }
+	
+    /**
+     * Filter JOIN clause for Expired Posts
+     * @param <string> $join
+     * @param <object> $query
+     * @return <string>
+     */
+    function intelliwidget_query_posts_join ($join, $query) {
+		// ignore this filter unless skip expired option is set
+        if ( empty( $query->query_vars['iw_skip_expired'] ) )
+            return $join;
+        global $wpdb;
+		// adds join clause to select posts with no expiration
+		// and posts with expiration that are still active
+		// note postmeta intelliwidget_expire_date date format 
+		// MUST be YYYY-MM-DD HH:MM for this to work correctly!
+		// Normally I avoid hard-coded SQL but WP can't currently 
+		// do this using meta_query parameters.
+        $new_join = "
+INNER JOIN {$wpdb->postmeta} pm1 ON (
+    pm1.post_id = {$wpdb->posts}.ID
+        AND pm1.meta_key = 'intelliwidget_expire_date'
+        AND CAST( pm1.meta_value AS CHAR ) > '" . date('Y-m-d H:i') . "'
+    )
+    OR (
+        pm1.post_id = {$wpdb->posts}.ID
+        AND pm1.post_id NOT IN (
+            SELECT pm2.post_id
+            FROM {$wpdb->postmeta} pm2
+            WHERE pm2.meta_key = 'intelliwidget_expire_date'
+        )
+    )
+";
+        return $join . ' ' . $new_join;
+    }
+	
+    /**
+     * Filter GROUP BY clause for Expired Posts
+     * @param <string> $groupby
+     * @param <object> $query
+     * @return <string>
+     */
+    function intelliwidget_query_posts_groupby ($groupby, $query) {
+		// ignore this filter unless skip expired option is set
+        if ( empty( $query->query_vars['iw_skip_expired'] ) )
+            return $groupby;
+        global $wpdb;
+        $new_groupby = $wpdb->posts . ".ID";
+		// check if we are already grouping by id
+		if (strpos($groupby, $new_groupby) === false) $groupby = $new_groupby;
+        return $groupby;
+    }
+	
     /**
      * Widget Update method
      * @param <array> $new_instance
@@ -206,7 +298,7 @@ class IntelliWidget_Widget extends WP_Widget {
             $instance['custom_text'] = stripslashes( wp_filter_post_kses( addslashes($new_instance['custom_text']) ) ); 
         endif;
         // special handling for checkboxes: //'replace_widget', 
-        foreach(array('skip_post', 'link_title', 'hide_if_empty', 'filter', 'future_only') as $cb):
+        foreach(array('skip_expired', 'skip_post', 'link_title', 'hide_if_empty', 'filter', 'future_only') as $cb):
             $instance[$cb] = isset($new_instance[$cb]);
         endforeach;
         return $instance;

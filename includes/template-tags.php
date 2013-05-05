@@ -156,7 +156,7 @@ if ( !function_exists('get_the_intelliwidget_title') ) {
     function get_the_intelliwidget_title($post_id = NULL) {
         global $this_instance;
         $post_id = ( NULL === $post_id ) ? get_the_ID() : $post_id;
-        if ( $alt_title = get_post_meta($post_id, 'alt_title', true) ):
+        if ( $alt_title = get_post_meta($post_id, 'intelliwidget_alt_title', true) ):
             return $alt_title;
         else:
             return get_the_title();
@@ -167,6 +167,31 @@ if ( !function_exists('get_the_intelliwidget_title') ) {
 if ( !function_exists('the_intelliwidget_title') ) {
     function the_intelliwidget_title($post_id = NULL) {
         echo get_the_intelliwidget_title($post_id);
+    }
+}
+
+if ( !function_exists('get_the_intelliwidget_date') ) {
+    /**
+     * Get the title for the current featured post, use alt title if it exists.
+     *
+     * @global <array> $this_instance
+     * @param <integer> $post_id
+     * @return <string>
+     */
+    function get_the_intelliwidget_date($post_id = NULL, $format = 'j') {
+        global $this_instance;
+        $post_id = ( NULL === $post_id ) ? get_the_ID() : $post_id;
+        if ( $date = get_post_meta($post_id, 'intelliwidget_event_date', true) ):
+            return date($format, strtotime($date));
+        else:
+            return date($format);
+        endif;
+    }
+}
+
+if ( !function_exists('the_intelliwidget_date') ) {
+    function the_intelliwidget_date($post_id = NULL) {
+        echo get_the_intelliwidget_date($post_id);
     }
 }
 

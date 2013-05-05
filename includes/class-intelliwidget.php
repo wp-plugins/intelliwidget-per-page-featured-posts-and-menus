@@ -42,6 +42,8 @@ class IntelliWidget {
         register_activation_hook($file, array(&$this, 'intelliwidget_activate'));
         // these actions only apply to admin users
         if (is_admin()):
+			$this->menus = get_terms( 'nav_menu', array( 'hide_empty' => false ) );
+			$this->templates  = $this->get_widget_templates();
             add_action('admin_init',          array(&$this, 'admin_init'));
             add_action('add_meta_boxes',      array(&$this, 'main_meta_box') );
             add_action('add_meta_boxes',      array(&$this, 'section_meta_box') );
@@ -242,7 +244,7 @@ class IntelliWidget {
         // additional processing for each box data segment
         foreach (array_keys($post_data) as $box_id):
             // special handling for checkboxes:
-            foreach(array('skip_post', 'link_title', 'hide_if_empty', 'filter', 'future_only') as $cb):
+            foreach(array('skip_expired', 'skip_post', 'link_title', 'hide_if_empty', 'filter', 'future_only') as $cb):
                 $post_data[$box_id][$cb] = isset($_POST[$prefix . $box_id . '_' . $cb]);
             endforeach;
             $post_data[$box_id]['post_types'] = empty($_POST[$prefix . $box_id . '_post_types']) ? 
@@ -434,16 +436,17 @@ class IntelliWidget {
         $themeFile = get_stylesheet_directory() . '/intelliwidget/' . $template . $ext;
         if ( file_exists($themeFile) ) {
             if ( $type == 'url' ) {
-                $file = get_bloginfo('template_url') . '/intelliwidget/' . $template . $ext;
+                return get_bloginfo('template_url') . '/intelliwidget/' . $template . $ext;
             } else {
                 $file = get_stylesheet_directory() . '/intelliwidget/' . $template . $ext;
             }
         } elseif ( $type == 'url' ) {
-            $file = $this->templatesURL . $template . $ext;
+            return $this->templatesURL . $template . $ext;
         } else {
             $file = $this->templatesPath . $template . $ext;
         }
-        return $file;
+		if (file_exists($file)) return $file;
+        return false;
     }
 
     /**
@@ -473,27 +476,29 @@ class IntelliWidget {
     public function defaults($instance = array()) {
         //if (empty($instance)) $instance = array();
         $defaults = array(
-            'template'        => 'menu',
-            'title'            => '',
-            'page'            => array(),
-            'category'        => -1,
-            'items'            => 5,
-            'length'        => 15,
-            'link_title'    => '',
-            'link_text'        => __('Read More', 'intelliwidget'),
-            'classes'        => '',
-            'post_types'    => array('page', 'element'),
-            'skip_post'        => '',
-            'sortby'        => 'title',
-            'sortorder'        => 'ASC',
+            'template'       => 'menu',
+            'page'           => array(),
+            'category'       => -1,
+            'items'          => 5,
+            'length'         => 15,
+            'link_text'      => __('Read More', 'intelliwidget'),
+            'post_types'     => array('page', 'post'),
+            'sortby'         => 'title',
+            'sortorder'      => 'ASC',
+            'replace_widget' => 'none',
+            'imagealign'     => 'auto',
+            'image_size'     => 'none',
+			'nav_menu'       => '',
+            'title'          => '',
             'custom_text'    => '',
-            'replace_widget'=> 'none',
-            'hide_if_empty'    => '',
-            'text_position'    => '',
-            'filter'        => '',
-            'future_only'    => '',
-            'imagealign'    => 'auto',
-            'image_size'    => 'none'
+            'text_position'  => '',
+            'classes'        => '',
+			'skip_expired'   => 0,
+            'link_title'     => 0,
+            'skip_post'      => 0,
+            'hide_if_empty'  => 0,
+            'filter'         => 0,
+            'future_only'    => 0,
         );
         // standard WP function for merging argument lists
         $merged = wp_parse_args($instance, $defaults);
