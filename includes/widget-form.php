@@ -254,14 +254,7 @@ name="<?php echo $this->get_field_name('custom_text'); ?>">
       </select>
     </p>
     <p>Post Types:<br/>
-      <?php
-if ( function_exists('get_post_types') ):
-    $types = get_post_types(array('public' => true));
-else:
-    $types = array('post', 'page');
-endif;
-?>
-      <?php foreach ( $types as $type ) : ?>
+      <?php foreach ( $intelliwidget->get_eligible_post_types() as $type ) : ?>
       <label for="<?php echo $this->get_field_id('post_types'); ?>">
         <input type="checkbox" id="<?php echo $this->get_field_id('post_types'); ?>" name="<?php echo $this->get_field_name('post_types'); ?>[]" value="<?php echo $type; ?>" <?php checked(in_array($type, $instance['post_types']), 1); ?> />
         <?php echo ucfirst($type); ?></label>

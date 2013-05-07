@@ -249,14 +249,7 @@ global $_wp_additional_image_sizes;
       </select>
     </p>
     <p> Post Types:<br/>
-      <?php
-if ( function_exists('get_post_types') ):
-    $types = get_post_types(array('public' => true));
-else:
-    $types = array('post', 'page');
-endif;
-?>
-      <?php foreach ( $types as $type ) : ?>
+      <?php foreach ( $this->get_eligible_post_types() as $type ) : ?>
       <label>
         <input id="<?php echo 'intelliwidget_' . $pagesection . '_post_types'; ?>" type="checkbox" name="<?php echo 'intelliwidget_' . $pagesection . '_post_types[]'; ?>" value="<?php echo $type; ?>" <?php checked(in_array($type, $intelliwidget_data['post_types']), 1); ?> />
         &nbsp;<?php echo ucfirst($type); ?></label>

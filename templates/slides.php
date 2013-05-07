@@ -15,9 +15,10 @@ if ( !defined('ABSPATH')) exit;
  ?>
 
 <ul class="slides">
-  <?php if ( $selected->have_posts() ) : while ($selected->have_posts()) : $selected->the_post(); ?>
-  <li id="intelliwidget_<?php the_id(); ?>" class="slide">
-    <?php the_content(); ?>
+<?php global $iwgt_post;
+if ( !empty($selected)) : foreach($selected as $iwgt_post) : ?>
+  <li id="intelliwidget_<?php the_intelliwidget_ID(); ?>" class="slide">
+    <?php the_intelliwidget_content(); ?>
   </li>
-  <?php endwhile; endif; ?>
+  <?php endforeach; endif; ?>
 </ul>

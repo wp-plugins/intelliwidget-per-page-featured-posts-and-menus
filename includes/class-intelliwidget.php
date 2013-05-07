@@ -47,7 +47,9 @@ class IntelliWidget {
             add_action('admin_init',          array(&$this, 'admin_init'));
             add_action('add_meta_boxes',      array(&$this, 'main_meta_box') );
             add_action('add_meta_boxes',      array(&$this, 'section_meta_box') );
+            add_action('add_meta_boxes',      array(&$this, 'post_meta_box') );
             add_action('save_post',           array(&$this, 'save_postdata'), 1, 2 );
+            add_action('wp_ajax_iw_cptsave',  array(&$this, 'ajax_save_cptdata' ));
             add_action('wp_ajax_iw_save',     array(&$this, 'ajax_save_postdata' ));
             add_action('wp_ajax_iw_copy',     array(&$this, 'ajax_copy_page' ));
             add_action('wp_ajax_iw_delete',   array(&$this, 'ajax_delete_meta_box' ));
@@ -58,7 +60,6 @@ class IntelliWidget {
         // thanks to woothemes for this
         add_action( 'after_setup_theme', array( &$this, 'ensure_post_thumbnails_support' ) );
     }
-    
     /**
      * Stub for loading settings in future release.
      */
@@ -169,6 +170,24 @@ class IntelliWidget {
     }
     
     /**
+     * Generate input form that applies to posts
+     * @return  void
+     */
+    function post_meta_box() {
+        global $post;
+        foreach ($this->get_eligible_post_types() as $type):
+        add_meta_box( 
+            'intelliwidget_post_meta_box',
+            __( 'IntelliWidget Custom Fields', 'intelliwidget'),
+            array( &$this, 'post_meta_box_form' ),
+            $type,
+            'side',
+            'low'
+        );
+        endforeach;
+    }
+
+    /**
      * Output the form in the section meta box(es). Params are passed by add_meta_box() function
      * @param <object> $post
      * @param <array>  $metabox
@@ -196,6 +215,16 @@ class IntelliWidget {
     function main_meta_box_form($post, $metabox) {
         $widget_page_id = get_post_meta($post->ID, '_intelliwidget_widget_page_id', true);
         include( $this->pluginPath . 'includes/page-form.php');
+    }
+    
+    /**
+     * Output the form in the post meta box. Params are passed by add_meta_box() function
+     * @param <object> $post
+     * @param <array>  $metabox
+     * @return  void
+     */
+    function post_meta_box_form($post, $metabox) {
+        include( $this->pluginPath . 'includes/post-form.php');
     }
     
     
@@ -270,6 +299,10 @@ class IntelliWidget {
     }
 
     function ajax_save_postdata() {
+        if ($this->save_postdata() === false) die('fail');
+        die('success');
+    }
+    function ajax_save_cptdata() {
         if ($this->save_postdata() === false) die('fail');
         die('success');
     }
@@ -504,7 +537,21 @@ class IntelliWidget {
         $merged = wp_parse_args($instance, $defaults);
         return $merged;
     }
-
+    
+    function get_eligible_post_types() {
+        $eligible = array();
+        if ( function_exists('get_post_types') ):
+            $types = get_post_types(array('public' => true));
+        else:
+            $types = array('post', 'page');
+        endif;
+        foreach($types as $type):
+            if (post_type_supports($type, 'custom-fields'))
+                $eligible[] = $type;
+        endforeach;
+        return $eligible;
+    }
+    
     /**
      * Stub for plugin activation
      */

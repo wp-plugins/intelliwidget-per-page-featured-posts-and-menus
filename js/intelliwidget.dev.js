@@ -18,6 +18,7 @@ jQuery(document).ready(function(e) {
     });
     // bind click events to edit page meta box buttons
     jQuery('body').on('click', '.iw-save', iw_save_postdata);    
+    jQuery('body').on('click', '.iw-cptsave', iw_save_cptdata);    
     jQuery('body').on('click', '.iw-copy', iw_copy_page);    
     jQuery('body').on('click', '.iw-add', iw_add_meta_box);    
     jQuery('body').on('click', '.iw-delete', iw_delete_meta_box);    

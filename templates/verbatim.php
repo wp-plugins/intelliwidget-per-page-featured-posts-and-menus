@@ -12,7 +12,9 @@ if ( !defined('ABSPATH')) exit;
  * @copyright 2013
  * @access public
  */
- 
- if ( $selected->have_posts() ) : while ($selected->have_posts()) : $selected->the_post(); ?>
-<?php the_content(); ?>
-<?php endwhile; endif; ?>
+global $iwgt_post;
+if ( !empty($selected)) : foreach($selected as $iwgt_post) : 
+    the_intelliwidget_content(); 
+endforeach; endif; 
+
+?>
