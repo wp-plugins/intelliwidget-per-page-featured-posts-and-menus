@@ -4,7 +4,7 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_i
 Tags: custom post types, custom sidebar, featured post, per page menu, plugin, textwidget, widget 
 Requires at least: 3.5
 Tested up to: 3.5.1
-Stable tag: 1.1.1
+Stable tag: 1.1.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -18,9 +18,7 @@ Why use IntelliWidget as your Featured Post plugin?
 * No new sidebars necessary--uses the sidebars you already have
 * Displays custom page settings if they exist, main widget if they don't
 * Supports Custom Post Types
-* Display Custom Nav Menus on any single page
-* Doubles as a Text Widget
-* Auto-expire content based on date and time
+* Doubles as a Text Widget--customizable to any page
 * Use as many different instances on a single page as you wish
 * Ajax interface designed for quick set up of sites with lots of pages
 * Create your own templates or use ours
@@ -64,12 +62,6 @@ Docs can be found at http://www.lilaeamedia.com/plugins/intelliwidget/
 
 == Changelog ==
 
-= 1.1.1 =
-* Added event date and expire date custom data field support
-* Depricated use of future (scheduled) publish date as event date
-* Added support for Custom Nav Menus
-* Fixed template tag for intelliwidget_alt_title
-
 = 1.1.0 =
 * Improved the overall interface.
 * Fixed bug in the way IW saves per-page widgets 
@@ -87,17 +79,6 @@ Docs can be found at http://www.lilaeamedia.com/plugins/intelliwidget/
 
 
 == Upgrade Notice ==
-= 1.1.1 =
-
-Big feature enhancements! 
-
-1. Use IntelliWidget to display Custom Nav Menus on a per-page basis by selecting "Nav Menu" from the "Template" dropdown and selecting the Menu from the new "Use Nav Menu" dropdown in "Advanced Settings." The original menu functionality continues to work as before.
-
-2. Use IntelliWidget as a calendar of events by adding intelliwidget_event_date custom data field to posts. The "Only Future Posts" checkbox setting now uses this field to filter upcoming events instead of the post publish date.
-
-3. Now you can automatically expire IntelliWidget content from posts by adding intelliwidget_expire_date custom data field to posts and checking the "Hide Expired Posts" box.
-
-See http://www.lilaeamedia.com/plugins/intelliwidget/ for complete documentation.
 
 = 1.1.0 =
 

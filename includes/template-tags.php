@@ -10,18 +10,18 @@ if ( !defined('ABSPATH')) exit;
  * @copyright 2013
  * @access public
  */
-if ( !function_exists('get_the_intelliwidget_ID') ) {
-    function get_the_intelliwidget_ID() {
+if ( !function_exists('get_the_iwgt_ID') ) {
+    function get_the_iwgt_ID() {
         global $iwgt_post;
         return $iwgt_post->ID;
     }
 }
-if ( !function_exists('the_intelliwidget_ID') ) {
-    function the_intelliwidget_ID() {
-        echo get_the_intelliwidget_ID();
+if ( !function_exists('the_iwgt_ID') ) {
+    function the_iwgt_ID() {
+        echo get_the_iwgt_ID();
     }
 }
-if ( !function_exists('get_the_intelliwidget_image') ) {
+if ( !function_exists('get_the_iwgt_image') ) {
     /**
      * Return the featured image if it exists and process based on settings
      *
@@ -29,15 +29,15 @@ if ( !function_exists('get_the_intelliwidget_image') ) {
      * @global <object> $iwgt_post
      * @return <string> if exists, <boolean> false if none
      */
-    function get_the_intelliwidget_image() {
+    function get_the_iwgt_image() {
         global $this_instance, $iwgt_post;
-        if ($this_instance['image_size'] != 'none' && has_intelliwidget_image() ) :
-            return '<a title="' . get_the_intelliwidget_title() . '" href="' . get_the_intelliwidget_url() . '">'
+        if ($this_instance['image_size'] != 'none' && has_iwgt_image() ) :
+            return '<a title="' . get_the_iwgt_title() . '" href="' . get_the_iwgt_url() . '">'
                 . get_the_post_thumbnail(
                     $iwgt_post->ID, 
                     $this_instance['image_size'], 
                     array(
-                        'title' => get_the_intelliwidget_title(), 
+                        'title' => get_the_iwgt_title(), 
                         'class' =>'intelliwidget-image-'. $this_instance['image_size'],
                     )
                 )
@@ -47,29 +47,29 @@ if ( !function_exists('get_the_intelliwidget_image') ) {
     }
 }
 
-if ( !function_exists('has_intelliwidget_image') ) {
+if ( !function_exists('has_iwgt_image') ) {
     /**
      * Check if the post has a featured image.
      * 
      * @global <object> $iwgt_post
      * @return <boolean>
      */
-    function has_intelliwidget_image() {
+    function has_iwgt_image() {
         global $iwgt_post;
         return !empty($iwgt_post->thumbnail_id);
     }
 }
 
-if ( !function_exists('the_intelliwidget_image') ) {
+if ( !function_exists('the_iwgt_image') ) {
     /**
      * Display the featured post image.
      */
-    function the_intelliwidget_image() {
-        echo get_the_intelliwidget_image();
+    function the_iwgt_image() {
+        echo get_the_iwgt_image();
     }
 }
 
-if ( !function_exists('get_the_intelliwidget_excerpt') ) {
+if ( !function_exists('get_the_iwgt_excerpt') ) {
     /**
      * Return the excerpt to display with the current post.
      *
@@ -77,32 +77,32 @@ if ( !function_exists('get_the_intelliwidget_excerpt') ) {
      * @global <object> $iwgt_post
      * @return <string>
      */
-    function get_the_intelliwidget_excerpt() {
+    function get_the_iwgt_excerpt() {
         global $this_instance, $iwgt_post;
         // use excerpt text if it exists otherwise parse the main content
         $excerpt = empty($iwgt_post->post_excerpt) ?
-            get_the_intelliwidget_content() : $iwgt_post->post_excerpt;
-        return _intelliwidget_trim_excerpt($excerpt, $this_instance['length']);
+            get_the_iwgt_content() : $iwgt_post->post_excerpt;
+        return _iwgt_trim_excerpt($excerpt, $this_instance['length']);
     }
 }
 
-if ( !function_exists('the_intelliwidget_excerpt') ) {
+if ( !function_exists('the_iwgt_excerpt') ) {
     /**
      * Display the excerpt for the featured post.
      */
-    function the_intelliwidget_excerpt() {
-        echo get_the_intelliwidget_excerpt();
+    function the_iwgt_excerpt() {
+        echo get_the_iwgt_excerpt();
     }
 }
 
-if ( !function_exists('get_the_intelliwidget_content') ) {
+if ( !function_exists('get_the_iwgt_content') ) {
     /**
      * Return the excerpt to display with the current post.
      *
      * @global <object> $iwgt_post
      * @return <string>
      */
-    function get_the_intelliwidget_content() {
+    function get_the_iwgt_content() {
         global $iwgt_post;
         $content = $iwgt_post->post_content;
 	    if ( strpos( $content, '<!--nextpage-->' ) ) {
@@ -112,16 +112,16 @@ if ( !function_exists('get_the_intelliwidget_content') ) {
     }
 }
 
-if ( !function_exists('the_intelliwidget_content') ) {
+if ( !function_exists('the_iwgt_content') ) {
     /**
      * Display the excerpt for the featured post.
      */
-    function the_intelliwidget_content() {
-        echo get_the_intelliwidget_content();
+    function the_iwgt_content() {
+        echo get_the_iwgt_content();
     }
 }
 
-if ( !function_exists('get_the_intelliwidget_link') ) {
+if ( !function_exists('get_the_iwgt_link') ) {
     /**
      * Return a link for a post based on parameters
      *
@@ -131,21 +131,21 @@ if ( !function_exists('get_the_intelliwidget_link') ) {
      * @param <integer> $category_id (optional) - return category permalink
      * @return <string>
      */
-    function get_the_intelliwidget_link($post_id = NULL, $link_text = NULL, $category_id = NULL) {
+    function get_the_iwgt_link($post_id = NULL, $link_text = NULL, $category_id = NULL) {
         global $iwgt_post;
         $post_id =  intval($post_id) ? $post_id : $iwgt_post->ID;
         if (empty( $link_text )):
-            $link_text = get_the_intelliwidget_title($post_id);
+            $link_text = get_the_iwgt_title($post_id);
         endif;
-        $url = get_the_intelliwidget_url($post_id, $category_id);
-        $classes = empty($iwgt_post->link_classes) ? '' :  ' class="' . $iwgt_post->link_classes . '"';
-        $target = empty($iwgt_post->link_target) ? '' : ' target="' . $iwgt_post->link_target . '"';
+        $url = get_the_iwgt_url($post_id, $category_id);
+        $classes = empty($iwgt_post->classes) ? '' :  ' class="' . $iwgt_post->classes . '"';
+        $target = empty($iwgt_post->target) ? '' : ' target="' . $iwgt_post->target . '"';
         $content = '<a title="' . $link_text . '" href="' . $url . '"' . $classes . $target . '>' . $link_text .  '</a>';
         return $content;
     }
 }
 
-if ( !function_exists('get_the_intelliwidget_url')) {
+if ( !function_exists('get_the_iwgt_url')) {
     /**
      * Return a url for a post based on parameters
      *
@@ -154,7 +154,7 @@ if ( !function_exists('get_the_intelliwidget_url')) {
      * @param <integer> $category_id (optional) - return category url
      * @return <string>
      */
-    function get_the_intelliwidget_url($post_id = NULL, $category_id = NULL) {
+    function get_the_iwgt_url($post_id = NULL, $category_id = NULL) {
         global $iwgt_post;
         $post_id = intval($post_id) ? $post_id : $iwgt_post->ID;
         if (intval($category_id) && $category_id != -1):
@@ -165,7 +165,7 @@ if ( !function_exists('get_the_intelliwidget_url')) {
     }
 }
 
-if ( !function_exists('the_intelliwidget_link') ) {
+if ( !function_exists('the_iwgt_link') ) {
     /**
      * Display a link for a post based on parameters
      *
@@ -173,19 +173,19 @@ if ( !function_exists('the_intelliwidget_link') ) {
      * @param <strong> $link_text (optional) - text inside area tag
      * @param <integer> $category_id (optional) - return category permalink
      */
-    function the_intelliwidget_link($post_id = NULL, $title = NULL, $category_id = NULL) {
-        echo get_the_intelliwidget_link($post_id, $title, $category_id);
+    function the_iwgt_link($post_id = NULL, $title = NULL, $category_id = NULL) {
+        echo get_the_iwgt_link($post_id, $title, $category_id);
     }
 }
 
-if ( !function_exists('get_the_intelliwidget_title') ) {
+if ( !function_exists('get_the_iwgt_title') ) {
     /**
      * Get the title for the current featured post, use alt title if it exists.
      *
      * @global <object> $iwgt_post
      * @return <string>
      */
-    function get_the_intelliwidget_title() {
+    function get_the_iwgt_title() {
         global $iwgt_post;
         return empty($iwgt->alt_title) ? $iwgt_post->post_title : $iwgt_post->alt_title;
     }
@@ -194,13 +194,13 @@ if ( !function_exists('get_the_intelliwidget_title') ) {
      * Display the title for the current featured post, use alt title if it exists.
      */
 
-if ( !function_exists('the_intelliwidget_title') ) {
-    function the_intelliwidget_title() {
-        echo get_the_intelliwidget_title();
+if ( !function_exists('the_iwgt_title') ) {
+    function the_iwgt_title() {
+        echo get_the_iwgt_title();
     }
 }
 
-if ( !function_exists('get_the_intelliwidget_date') ) {
+if ( !function_exists('get_the_iwgt_date') ) {
     /**
      * Get the event date for the post if it exists, otherwise return the post date.
      *
@@ -208,7 +208,7 @@ if ( !function_exists('get_the_intelliwidget_date') ) {
      * @param <string> $format
      * @return <string>
      */
-    function get_the_intelliwidget_date($format = 'j') {
+    function get_the_iwgt_date($format = 'j') {
         global $iwgt_post;
         $date = empty($iwgt_post->event_date) ? $iwgt_post->post_date : $iwgt_post->event_date;
         return date($format, strtotime($date));
@@ -218,13 +218,13 @@ if ( !function_exists('get_the_intelliwidget_date') ) {
      * Display the event date if it exists otherwise display post date.
      */
 
-if ( !function_exists('the_intelliwidget_date') ) {
-    function the_intelliwidget_date($format = 'j') {
-        echo get_the_intelliwidget_date($format);
+if ( !function_exists('the_iwgt_date') ) {
+    function the_iwgt_date($format = 'j') {
+        echo get_the_iwgt_date($format);
     }
 }
 
-if ( !function_exists('_intelliwidget_trim_excerpt') ) {
+if ( !function_exists('_iwgt_trim_excerpt') ) {
     /**
      * Trim the content to a set number of words.
      *
@@ -232,7 +232,7 @@ if ( !function_exists('_intelliwidget_trim_excerpt') ) {
      * @param <integer> $length
      * @return <string>
      */
-    function _intelliwidget_trim_excerpt($text, $length = 15) {
+    function _iwgt_trim_excerpt($text, $length = 15) {
         $text = apply_filters('the_content', $text);
         $text = str_replace(']]>', ']]&gt;', $text);
         $text = preg_replace('@<script[^>]*?>.*?</script>@si', '', $text);

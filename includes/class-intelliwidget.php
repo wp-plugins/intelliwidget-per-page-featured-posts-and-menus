@@ -176,17 +176,24 @@ class IntelliWidget {
     function post_meta_box() {
         global $post;
         foreach ($this->get_eligible_post_types() as $type):
-        add_meta_box( 
-            'intelliwidget_post_meta_box',
-            __( 'IntelliWidget Custom Fields', 'intelliwidget'),
-            array( &$this, 'post_meta_box_form' ),
-            $type,
-            'side',
-            'low'
-        );
+            add_meta_box( 
+                'intelliwidget_post_meta_box',
+                __( 'IntelliWidget Custom Fields', 'intelliwidget'),
+                array( &$this, 'post_meta_box_form' ),
+                $type,
+                'side',
+                'low'
+            );
         endforeach;
+        add_filter('default_hidden_meta_boxes', array(&$this, 'hide_post_meta_box') );
     }
-
+    /**
+     * Hide Custom Post Fields Meta Box by default
+     */
+    function hide_post_meta_box( $hidden ) {
+        $hidden[] = 'intelliwidget_post_meta_box';
+        return $hidden;
+    }
     /**
      * Output the form in the section meta box(es). Params are passed by add_meta_box() function
      * @param <object> $post
@@ -269,7 +276,8 @@ class IntelliWidget {
             // organize this into a 2-dimensional array for later
             $post_data[$box_id][$iw_field] = $this->sanitize($_POST[$iw_key]);
         endforeach;
-
+        // track meta boxes updated
+        $boxcounter = 0;
         // additional processing for each box data segment
         foreach (array_keys($post_data) as $box_id):
             // special handling for checkboxes:
@@ -290,9 +298,14 @@ class IntelliWidget {
             // serialize and save new data
             $savedata = serialize($post_data[$box_id]);
             update_post_meta($post_ID, '_intelliwidget_data_' . $box_id, $savedata);
+            // increment box counter
+            $boxescounter++;
         endforeach;
-        // serialize and save new map
-        update_post_meta($post_ID, '_intelliwidget_map', serialize($box_map));
+        if ($boxcounter)
+            // if we have updates, serialize and save new map
+            update_post_meta($post_ID, '_intelliwidget_map', serialize($box_map));
+        // save custom post data if it exists
+        $this->save_cptdata();
         // save copy page id (i.e., "use settings from ..." ) if it exists
         $this->save_copy_page($post_ID);
         return true;
@@ -303,10 +316,35 @@ class IntelliWidget {
         die('success');
     }
     function ajax_save_cptdata() {
-        if ($this->save_postdata() === false) die('fail');
+        if ($this->save_cptdata() === false) die('fail');
         die('success');
     }
-
+    function save_cptdata() {
+        if (empty($_POST['iwpage']) ) return false;
+        
+        $post_ID   = intval($_POST['post_ID']);
+        // security checkpoint
+        if ( empty($post_ID) || !current_user_can('edit_post', $post_ID) || !wp_verify_nonce($_POST['iwpage'],'iwpage_' . $post_ID) ) return false;
+        // reset the data array
+        $prefix    = 'intelliwidget_';
+        foreach (array(
+            'event_date',
+            'expire_date',
+            'alt_title',
+            'external_url',
+            'link_classes',
+            'link_target',
+            ) as $cptfield):
+            if (array_key_exists($prefix.$cptfield, $_POST)):
+                if (empty($_POST[$prefix.$cptfield])):
+                    delete_post_meta($post_ID, $prefix.$cptfield);
+                else:
+                    update_post_meta($post_ID, $prefix.$cptfield, $_POST[$prefix.$cptfield]);
+                endif;
+            endif;
+        endforeach;
+    }
+    
     function ajax_delete_meta_box() {
         if (!array_key_exists('post', $_POST) || !array_key_exists('iwdelete', $_POST) || 
             !array_key_exists('_wpnonce', $_POST)) die('fail');

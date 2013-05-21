@@ -1,3 +1,66 @@
+<style>
+.iw-save-container, .iw-copy-container, .iw-cpt-container {
+    position: relative;
+    float: right;
+}
+.iw-save-container.success:before, .iw-copy-container.success:before, .iw-cpt-container.success:before {
+    content: "";
+    display: block;
+    position: absolute;
+    height: 16px;
+    width: 16px;
+    top: 8px;
+    left: -26px;
+	background:url(<?php echo admin_url( 'images/yes.png' ); ?>) no-repeat;
+}
+input.iw-save.failure:before, input.iw-copy.failure:before {
+    content: "";
+    display: block;
+    position: absolute;
+    height: 16px;
+    width: 16px;
+    top: 8px;
+    left: -26px;
+	background:url(<?php echo admin_url( 'images/no.png') ; ?>) no-repeat;
+}
+.intelliwidget-timestamp-div select {
+    height: 20px;
+    line-height: 14px;
+    padding: 0;
+    vertical-align: top
+}
+.intelliwidget-aa, .intelliwidget-jj, .intelliwidget-hh, .intelliwidget-mn {
+    padding: 1px;
+    font-size: 12px
+}
+.intelliwidget-jj, .intelliwidget-hh, .intelliwidget-mn {
+    width: 2em
+}
+.intelliwidget-aa {
+    width: 3.4em
+}
+.intelliwidget-timestamp-div {
+    position:relative;
+    padding-top: 5px;
+    line-height: 23px
+}
+.intelliwidget-timestamp-div p {
+    margin: 8px 0 6px
+}
+.intelliwidget-timestamp-div input {
+    border-width: 1px;
+    border-style: solid
+}
+input.intelliwidget-input, select.intelliwidget-input {
+    float:right;
+    width:65%;
+}
+.intelliwidget-edit-timestamp, .intelliwidget-timestamp {
+    float:right;
+    margin-left:5%;
+}
+    
+</style>
 <?php 
         $keys = array(
             'intelliwidget_event_date',
@@ -15,64 +78,42 @@
                 $fields[$key] = $custom_data[$key][0];
         endforeach;
 ?>
-<style>
-.intelliwidget-timestamp-div select {
-    height: 20px;
-    line-height: 14px;
-    padding: 0;
-    vertical-align: top
-}
-.intelliwidget-aa, .intelliwidget-jj, .intelliwidget-hh, .intelliwidget-mn {
-    padding: 1px;
-    font-size: 12px
-}
-.intelliwidget-jj, .intelliwidget-hh, .intelliwidget-mn {
-    width: 2em
-}
-.intelliwidget-aa {
-    width: 3.4em
-}
-.intelliwidget-timestamp {
-    background-repeat: no-repeat;
-    background-position: left center;
-    padding: 2px 0 1px 20px
-}
-.intelliwidget-timestamp-div {
-    position:relative;
-    padding-top: 5px;
-    line-height: 23px
-}
-.intelliwidget-timestamp-div p {
-    margin: 8px 0 6px
-}
-.intelliwidget-timestamp-div input {
-    border-width: 1px;
-    border-style: solid
-}
-</style>
-<p>	<label style="width:34%" for="intelliwidget_event_date"><?php echo __('Event Date', 'intelliwidget') . ': '; ?><span id="intelliwidget_event_date_timestamp" class="intelliwidget-timestamp">
-	<?php echo $fields['intelliwidget_event_date'] ?></span></label>
-    <input type="hidden" id="intelliwidget_event_date" name="intelliwidget_event_date" value="<?php echo $fields['intelliwidget_event_date'] ?>" />
+<p>	<label for="intelliwidget_event_date"><?php echo __('Event Date', 'intelliwidget') . ': '; ?>
 	<a href="#edit_timestamp" id="intelliwidget_event_date-edit" class="intelliwidget-edit-timestamp hide-if-no-js"><?php _e('Edit') ?></a>
+<span id="intelliwidget_event_date_timestamp" class="intelliwidget-timestamp">
+	<?php echo $fields['intelliwidget_event_date'] ?></span></label>
+    <input type="hidden" class="intelliwidget-input" id="intelliwidget_event_date" name="intelliwidget_event_date" value="<?php echo $fields['intelliwidget_event_date'] ?>" />
 	<div id="intelliwidget_event_date_div" class="intelliwidget-timestamp-div hide-if-js"><?php intelliwidget_timestamp('intelliwidget_event_date', $fields['intelliwidget_event_date']); ?></div></p>
-<p>	<label style="width:34%"  for="intelliwidget_expire_date"><?php echo __('Expire Date', 'intelliwidget') . ': '; ?><span id="intelliwidget_expire_date_timestamp" class="intelliwidget-timestamp">
-	<?php echo $fields['intelliwidget_expire_date']; ?></span></label>
-    <input type="hidden" id="intelliwidget_expire_date" name="intelliwidget_expire_date" value="<?php echo $fields['intelliwidget_expire_date'] ?>" />
+<p>	<label for="intelliwidget_expire_date"><?php echo __('Expire Date', 'intelliwidget') . ': '; ?>
 	<a href="#edit_timestamp" id="intelliwidget_expire_date-edit" class="intelliwidget-edit-timestamp hide-if-no-js"><?php _e('Edit') ?></a>
+<span id="intelliwidget_expire_date_timestamp" class="intelliwidget-timestamp">
+	<?php echo $fields['intelliwidget_expire_date']; ?></span></label>
+    <input type="hidden" class="intelliwidget-input" id="intelliwidget_expire_date" name="intelliwidget_expire_date" value="<?php echo $fields['intelliwidget_expire_date'] ?>" />
 	<div id="intelliwidget_expire_date_div" class="intelliwidget-timestamp-div hide-if-js"><?php intelliwidget_timestamp('intelliwidget_expire_date', $fields['intelliwidget_expire_date']); ?></div>
 </p>
-<p>	<label style="width:34%"  for="intelliwidget_alt_title"><?php echo __('Alt Title', 'intelliwidget') . ': '; ?></label>
-    <input type="text" id="intelliwidget_alt_title" name="intelliwidget_alt_title" value="<?php echo $fields['intelliwidget_alt_title'] ?>" />
+<p>	<label for="intelliwidget_alt_title"><?php echo __('Alt Title', 'intelliwidget') . ': '; ?></label>
+    <input class="intelliwidget-input" type="text" id="intelliwidget_alt_title" name="intelliwidget_alt_title" value="<?php echo $fields['intelliwidget_alt_title'] ?>" />
 </p>
-<p>	<label style="width:34%"  for="intelliwidget_external_url"><?php echo __('External URL', 'intelliwidget') . ': '; ?></label>
-    <input type="text" id="intelliwidget_external_url" name="intelliwidget_external_url" value="<?php echo $fields['intelliwidget_external_url'] ?>" />
+<p>	<label for="intelliwidget_external_url"><?php echo __('External URL', 'intelliwidget') . ': '; ?></label>
+    <input class="intelliwidget-input" type="text" id="intelliwidget_external_url" name="intelliwidget_external_url" value="<?php echo $fields['intelliwidget_external_url'] ?>" />
 </p>
-<p>	<label style="width:34%"  for="intelliwidget_link_classes"><?php echo __('Link Classes', 'intelliwidget') . ': '; ?></label>
-    <input type="text" id="intelliwidget_link_classes" name="intelliwidget_link_classes" value="<?php echo $fields['intelliwidget_link_classes'] ?>" />
+<p>	<label for="intelliwidget_link_classes"><?php echo __('Link Classes', 'intelliwidget') . ': '; ?></label>
+    <input class="intelliwidget-input" type="text" id="intelliwidget_link_classes" name="intelliwidget_link_classes" value="<?php echo $fields['intelliwidget_link_classes'] ?>" />
 </p>
-<p>	<label style="width:34%"  for="intelliwidget_link_target"><?php echo __('Link Target', 'intelliwidget') . ': '; ?></label>
-    <input type="text" id="intelliwidget_link_target" name="intelliwidget_link_target" value="<?php echo $fields['intelliwidget_link_target'] ?>" />
+<p>	<label for="intelliwidget_link_target"><?php echo __('Link Target', 'intelliwidget') . ': '; ?></label>
+    <select class="intelliwidget-input" id="intelliwidget_link_target" name="intelliwidget_link_target">
+      <option value=""<?php selected( $fields['intelliwidget_link_target'], '' ); ?>>None</option>
+      <option value="_new"<?php selected( $fields['intelliwidget_link_target'], '_new' ); ?>>_new</option>
+      <option value="_blank"<?php selected( $fields['intelliwidget_link_target'], '_blank' ); ?>>_blank</option>
+      <option value="_self"<?php selected( $fields['intelliwidget_link_target'], '_self' ); ?>>_self</option>
+      <option value="_top"<?php selected( $fields['intelliwidget_link_target'], '_top' ); ?>>_top</option>
+    </select>
 </p>
+<div class="iw-cpt-container">
+  <input name="save" class="iw-cptsave button button-primary button-large" id="iw_cptsave" value="Save" type="button" style="float:right" />
+  <span class="spinner" id="intelliwidget_cpt_spinner"></span> </div>
+<?php wp_nonce_field('iwpage_' . $post->ID,'iwpage'); ?>
+<div style="clear:both"></div>
 <?php
 
 /**
@@ -122,7 +163,7 @@ function intelliwidget_timestamp($field = 'intelliwidget_event_date', $post_date
 
 	echo "\n\n";
 	foreach ( array('mm', 'jj', 'aa', 'hh', 'mn') as $timeunit ) {
-		echo '<input type="hidden" id="'.$field.'_hidden_' . $timeunit . '" name="'.$field.'_hidden_' . $timeunit . '" value="' . $$timeunit . '" />' . "\n";
+		echo '<input type="hidden" id="'.$field.'_hidden_' . $timeunit . '" name="'.$field.'_hidden_' . $timeunit . '" value="' . (($post_date) ? $$timeunit : '') . '" />' . "\n";
 		$cur_timeunit = 'cur_' . $timeunit;
 		echo '<input type="hidden" id="'. $field . '_' . $cur_timeunit . '" name="'. $field . '_' . $cur_timeunit . '" value="' . $$cur_timeunit . '" />' . "\n";
 	}
@@ -130,92 +171,9 @@ function intelliwidget_timestamp($field = 'intelliwidget_event_date', $post_date
 
 <p>
 <a href="#edit_timestamp" id="<?php echo $field; ?>-save" class="intelliwidget-save-timestamp hide-if-no-js button"><?php _e('OK'); ?></a>
+<a href="#edit_timestamp" id="<?php echo $field; ?>-clear" class="intelliwidget-clear-timestamp hide-if-no-js button"><?php _e('Clear'); ?></a>
 <a href="#edit_timestamp" id="<?php echo $field; ?>-cancel" class="intelliwidget-cancel-timestamp hide-if-no-js"><?php _e('Cancel'); ?></a>
 </p>
 <?php
 }
 ?>
-<script>
-jQuery(document).ready( function($) {
-		$('body').on('click', 'a.intelliwidget-edit-timestamp', function() {
-            var field = $(this).attr('id').split('-', 1);
-			if ($('#'+field+'_div').is(":hidden")) {
-				$('#'+field+'_div').slideDown('fast');
-				$('#'+field+'_mm').focus();
-				$(this).hide();
-			}
-			return false;
-		});
-
-		$('body').on('click', '.intelliwidget-cancel-timestamp', function() {
-            var field = $(this).attr('id').split('-', 1);
-			$('#'+field+'_div').slideUp('fast');
-			$('#'+field+'_mm').val($('#'+field+'_hidden_mm').val());
-			$('#'+field+'_jj').val($('#'+field+'_hidden_jj').val());
-			$('#'+field+'_aa').val($('#'+field+'_hidden_aa').val());
-			$('#'+field+'_hh').val($('#'+field+'_hidden_hh').val());
-			$('#'+field+'_mn').val($('#'+field+'_hidden_mn').val());
-			$('a#'+field+'-edit').show();
-			iwUpdateTimestampText(field);
-			return false;
-		});
-
-		$('body').on('click', '.intelliwidget-save-timestamp', function () { 
-            var field = $(this).attr('id').split('-', 1);
-			if ( iwUpdateTimestampText(field) ) {
-				$('#'+field+'_div').slideUp('fast');
-			    $('a#'+field+'-edit').show();
-			}
-			return false;
-		});
-        
-        
-		function iwUpdateTimestampText(field) {
-		    var stamp = $('#'+field+'_timestamp').html();
-            var div = '#' + field + '_div';
-			if ( ! $(div).length )
-				return true;
-
-			var attemptedDate, originalDate, currentDate, 
-                aa = $('#'+field+'_aa').val(),
-				mm = $('#'+field+'_mm').val(), 
-                jj = $('#'+field+'_jj').val(), 
-                hh = $('#'+field+'_hh').val(), 
-                mn = $('#'+field+'_mn').val();
-
-			attemptedDate = new Date( aa, mm - 1, jj, hh, mn );
-			originalDate  = new Date( 
-                $('#'+field+'_hidden_aa').val(), 
-                $('#'+field+'_hidden_mm').val() -1, 
-                $('#'+field+'_hidden_jj').val(), 
-                $('#'+field+'_hidden_hh').val(), 
-                $('#'+field+'_hidden_mn').val() );
-			currentDate   = new Date( 
-                $('#'+field+'_cur_aa').val(), 
-                $('#'+field+'_cur_mm').val() -1, 
-                $('#'+field+'_cur_jj').val(), 
-                $('#'+field+'_cur_hh').val(), 
-                $('#'+field+'_cur_mn').val() );
-
-			if ( attemptedDate.getFullYear() != aa || 
-                (1 + attemptedDate.getMonth()) != mm || 
-                attemptedDate.getDate() != jj ||
-                attemptedDate.getMinutes() != mn ) {
-				    $(div).addClass('form-invalid');
-				    return false;
-			} else {
-				$(div).removeClass('form-invalid');
-			}
-
-				$('#'+field+'_timestamp').html(
-					'<b>' +
-					$('option[value="' + $('#'+field+'_mm').val() + '"]', '#'+field+'_mm').text() + ' ' +
-					jj + ', ' +
-					aa + ' @ ' +
-					hh + ':' +
-					mn + '</b> '
-				);
-			return true;
-		}
-});
-</script>

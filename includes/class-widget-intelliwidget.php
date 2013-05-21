@@ -140,7 +140,7 @@ class IntelliWidget_Widget extends WP_Widget {
             echo $before_title;
             if ( $instance['link_title'] && !empty($selected)) {
                 // @params $post_ID, $text, $category_ID
-                the_intelliwidget_link($selected[0]->ID, $title, $instance['category']);
+                the_iwgt_link($selected[0]->ID, $title, $instance['category']);
             } else {
                 echo $title;
             }
@@ -223,7 +223,7 @@ SELECT
 	pm2.meta_value AS event_date, 
 	pm3.meta_value AS classes,
 	pm4.meta_value AS alt_title,
-	pm5.meta_value AS link_target,
+	pm5.meta_value AS target,
 	pm6.meta_value AS external_url,
 	pm7.meta_value AS thumbnail_id
  FROM {$wpdb->posts} p1
@@ -238,7 +238,7 @@ LEFT OUTER JOIN (
 LEFT OUTER JOIN (
 	SELECT post_id, meta_value
 	FROM {$wpdb->postmeta}
-	WHERE meta_key = 'intelliwidget_link_classes'
+	WHERE meta_key = 'intelliwidget_classes'
 ) pm3 ON pm3.post_id = p1.ID
             ", "
 LEFT OUTER JOIN (
@@ -250,7 +250,7 @@ LEFT OUTER JOIN (
 LEFT OUTER JOIN (
 	SELECT post_id, meta_value
 	FROM {$wpdb->postmeta}
-	WHERE meta_key = 'intelliwidget_link_target'
+	WHERE meta_key = 'intelliwidget_target'
 ) pm5 ON pm5.post_id = p1.ID
             ", "
 LEFT OUTER JOIN (
