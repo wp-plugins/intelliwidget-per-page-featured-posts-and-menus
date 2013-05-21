@@ -8,7 +8,7 @@ Stable tag: 1.1.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Display featured posts, custom menus, html content and more within a single dynamic sidebar that can be customized on a per-page or site-wide basis.
+Display featured posts, custom menus, html content and more within a single dynamic sidebar that can be customized on a per-page basis or globally.
 
 == Description ==
 
@@ -51,7 +51,7 @@ IntelliWidget is flexible and versatile. Please read the documentation to see mo
 
 See the "Getting Started" section.
 
-= Where can I find documentation? =
+= Where can I find documentation?
 
 Docs can be found at http://www.lilaeamedia.com/plugins/intelliwidget/
 
@@ -62,7 +62,7 @@ Docs can be found at http://www.lilaeamedia.com/plugins/intelliwidget/
 
 == Changelog ==
 
-= 1.1.0 =
+= 1.1.0
 * Improved the overall interface.
 * Fixed bug in the way IW saves per-page widgets 
 

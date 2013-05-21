@@ -42,14 +42,10 @@ class IntelliWidget {
         register_activation_hook($file, array(&$this, 'intelliwidget_activate'));
         // these actions only apply to admin users
         if (is_admin()):
-			$this->menus = get_terms( 'nav_menu', array( 'hide_empty' => false ) );
-			$this->templates  = $this->get_widget_templates();
             add_action('admin_init',          array(&$this, 'admin_init'));
             add_action('add_meta_boxes',      array(&$this, 'main_meta_box') );
             add_action('add_meta_boxes',      array(&$this, 'section_meta_box') );
-            add_action('add_meta_boxes',      array(&$this, 'post_meta_box') );
             add_action('save_post',           array(&$this, 'save_postdata'), 1, 2 );
-            add_action('wp_ajax_iw_cptsave',  array(&$this, 'ajax_save_cptdata' ));
             add_action('wp_ajax_iw_save',     array(&$this, 'ajax_save_postdata' ));
             add_action('wp_ajax_iw_copy',     array(&$this, 'ajax_copy_page' ));
             add_action('wp_ajax_iw_delete',   array(&$this, 'ajax_delete_meta_box' ));
@@ -60,6 +56,7 @@ class IntelliWidget {
         // thanks to woothemes for this
         add_action( 'after_setup_theme', array( &$this, 'ensure_post_thumbnails_support' ) );
     }
+    
     /**
      * Stub for loading settings in future release.
      */
@@ -170,31 +167,6 @@ class IntelliWidget {
     }
     
     /**
-     * Generate input form that applies to posts
-     * @return  void
-     */
-    function post_meta_box() {
-        global $post;
-        foreach ($this->get_eligible_post_types() as $type):
-            add_meta_box( 
-                'intelliwidget_post_meta_box',
-                __( 'IntelliWidget Custom Fields', 'intelliwidget'),
-                array( &$this, 'post_meta_box_form' ),
-                $type,
-                'side',
-                'low'
-            );
-        endforeach;
-        add_filter('default_hidden_meta_boxes', array(&$this, 'hide_post_meta_box') );
-    }
-    /**
-     * Hide Custom Post Fields Meta Box by default
-     */
-    function hide_post_meta_box( $hidden ) {
-        $hidden[] = 'intelliwidget_post_meta_box';
-        return $hidden;
-    }
-    /**
      * Output the form in the section meta box(es). Params are passed by add_meta_box() function
      * @param <object> $post
      * @param <array>  $metabox
@@ -222,16 +194,6 @@ class IntelliWidget {
     function main_meta_box_form($post, $metabox) {
         $widget_page_id = get_post_meta($post->ID, '_intelliwidget_widget_page_id', true);
         include( $this->pluginPath . 'includes/page-form.php');
-    }
-    
-    /**
-     * Output the form in the post meta box. Params are passed by add_meta_box() function
-     * @param <object> $post
-     * @param <array>  $metabox
-     * @return  void
-     */
-    function post_meta_box_form($post, $metabox) {
-        include( $this->pluginPath . 'includes/post-form.php');
     }
     
     
@@ -276,12 +238,11 @@ class IntelliWidget {
             // organize this into a 2-dimensional array for later
             $post_data[$box_id][$iw_field] = $this->sanitize($_POST[$iw_key]);
         endforeach;
-        // track meta boxes updated
-        $boxcounter = 0;
+
         // additional processing for each box data segment
         foreach (array_keys($post_data) as $box_id):
             // special handling for checkboxes:
-            foreach(array('skip_expired', 'skip_post', 'link_title', 'hide_if_empty', 'filter', 'future_only') as $cb):
+            foreach(array('skip_post', 'link_title', 'hide_if_empty', 'filter', 'future_only') as $cb):
                 $post_data[$box_id][$cb] = isset($_POST[$prefix . $box_id . '_' . $cb]);
             endforeach;
             $post_data[$box_id]['post_types'] = empty($_POST[$prefix . $box_id . '_post_types']) ? 
@@ -298,14 +259,9 @@ class IntelliWidget {
             // serialize and save new data
             $savedata = serialize($post_data[$box_id]);
             update_post_meta($post_ID, '_intelliwidget_data_' . $box_id, $savedata);
-            // increment box counter
-            $boxescounter++;
         endforeach;
-        if ($boxcounter)
-            // if we have updates, serialize and save new map
-            update_post_meta($post_ID, '_intelliwidget_map', serialize($box_map));
-        // save custom post data if it exists
-        $this->save_cptdata();
+        // serialize and save new map
+        update_post_meta($post_ID, '_intelliwidget_map', serialize($box_map));
         // save copy page id (i.e., "use settings from ..." ) if it exists
         $this->save_copy_page($post_ID);
         return true;
@@ -315,36 +271,7 @@ class IntelliWidget {
         if ($this->save_postdata() === false) die('fail');
         die('success');
     }
-    function ajax_save_cptdata() {
-        if ($this->save_cptdata() === false) die('fail');
-        die('success');
-    }
-    function save_cptdata() {
-        if (empty($_POST['iwpage']) ) return false;
-        
-        $post_ID   = intval($_POST['post_ID']);
-        // security checkpoint
-        if ( empty($post_ID) || !current_user_can('edit_post', $post_ID) || !wp_verify_nonce($_POST['iwpage'],'iwpage_' . $post_ID) ) return false;
-        // reset the data array
-        $prefix    = 'intelliwidget_';
-        foreach (array(
-            'event_date',
-            'expire_date',
-            'alt_title',
-            'external_url',
-            'link_classes',
-            'link_target',
-            ) as $cptfield):
-            if (array_key_exists($prefix.$cptfield, $_POST)):
-                if (empty($_POST[$prefix.$cptfield])):
-                    delete_post_meta($post_ID, $prefix.$cptfield);
-                else:
-                    update_post_meta($post_ID, $prefix.$cptfield, $_POST[$prefix.$cptfield]);
-                endif;
-            endif;
-        endforeach;
-    }
-    
+
     function ajax_delete_meta_box() {
         if (!array_key_exists('post', $_POST) || !array_key_exists('iwdelete', $_POST) || 
             !array_key_exists('_wpnonce', $_POST)) die('fail');
@@ -507,17 +434,16 @@ class IntelliWidget {
         $themeFile = get_stylesheet_directory() . '/intelliwidget/' . $template . $ext;
         if ( file_exists($themeFile) ) {
             if ( $type == 'url' ) {
-                return get_bloginfo('template_url') . '/intelliwidget/' . $template . $ext;
+                $file = get_bloginfo('template_url') . '/intelliwidget/' . $template . $ext;
             } else {
                 $file = get_stylesheet_directory() . '/intelliwidget/' . $template . $ext;
             }
         } elseif ( $type == 'url' ) {
-            return $this->templatesURL . $template . $ext;
+            $file = $this->templatesURL . $template . $ext;
         } else {
             $file = $this->templatesPath . $template . $ext;
         }
-		if (file_exists($file)) return $file;
-        return false;
+        return $file;
     }
 
     /**
@@ -547,49 +473,33 @@ class IntelliWidget {
     public function defaults($instance = array()) {
         //if (empty($instance)) $instance = array();
         $defaults = array(
-            'template'       => 'menu',
-            'page'           => array(),
-            'category'       => -1,
-            'items'          => 5,
-            'length'         => 15,
-            'link_text'      => __('Read More', 'intelliwidget'),
-            'post_types'     => array('page', 'post'),
-            'sortby'         => 'title',
-            'sortorder'      => 'ASC',
-            'replace_widget' => 'none',
-            'imagealign'     => 'auto',
-            'image_size'     => 'none',
-			'nav_menu'       => '',
-            'title'          => '',
-            'custom_text'    => '',
-            'text_position'  => '',
+            'template'        => 'menu',
+            'title'            => '',
+            'page'            => array(),
+            'category'        => -1,
+            'items'            => 5,
+            'length'        => 15,
+            'link_title'    => '',
+            'link_text'        => __('Read More', 'intelliwidget'),
             'classes'        => '',
-			'skip_expired'   => 0,
-            'link_title'     => 0,
-            'skip_post'      => 0,
-            'hide_if_empty'  => 0,
-            'filter'         => 0,
-            'future_only'    => 0,
+            'post_types'    => array('page', 'element'),
+            'skip_post'        => '',
+            'sortby'        => 'title',
+            'sortorder'        => 'ASC',
+            'custom_text'    => '',
+            'replace_widget'=> 'none',
+            'hide_if_empty'    => '',
+            'text_position'    => '',
+            'filter'        => '',
+            'future_only'    => '',
+            'imagealign'    => 'auto',
+            'image_size'    => 'none'
         );
         // standard WP function for merging argument lists
         $merged = wp_parse_args($instance, $defaults);
         return $merged;
     }
-    
-    function get_eligible_post_types() {
-        $eligible = array();
-        if ( function_exists('get_post_types') ):
-            $types = get_post_types(array('public' => true));
-        else:
-            $types = array('post', 'page');
-        endif;
-        foreach($types as $type):
-            if (post_type_supports($type, 'custom-fields'))
-                $eligible[] = $type;
-        endforeach;
-        return $eligible;
-    }
-    
+
     /**
      * Stub for plugin activation
      */

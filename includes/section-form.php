@@ -42,8 +42,7 @@ global $_wp_additional_image_sizes;
     <?php _e('Template', 'intelliwidget'); ?>
     :</label>
   <select name="<?php echo 'intelliwidget_' . $pagesection . '_template'; ?>" id="<?php echo 'intelliwidget_' . $pagesection . '_template'; ?>">
-    <option value="WP_NAV_MENU" <?php selected($intelliwidget_data['template'], 'WP_NAV_MENU'); ?>>[NAV MENU]</option>
-    <?php foreach ( $this->templates as $template => $name ) : ?>
+    <?php foreach ( $this->get_widget_templates() as $template => $name ) : ?>
     <option value="<?php echo $template; ?>" <?php selected($intelliwidget_data['template'], $template); ?>><?php echo $name; ?></option>
     <?php endforeach; ?>
   </select>
@@ -52,7 +51,7 @@ global $_wp_additional_image_sizes;
   <label for="<?php echo 'intelliwidget_' . $pagesection . '_category'; ?>">
     <?php _e('Category', 'intelliwidget'); ?>
     :</label>
-  <?php wp_dropdown_categories(array('name' => 'intelliwidget_' . $pagesection . '_category', 'id' => 'intelliwidget_' . $pagesection . '_category', 'show_option_none' => __('None', 'intelliwidget'), 'hide_empty' => false, 'selected' => $intelliwidget_data['category'] )); ?>
+  <?php wp_dropdown_categories(array('name' => 'intelliwidget_' . $pagesection . '_category', 'id' => 'intelliwidget_' . $pagesection . '_category', 'show_option_none' => __('None', 'intelliwidget'), 'selected' => $intelliwidget_data['category'] )); ?>
 </p>
 <div id="iw-specificposts" class="postbox closed">
   <div class="handlediv" title="<?php _e('Click to toggle', 'intelliwidget'); ?>"></div>
@@ -96,35 +95,15 @@ global $_wp_additional_image_sizes;
     </span></h3>
   <div class="inside">
     <p>
-      <label for="<?php echo 'intelliwidget_' . $pagesection . '_nav_menu'; ?>">
-        <?php _e('WP Nav Menu:'); ?>
-      </label>
-      <select id="<?php echo 'intelliwidget_' . $pagesection . '_nav_menu'; ?>" name="<?php echo 'intelliwidget_' . $pagesection . '_nav_menu'; ?>">
-        <option value="" <?php selected( $intelliwidget_data['nav_menu'], '' ); ?>>None</option>
-        <?php
-			// Get menus
-			foreach ( $intelliwidget->menus as $menu ):
-				echo '<option value="' . $menu->term_id . '"'
-					. selected( $intelliwidget_data['nav_menu'], $menu->term_id, false )
-					. '>'. $menu->name . '</option>';
-			endforeach;
-
-		?>
-      </select>
-    </p>
-    <p>
       <label for="<?php echo 'intelliwidget_' . $pagesection . '_sortby'; ?>">
         <?php _e( 'Sort by:', 'intelliwidget'); ?>
       </label>
       <select name="<?php echo 'intelliwidget_' . $pagesection . '_sortby'; ?>" id="<?php echo 'intelliwidget_' . $pagesection . '_sortby'; ?>">
         <option value="date"<?php selected( $intelliwidget_data['sortby'], 'date' ); ?>>
-        <?php _e('Post Date', 'intelliwidget'); ?>
-        </option>
-        <option value="meta_value"<?php selected( $intelliwidget_data['sortby'], 'meta_value' ); ?>>
-        <?php _e('Event Date', 'intelliwidget'); ?>
+        <?php _e('Date', 'intelliwidget'); ?>
         </option>
         <option value="menu_order"<?php selected( $intelliwidget_data['sortby'], 'menu_order' ); ?>>
-        <?php _e('Menu Order', 'intelliwidget'); ?>
+        <?php _e('Order', 'intelliwidget'); ?>
         </option>
         <option value="title"<?php selected( $intelliwidget_data['sortby'], 'title' ); ?>>
         <?php _e('Title', 'intelliwidget'); ?>
@@ -187,14 +166,7 @@ global $_wp_additional_image_sizes;
       <label for="<?php echo 'intelliwidget_' . $pagesection . '_future_only'; ?>">
         <input id="<?php echo 'intelliwidget_' . $pagesection . '_future_only'; ?>" name="<?php echo 'intelliwidget_' . $pagesection . '_future_only'; ?>" type="checkbox" <?php checked($intelliwidget_data['future_only'], 1); ?> />
         &nbsp;
-        <?php _e('Only future events', 'intelliwidget'); ?>
-      </label>
-    </p>
-    <p>
-      <label for="<?php echo 'intelliwidget_' . $pagesection . '_skip_expired'; ?>">
-        <input id="<?php echo 'intelliwidget_' . $pagesection . '_skip_expired'; ?>" name="<?php echo 'intelliwidget_' . $pagesection . '_skip_expired'; ?>" type="checkbox" <?php checked($intelliwidget_data['skip_expired'], 1); ?> />
-        &nbsp;
-        <?php _e('Exclude expired posts', 'intelliwidget'); ?>
+        <?php _e('Only future posts (upcoming events)', 'intelliwidget'); ?>
       </label>
     </p>
     <p>
@@ -249,7 +221,14 @@ global $_wp_additional_image_sizes;
       </select>
     </p>
     <p> Post Types:<br/>
-      <?php foreach ( $this->get_eligible_post_types() as $type ) : ?>
+      <?php
+if ( function_exists('get_post_types') ):
+    $types = get_post_types(array('public' => true));
+else:
+    $types = array('post', 'page');
+endif;
+?>
+      <?php foreach ( $types as $type ) : ?>
       <label>
         <input id="<?php echo 'intelliwidget_' . $pagesection . '_post_types'; ?>" type="checkbox" name="<?php echo 'intelliwidget_' . $pagesection . '_post_types[]'; ?>" value="<?php echo $type; ?>" <?php checked(in_array($type, $intelliwidget_data['post_types']), 1); ?> />
         &nbsp;<?php echo ucfirst($type); ?></label>

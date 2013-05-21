@@ -111,20 +111,43 @@ class IntelliWidget_Widget extends WP_Widget {
      * @return void
      */
     function build_widget($args, $instance) {
-        global $intelliwidget, $this_instance;
+        global $intelliwidget, $post, $this_instance;
         $this_instance = $instance = $intelliwidget->defaults($instance);
         if (!is_array($instance['page'])) $instance['page'] = array($instance['page']);
         if (!is_array($instance['post_types'])) $instance['post_types'] = array($instance['post_types']);
         extract($args, EXTR_SKIP);
-		/* if this is a nav menu get menu object and skip query */
-		$nav_menu = false;
-		if ($instance['template'] == 'WP_NAV_MENU' && ! empty( $instance['nav_menu'] )) :
-			$nav_menu =  wp_get_nav_menu_object( $instance['nav_menu'] );
-		else:
-            $selected = $this->iw_query($instance);
-        endif;
+        /* Remove current page from list of pages if set */
+        if ( $instance['skip_post'] and in_array($post->ID, $instance['page']) ) {
+            $pages = array_flip($instance['page']);
+            unset($pages[$post->ID]);
+            $instance['page'] = array_flip($pages);
+        }
+        $args = array(
+            'posts_per_page'      => intval($instance['items']),
+            'orderby'             => $instance['sortby'],
+            'order'               => $instance['sortorder'],
+            'post_status'         => 'publish',
+            'post_type'           => $instance['post_types'],
+            'ignore_sticky_posts' => true,
+        );
         
-        // use widget CSS if present
+        /* Get the list of pages */
+        if ( $instance['category'] != -1 ) {
+            // get future only if this is event list
+            if ($instance['future_only']):
+                $args['post_status'] = 'future';        
+            endif;
+            $pages = array_flip($instance['post_types']);
+            unset($pages['page']);
+            $instance['post_types'] = array_flip($pages);
+            $args['category__in'] = $instance['category'];
+        } else {
+            $args['post__in'] = $instance['page'];
+        }
+        $selected = new WP_Query($args);
+        
+        
+        /* Output the widget */
         $classes = array();
         if (!empty($instance['classes'])) :
             $classes = explode("[, ;]", $instance['classes']);
@@ -132,15 +155,14 @@ class IntelliWidget_Widget extends WP_Widget {
         if (!empty($classes)):
             $before_widget = preg_replace('/class="/', 'class="' . implode(" ", $classes) . ' ', $before_widget);
         endif;
-		// use before widget argument
         echo $before_widget;
         // handle title
         $title = apply_filters( 'widget_title', empty( $instance['title'] ) ? '' : $instance['title'], $instance );
         if ( !empty( $title ) ) {
             echo $before_title;
-            if ( $instance['link_title'] && !empty($selected)) {
+            if ( $instance['link_title'] ) {
                 // @params $post_ID, $text, $category_ID
-                the_iwgt_link($selected[0]->ID, $title, $instance['category']);
+                the_intelliwidget_link($selected->posts[0]->ID, $title, $instance['category']);
             } else {
                 echo $title;
             }
@@ -156,22 +178,19 @@ class IntelliWidget_Widget extends WP_Widget {
             echo $after_widget;
             return;
         endif;
-		// if this is a nav menu, use default WP menu output
-		if ($instance['template'] == 'WP_NAV_MENU' && !empty($nav_menu)):
-		    wp_nav_menu( array( 'fallback_cb' => '', 'menu' => $nav_menu, 'menu_class' => 'iw-menu'));
-		// otherwise load IW template
-		else:
-			if ($template = $intelliwidget->get_template($instance['template'])):
-	    	    include ($template);
-			endif;
-		endif;
+        // temporarily disable wpautop if it is on
+        if ($has_content_filter = has_filter('the_content', 'wpautop'))
+            remove_filter( 'the_content', 'wpautop' );
+        include ($intelliwidget->get_template($instance['template']));
+        // restore wpautop if it was on
+        if ($has_content_filter)
+            add_filter( 'the_content', 'wpautop' );
         if ($instance['text_position'] == 'below'):
             echo "<div class=\"textwidget\">\n" . ( !empty( $instance['filter'] ) ? 
                 wpautop( $custom_text ) : $custom_text ) . "\n</div>\n";
         endif;
         echo $after_widget;
     }
-	
     /**
      * Widget Update method
      * @param <array> $new_instance
@@ -187,7 +206,7 @@ class IntelliWidget_Widget extends WP_Widget {
             $instance['custom_text'] = stripslashes( wp_filter_post_kses( addslashes($new_instance['custom_text']) ) ); 
         endif;
         // special handling for checkboxes: //'replace_widget', 
-        foreach(array('skip_expired', 'skip_post', 'link_title', 'hide_if_empty', 'filter', 'future_only') as $cb):
+        foreach(array('skip_post', 'link_title', 'hide_if_empty', 'filter', 'future_only') as $cb):
             $instance[$cb] = isset($new_instance[$cb]);
         endforeach;
         return $instance;
@@ -202,138 +221,13 @@ class IntelliWidget_Widget extends WP_Widget {
         // fill in any missing fields from unserialize or unsaved instance
         $instance = $intelliwidget->defaults($instance);
         // normalize page and post_types into array datatype
+        if (!is_array($instance['page'])) $instance['page'] = array($instance['page']);
         if (!is_array($instance['post_types'])) $instance['post_types'] = array($instance['post_types']);
         include( $intelliwidget->pluginPath . 'includes/widget-form.php');
     }
     
-    /* Intelliwidget has a lot of internal logic that can't be done efficiently using the standard
-     * WP_Query parameters. This function dyanamically builds a custom query so that the majority of the 
-     * post and postmeta data can be retrieved in a single db query.
-     */
-    function iw_query($instance) {
-        global $wpdb;
-        $select = "
-SELECT 
-	p1.ID,
-	p1.post_content, 
-	p1.post_excerpt, 
-	p1.post_title,
-    p1.post_date,
-    p1.post_author,
-	pm2.meta_value AS event_date, 
-	pm3.meta_value AS classes,
-	pm4.meta_value AS alt_title,
-	pm5.meta_value AS target,
-	pm6.meta_value AS external_url,
-	pm7.meta_value AS thumbnail_id
- FROM {$wpdb->posts} p1
-";
-         $joins = array("
-LEFT OUTER JOIN (
-	SELECT post_id, meta_value
-	FROM {$wpdb->postmeta}
-	WHERE meta_key = 'intelliwidget_event_date'
-) pm2 ON pm2.post_id = p1.ID
-            ", "
-LEFT OUTER JOIN (
-	SELECT post_id, meta_value
-	FROM {$wpdb->postmeta}
-	WHERE meta_key = 'intelliwidget_classes'
-) pm3 ON pm3.post_id = p1.ID
-            ", "
-LEFT OUTER JOIN (
-	SELECT post_id, meta_value
-	FROM {$wpdb->postmeta}
-	WHERE meta_key = 'intelliwidget_alt_title'
-) pm4 ON pm4.post_id = p1.ID
-            ", "
-LEFT OUTER JOIN (
-	SELECT post_id, meta_value
-	FROM {$wpdb->postmeta}
-	WHERE meta_key = 'intelliwidget_target'
-) pm5 ON pm5.post_id = p1.ID
-            ", "
-LEFT OUTER JOIN (
-	SELECT post_id, meta_value
-	FROM {$wpdb->postmeta}
-	WHERE meta_key = 'intelliwidget_external_url'
-) pm6 ON pm6.post_id = p1.ID
-            ", "
-LEFT OUTER JOIN (
-	SELECT post_id, meta_value
-	FROM {$wpdb->postmeta}
-	WHERE meta_key = '_thumbnail_id'
-) pm7 ON pm7.post_id = p1.ID
-");
-        $clauses = array(
-            "(p1.post_status = 'publish')",
-            "(p1.post_password = '' OR p1.post_password IS NULL)",
-        );
-        if ( $instance['category'] != -1 ):
-            $clauses[] = '( tx1.term_taxonomy_id IN (' . $instance['category'] . ') )';
-            $joins[] = "INNER JOIN {$wpdb->term_relationships} tx1 ON p1.ID = tx1.object_id"; 
-        endif;
-        if (!empty($instance['page'])):
-            $pages = is_array($instance['page']) ? implode(',', $instance['page']) : $instance['page'];
-            $clauses[] = '(p1.ID IN (' . $pages . ') )'; 
-        endif;
-        /* Remove current page from list of pages if set */
-        if ( $instance['skip_post'] && !empty($post)):
-            $clauses[] = "(p1.ID != '" . $post->ID . "' )";
-        endif;
-        $post_types = empty($instance['post_types']) ? "'post'" : "'" . implode("','", $instance['post_types']) . "'";
-        $clauses[] = '(p1.post_type IN (' . $post_types . ') )';
-
-        $time_adj = gmdate('Y-m-d H:i', current_time('timestamp') );
-
-        // skip expired posts
-        if ($instance['skip_expired']):
-            $joins[] = "
-LEFT OUTER JOIN (
-	SELECT post_id, meta_value
-	FROM {$wpdb->postmeta}
-	WHERE meta_key = 'intelliwidget_expire_date'
-) pm1 ON pm1.post_id = p1.ID
-            ";
-            $clauses[] = "(  pm1.meta_value IS NULL  OR CAST( pm1.meta_value AS CHAR ) > '" . $time_adj . "' )";
-        endif;
-        // use future events only
-		// note postmeta intelliwidget_event_date date format 
-		// MUST be YYYY-MM-DD HH:MM for this to work correctly!
-        if ($instance['future_only']):
-			$clauses[] = "(CAST( pm2.meta_value AS CHAR ) > '" . $time_adj . "')";
-        endif;
-
-        $order = $instance['sortorder'] == 'ASC' ? 'ASC' : 'DESC';
-        switch ($instance['sortby']):
-            case 'meta_value':
-                $orderby = 'pm2.meta_value ' . $order;
-                break;
-            case 'random':
-                $orderby = 'RAND()';
-                break;
-            case 'menu_order':
-                $orderby = 'p1.menu_order ' . $order;
-                break;
-            case 'date':
-                $orderby = 'p1.post_date ' . $order;
-                break;
-            case 'title':
-            default:
-                $orderby = 'p1.post_title ' . $order;
-                break;
-            
-        endswitch;
-        $orderby = ' ORDER BY ' . $orderby;
-        $items = intval($instance['items']);
-        $limit = ' LIMIT 0, ' . (empty($items) ? '5' : $items);
-        $querystr = $select . implode(' ', $joins) . ' WHERE ' . implode(" AND ", $clauses) . $orderby . $limit;
-
-        return $wpdb->get_results($querystr, OBJECT);
-    }
-
+        
 }
-
 // initialize the widget
 add_action('widgets_init', create_function('', 'return register_widget("IntelliWidget_Widget");'));
 

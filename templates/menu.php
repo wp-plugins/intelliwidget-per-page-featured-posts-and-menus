@@ -15,15 +15,14 @@ if ( !defined('ABSPATH')) exit;
  ?>
 
 <ul class="intelliwidget-menu">
-<?php global $iwgt_post;
-if ( !empty($selected)) : foreach($selected as $iwgt_post) : ?>
-  <li id="intelliwidget_<?php the_iwgt_ID(); ?>" class="intelliwidget-menu-item">
-    <?php if ( has_iwgt_image() ) : ?>
+  <?php if ( $selected->have_posts() ) : while ($selected->have_posts()) : $selected->the_post();?>
+  <li id="intelliwidget_<?php the_id(); ?>" class="intelliwidget-menu-item">
+    <?php if ( has_intelliwidget_image() ) : ?>
     <div class="intelliwidget-image-container-<?php echo $instance['image_size'];?> intelliwidget-align-<?php echo $instance['imagealign']; ?>">
-      <?php the_iwgt_image(); ?>
+      <?php the_intelliwidget_image(); ?>
     </div>
     <?php endif; ?>
-    <?php the_iwgt_link(); ?>
+    <?php the_intelliwidget_link(); ?>
   </li>
-  <?php endforeach; endif; ?>
+  <?php endwhile; endif; ?>
 </ul>
