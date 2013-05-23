@@ -34,14 +34,15 @@ global $_wp_additional_image_sizes;
     <?php _e('Template', 'intelliwidget'); ?>
     :</label>
   <select name="<?php echo $this->get_field_name('template'); ?>" id="<?php echo $this->get_field_id('template'); ?>">
-    <?php foreach ( $intelliwidget->get_widget_templates() as $template => $name ) : ?>
+    <option value="WP_NAV_MENU" <?php selected($instance['template'], 'WP_NAV_MENU'); ?>>[NAV MENU]</option>
+    <?php foreach ( $intelliwidget->templates as $template => $name ) : ?>
     <option value="<?php echo $template; ?>" <?php selected($instance['template'], $template); ?>><?php echo $name; ?></option>
     <?php endforeach; ?>
   </select>
   <label for="<?php echo $this->get_field_id('category'); ?>">
     <?php _e('Category', 'intelliwidget'); ?>
     :</label>
-  <?php wp_dropdown_categories(array('name' => $this->get_field_name('category'), 'id' => $this->get_field_id('category'), 'show_option_none' => __('None', 'intelliwidget'), 'selected' => $instance['category'] )); ?>
+  <?php wp_dropdown_categories(array('name' => $this->get_field_name('category'), 'id' => $this->get_field_id('category'), 'show_option_none' => __('None', 'intelliwidget'), 'hide_empty' => false, 'selected' => $instance['category'] )); ?>
 </p>
 <div class="postbox">
   <div class="iw-collapsible" id="<?php echo $this->get_field_id('specificposts'); ?>" title="<?php _e('Click to toggle', 'intelliwidget'); ?>">
@@ -100,15 +101,35 @@ name="<?php echo $this->get_field_name('custom_text'); ?>">
   </div>
   <div id="<?php echo $this->get_field_id('advancedoptions'); ?>-inside" style="display:none;padding:8px" class="closed">
     <p>
+      <label for="<?php echo $this->get_field_id('nav_menu'); ?>">
+        <?php _e('WP Nav Menu:'); ?>
+      </label>
+      <select id="<?php echo $this->get_field_id('nav_menu'); ?>" name="<?php echo $this->get_field_name('nav_menu'); ?>">
+        <option value="" <?php selected($instance['nav_menu'], ""); ?>>None</option>
+        <?php
+			// Get menus
+			foreach ( $intelliwidget->menus as $menu ):
+				echo '<option value="' . $menu->term_id . '"'
+					. selected( $instance['nav_menu'], $menu->term_id, false )
+					. '>'. $menu->name . '</option>';
+			endforeach;
+
+		?>
+      </select>
+    </p>
+    <p>
       <label for="<?php echo $this->get_field_id('sortby'); ?>">
         <?php _e( 'Sort by:', 'intelliwidget'); ?>
       </label>
       <select name="<?php echo $this->get_field_name('sortby'); ?>" id="<?php echo $this->get_field_id('sortby'); ?>">
         <option value="date"<?php selected( $instance['sortby'], 'date' ); ?>>
-        <?php _e('Date', 'intelliwidget'); ?>
+        <?php _e('Post Date', 'intelliwidget'); ?>
+        </option>
+        <option value="meta_value"<?php selected( $instance['sortby'], 'meta_value' ); ?>>
+        <?php _e('Event Date', 'intelliwidget'); ?>
         </option>
         <option value="menu_order"<?php selected( $instance['sortby'], 'menu_order' ); ?>>
-        <?php _e('Order', 'intelliwidget'); ?>
+        <?php _e('Menu Order', 'intelliwidget'); ?>
         </option>
         <option value="title"<?php selected( $instance['sortby'], 'title' ); ?>>
         <?php _e('Title', 'intelliwidget'); ?>
@@ -159,7 +180,14 @@ name="<?php echo $this->get_field_name('custom_text'); ?>">
       <label>
         <input name="<?php echo $this->get_field_name('future_only'); ?>" id="<?php echo $this->get_field_id('future_only'); ?>" type="checkbox" <?php checked($instance['future_only'], 1); ?> />
         &nbsp;
-        <?php _e('Only future posts (upcoming events)', 'intelliwidget'); ?>
+        <?php _e('Only future events', 'intelliwidget'); ?>
+      </label>
+    </p>
+    <p>
+      <label>
+        <input name="<?php echo $this->get_field_name('skip_expired'); ?>" id="<?php echo $this->get_field_id('skip_expired'); ?>" type="checkbox" <?php checked($instance['skip_expired'], 1); ?> />
+        &nbsp;
+        <?php _e('Exclude expired posts', 'intelliwidget'); ?>
       </label>
     </p>
     <p>
@@ -226,14 +254,7 @@ name="<?php echo $this->get_field_name('custom_text'); ?>">
       </select>
     </p>
     <p>Post Types:<br/>
-      <?php
-if ( function_exists('get_post_types') ):
-    $types = get_post_types(array('public' => true));
-else:
-    $types = array('post', 'page');
-endif;
-?>
-      <?php foreach ( $types as $type ) : ?>
+      <?php foreach ( $intelliwidget->get_eligible_post_types() as $type ) : ?>
       <label for="<?php echo $this->get_field_id('post_types'); ?>">
         <input type="checkbox" id="<?php echo $this->get_field_id('post_types'); ?>" name="<?php echo $this->get_field_name('post_types'); ?>[]" value="<?php echo $type; ?>" <?php checked(in_array($type, $instance['post_types']), 1); ?> />
         <?php echo ucfirst($type); ?></label>

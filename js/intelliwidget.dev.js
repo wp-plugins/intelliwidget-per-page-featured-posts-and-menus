@@ -18,14 +18,104 @@ jQuery(document).ready(function(e) {
     });
     // bind click events to edit page meta box buttons
     jQuery('body').on('click', '.iw-save', iw_save_postdata);    
+    jQuery('body').on('click', '.iw-cptsave', iw_save_cptdata);    
     jQuery('body').on('click', '.iw-copy', iw_copy_page);    
     jQuery('body').on('click', '.iw-add', iw_add_meta_box);    
     jQuery('body').on('click', '.iw-delete', iw_delete_meta_box);    
+	jQuery('body').on('click', 'a.intelliwidget-edit-timestamp', function() {
+        var field = jQuery(this).attr('id').split('-', 1);
+			if (jQuery('#'+field+'_div').is(":hidden")) {
+				jQuery('#'+field+'_div').slideDown('fast');
+				jQuery('#'+field+'_mm').focus();
+				jQuery(this).hide();
+			}
+			return false;
+		});
+
+	jQuery('body').on('click', '.intelliwidget-clear-timestamp', function() {
+        var field = jQuery(this).attr('id').split('-', 1);
+			jQuery('#'+field+'_div').slideUp('fast');
+			jQuery('#'+field+'_mm').val('');
+			jQuery('#'+field+'_jj').val('');
+			jQuery('#'+field+'_aa').val('');
+			jQuery('#'+field+'_hh').val('');
+			jQuery('#'+field+'_mn').val('');
+			jQuery('a#'+field+'-edit').show();
+			iwUpdateTimestampText(field, false);
+			return false;
+		});
+
+	jQuery('body').on('click', '.intelliwidget-cancel-timestamp', function() {
+        var field = jQuery(this).attr('id').split('-', 1);
+			jQuery('#'+field+'_div').slideUp('fast');
+			jQuery('#'+field+'_mm').val(jQuery('#'+field+'_hidden_mm').val());
+			jQuery('#'+field+'_jj').val(jQuery('#'+field+'_hidden_jj').val());
+			jQuery('#'+field+'_aa').val(jQuery('#'+field+'_hidden_aa').val());
+			jQuery('#'+field+'_hh').val(jQuery('#'+field+'_hidden_hh').val());
+			jQuery('#'+field+'_mn').val(jQuery('#'+field+'_hidden_mn').val());
+			jQuery('a#'+field+'-edit').show();
+			iwUpdateTimestampText(field, false);
+			return false;
+		});
+
+	jQuery('body').on('click', '.intelliwidget-save-timestamp', function () { 
+            var field = jQuery(this).attr('id').split('-', 1);
+			if ( iwUpdateTimestampText(field, true) ) {
+				jQuery('#'+field+'_div').slideUp('fast');
+			    jQuery('a#'+field+'-edit').show();
+			}
+			return false;
+		});
+        
+        
+	function iwUpdateTimestampText(field, validate) {
+		    var stamp = jQuery('#'+field+'_timestamp').html();
+            var div = '#' + field + '_div';
+			if ( ! jQuery(div).length )
+				return true;
+
+			var attemptedDate, originalDate, currentDate, 
+                aa = jQuery('#'+field+'_aa').val(),
+				mm = jQuery('#'+field+'_mm').val(), 
+                jj = jQuery('#'+field+'_jj').val(), 
+                hh = jQuery('#'+field+'_hh').val(), 
+                mn = jQuery('#'+field+'_mn').val();
+				ss = jQuery('#'+field+'_ss').val();
+
+			attemptedDate = new Date( aa, mm - 1, jj, hh, mn );
+
+			if ( validate && (attemptedDate.getFullYear() != aa || 
+                (1 + attemptedDate.getMonth()) != mm || 
+                attemptedDate.getDate() != jj ||
+                attemptedDate.getMinutes() != mn )) {
+				    jQuery(div).addClass('form-invalid');
+				    return false;
+			} else {
+				jQuery(div).removeClass('form-invalid');
+			}
+			if (aa) {
+				jQuery('#'+field).val(
+					aa + '-' + mm + '-' + jj + ' ' + hh + ':' + mn + ':' + ss
+				);
+				jQuery('#'+field+'_timestamp').html(
+					'<b>' +
+					jQuery('option[value="' + mm + '"]', '#'+field+'_mm').text() + ' ' +
+					jj + ', ' +
+					aa + ' @ ' +
+					hh + ':' +
+					mn + '</b> '
+				);
+			} else {
+				jQuery('#'+field+'_timestamp').html('');
+				jQuery('#'+field).val('');
+			}
+			return true;
+		}
 });
 var iw_save_postdata = function (){ 
         // disable the button until ajax returns
         jQuery(this).attr('disabled', 'disabled');;
-        jQuery('.iw-copy-container,.iw-save-container').removeClass('success failure');
+        jQuery('.iw-copy-container,.iw-save-container,.iw-cpt-container').removeClass('success failure');
         // get id of button
         var thisID = jQuery(this).attr('id');
         // munge selector
@@ -73,12 +163,52 @@ var iw_save_postdata = function (){
         );  
         return false;  
 }
+var iw_save_cptdata = function (){ 
+        // disable the button until ajax returns
+        jQuery(this).attr('disabled', 'disabled');
+        // clear previous success/fail icons
+        jQuery('.iw-copy-container,.iw-save-container,.iw-cptsave-container').removeClass('success failure');
+        // unbind button from click event
+        jQuery('body').off('click', '#iw_cptsave', iw_save_cptdata);
+        // show spinner
+        jQuery('#intelliwidget_cpt_spinner').show();
+        // build post data array
+        var postData = {};
+        // find inputs for this section
+        jQuery('input[name=post_ID],input[name=iwpage],.iw-cpt').each(function(index, element) {
+            // get field id
+            fieldID = jQuery(this).attr('id');
+            postData[fieldID] = jQuery(this).val();
+        });
+		console.log(postData);
+        // add wp ajax action to array
+        postData['action'] = 'iw_cptsave';
+        // send to wp
+        jQuery.post(  
+            // get ajax url from localized object
+            IWAjax.ajaxurl,  
+            //Data  
+            postData,
+            //on success function  
+            function(response){
+				console.log(response);
+                // release button
+                jQuery('#iw_cptsave').removeAttr('disabled');
+                // hide spinner
+                jQuery('#intelliwidget_cpt_spinner').hide();
+                // show check mark
+                jQuery('.iw-cptsave-container').addClass('success');
+                return false;  
+            }
+        );  
+        return false;  
+}
 
 var iw_copy_page = function (){ 
         // disable the button until ajax returns
         jQuery(this).attr('disabled', 'disabled');
         // clear previous success/fail icons
-        jQuery('.iw-copy-container,.iw-save-container').removeClass('success failure');
+        jQuery('.iw-copy-container,.iw-save-container,.iw-cptsave-container').removeClass('success failure');
         // unbind button from click event
         jQuery('body').off('click', '#iw_copy', iw_copy_page);
         // show spinner
@@ -121,7 +251,7 @@ var iw_add_meta_box = function (e){
         // disable the button until ajax returns
         jQuery(this).addClass('disabled');
         // clear previous success/fail icons
-        jQuery('.iw-copy-container,.iw-save-container').removeClass('success failure');
+        jQuery('.iw-copy-container,.iw-save-container,.iw-cptsave-container').removeClass('success failure');
         // get id of button
         var thisID = jQuery(this).attr('id');
         // munge selector
@@ -180,7 +310,7 @@ var iw_delete_meta_box = function (e){
         // disable the button until ajax returns
         jQuery(this).addClass('disabled');
         // clear previous success/fail icons
-        jQuery('.iw-copy-container,.iw-save-container').removeClass('success failure');
+        jQuery('.iw-copy-container,.iw-save-container,.iw-cpt-container').removeClass('success failure');
         // get id of button
         var thisID = jQuery(this).attr('id');
         // munge selector

@@ -10,23 +10,40 @@ if ( !defined('ABSPATH')) exit;
  * @copyright 2013
  * @access public
  */
+if ( !function_exists('get_the_intelliwidget_ID') ) {
+    function get_the_intelliwidget_ID() {
+        global $iwgt_post;
+        return $iwgt_post->ID;
+    }
+}
+if ( !function_exists('the_intelliwidget_ID') ) {
+    function the_intelliwidget_ID() {
+        echo get_the_intelliwidget_ID();
+    }
+}
 if ( !function_exists('get_the_intelliwidget_image') ) {
     /**
      * Return the featured image if it exists and process based on settings
-     * 
-     * @param int $post_id (optional)
+     *
+     * @global <array> $this_instance
+     * @global <object> $iwgt_post
      * @return <string> if exists, <boolean> false if none
      */
-    function get_the_intelliwidget_image($post_id = NULL) {
-        global $this_instance;
-        $post_id = ( NULL === $post_id ) ? get_the_ID() : $post_id;
-        if ($this_instance['image_size'] != 'none' && function_exists('has_post_thumbnail') && has_post_thumbnail() ) :
+    function get_the_intelliwidget_image() {
+        global $this_instance, $iwgt_post;
+        if ($this_instance['image_size'] != 'none' && has_intelliwidget_image() ) :
             return '<a title="' . get_the_intelliwidget_title() . '" href="' . get_the_intelliwidget_url() . '">'
-                . get_the_post_thumbnail($post_id, $this_instance['image_size'], array('title' => get_the_intelliwidget_title(), 'class'=>'intelliwidget-image-'. $this_instance['image_size']))
+                . get_the_post_thumbnail(
+                    $iwgt_post->ID, 
+                    $this_instance['image_size'], 
+                    array(
+                        'title' => get_the_intelliwidget_title(), 
+                        'class' =>'intelliwidget-image-'. $this_instance['image_size'],
+                    )
+                )
                 . '</a>';
-        else:
-            return false;
         endif;
+        return false;
     }
 }
 
@@ -34,23 +51,21 @@ if ( !function_exists('has_intelliwidget_image') ) {
     /**
      * Check if the post has a featured image.
      * 
-     * @param <integer> $post_id
+     * @global <object> $iwgt_post
      * @return <boolean>
      */
-    function has_intelliwidget_image($post_id = NULL) {
-        $image = get_the_intelliwidget_image($post_id);
-        return !empty($image);
+    function has_intelliwidget_image() {
+        global $iwgt_post;
+        return !empty($iwgt_post->thumbnail_id);
     }
 }
 
 if ( !function_exists('the_intelliwidget_image') ) {
     /**
      * Display the featured post image.
-     *
-     * @param int $post_id (optional)
      */
-    function the_intelliwidget_image($post_id = NULL) {
-        echo get_the_intelliwidget_image($post_id);
+    function the_intelliwidget_image() {
+        echo get_the_intelliwidget_image();
     }
 }
 
@@ -59,30 +74,50 @@ if ( !function_exists('get_the_intelliwidget_excerpt') ) {
      * Return the excerpt to display with the current post.
      *
      * @global <array> $this_instance
-     * @param  <integer> $post_id (optional)
+     * @global <object> $iwgt_post
      * @return <string>
      */
-    function get_the_intelliwidget_excerpt($post_id = NULL) {
-        global $this_instance;
-        $post_id = ( NULL === $post_id ) ? get_the_ID() : $post_id;
+    function get_the_intelliwidget_excerpt() {
+        global $this_instance, $iwgt_post;
         // use excerpt text if it exists otherwise parse the main content
-        $content = preg_replace("#\[\.\.\.\]#", '', get_the_excerpt()); //"[...]"
-        if ( empty($content)):
-            $content = get_the_content();
-        endif;
-        $content = _intelliwidget_trim_excerpt($content, $this_instance['length']);
-        return $content;
+        $excerpt = empty($iwgt_post->post_excerpt) ?
+            get_the_intelliwidget_content() : $iwgt_post->post_excerpt;
+        return _intelliwidget_trim_excerpt($excerpt, $this_instance['length']);
     }
 }
 
 if ( !function_exists('the_intelliwidget_excerpt') ) {
     /**
      * Display the excerpt for the featured post.
-     *
-     * @param <integer> $post_id (optional)
      */
-    function the_intelliwidget_excerpt($post_id = NULL) {
-        echo get_the_intelliwidget_excerpt($post_id);
+    function the_intelliwidget_excerpt() {
+        echo get_the_intelliwidget_excerpt();
+    }
+}
+
+if ( !function_exists('get_the_intelliwidget_content') ) {
+    /**
+     * Return the excerpt to display with the current post.
+     *
+     * @global <object> $iwgt_post
+     * @return <string>
+     */
+    function get_the_intelliwidget_content() {
+        global $iwgt_post;
+        $content = $iwgt_post->post_content;
+	    if ( strpos( $content, '<!--nextpage-->' ) ) {
+    	    $content = preg_replace("#\s*<!\-\-nextpage\-\->.*#s", '', $content);
+        }
+        return $content;
+    }
+}
+
+if ( !function_exists('the_intelliwidget_content') ) {
+    /**
+     * Display the excerpt for the featured post.
+     */
+    function the_intelliwidget_content() {
+        echo get_the_intelliwidget_content();
     }
 }
 
@@ -90,22 +125,21 @@ if ( !function_exists('get_the_intelliwidget_link') ) {
     /**
      * Return a link for a post based on parameters
      *
+     * @global <object> $iwgt_post
      * @param <integer> $post_id (optional)
      * @param <string> $link_text (optional) - text inside area tag
-     * @param <integer> $category_ID (optional) - return category permalink
+     * @param <integer> $category_id (optional) - return category permalink
      * @return <string>
      */
-    function get_the_intelliwidget_link($post_ID = NULL, $link_text = NULL, $category_ID = NULL) {
-        global $this_instance;
-        $post_ID = intval($post_ID) ? $post_ID : get_the_ID();
+    function get_the_intelliwidget_link($post_id = NULL, $link_text = NULL, $category_id = NULL) {
+        global $iwgt_post;
+        $post_id =  intval($post_id) ? $post_id : $iwgt_post->ID;
         if (empty( $link_text )):
-            $link_text = get_the_intelliwidget_title($post_ID);
+            $link_text = get_the_intelliwidget_title($post_id);
         endif;
-        $url = get_the_intelliwidget_url($post_ID, $category_ID);
-        if (! $classes = get_post_meta($post_ID, 'intelliwidget_classes', true) ) $classes = '';
-        $classes = ' class="' . $classes . '"';
-        if (! $target = get_post_meta($post_ID, 'intelliwidget_target', true) ) $target = '';
-        $target = empty($target) ? '' : ' target="' . $target . '"';
+        $url = get_the_intelliwidget_url($post_id, $category_id);
+        $classes = empty($iwgt_post->link_classes) ? '' :  ' class="' . $iwgt_post->link_classes . '"';
+        $target = empty($iwgt_post->link_target) ? '' : ' target="' . $iwgt_post->link_target . '"';
         $content = '<a title="' . $link_text . '" href="' . $url . '"' . $classes . $target . '>' . $link_text .  '</a>';
         return $content;
     }
@@ -115,19 +149,19 @@ if ( !function_exists('get_the_intelliwidget_url')) {
     /**
      * Return a url for a post based on parameters
      *
+     * @global <object> $iwgt_post
      * @param <integer> $post_id (optional)
-     * @param <integer> $category_ID (optional) - return category url
+     * @param <integer> $category_id (optional) - return category url
      * @return <string>
      */
-    function get_the_intelliwidget_url($post_ID = NULL, $category_ID = NULL) {
-        global $this_instance;
-        $post_ID = intval($post_ID) ? $post_ID : get_the_ID();
-        if (intval($category_ID) && $category_ID != -1):
-            $url = get_category_link($category_ID);
+    function get_the_intelliwidget_url($post_id = NULL, $category_id = NULL) {
+        global $iwgt_post;
+        $post_id = intval($post_id) ? $post_id : $iwgt_post->ID;
+        if (intval($category_id) && $category_id != -1):
+            return get_category_link($category_id);
         else:
-            if (! $url = get_post_meta($post_ID, 'intelliwidget_external_url', true) ) $url = get_permalink($post_ID);
+            return empty($iwgt_post->external_url) ? get_permalink($post_id) : $iwgt_post->external_url;
         endif;
-        return $url;
     }
 }
 
@@ -137,11 +171,10 @@ if ( !function_exists('the_intelliwidget_link') ) {
      *
      * @param <integer> $post_id (optional)
      * @param <strong> $link_text (optional) - text inside area tag
-     * @param <integer> $category_ID (optional) - return category permalink
-     * @return <string>
+     * @param <integer> $category_id (optional) - return category permalink
      */
-    function the_intelliwidget_link($post_ID = NULL, $title = NULL, $category_ID = NULL) {
-        echo get_the_intelliwidget_link($post_ID, $title, $category_ID);
+    function the_intelliwidget_link($post_id = NULL, $title = NULL, $category_id = NULL) {
+        echo get_the_intelliwidget_link($post_id, $title, $category_id);
     }
 }
 
@@ -149,24 +182,45 @@ if ( !function_exists('get_the_intelliwidget_title') ) {
     /**
      * Get the title for the current featured post, use alt title if it exists.
      *
-     * @global <array> $this_instance
-     * @param <integer> $post_id
+     * @global <object> $iwgt_post
      * @return <string>
      */
-    function get_the_intelliwidget_title($post_id = NULL) {
-        global $this_instance;
-        $post_id = ( NULL === $post_id ) ? get_the_ID() : $post_id;
-        if ( $alt_title = get_post_meta($post_id, 'alt_title', true) ):
-            return $alt_title;
-        else:
-            return get_the_title();
-        endif;
+    function get_the_intelliwidget_title() {
+        global $iwgt_post;
+        return empty($iwgt->alt_title) ? $iwgt_post->post_title : $iwgt_post->alt_title;
+    }
+}
+    /**
+     * Display the title for the current featured post, use alt title if it exists.
+     */
+
+if ( !function_exists('the_intelliwidget_title') ) {
+    function the_intelliwidget_title() {
+        echo get_the_intelliwidget_title();
     }
 }
 
-if ( !function_exists('the_intelliwidget_title') ) {
-    function the_intelliwidget_title($post_id = NULL) {
-        echo get_the_intelliwidget_title($post_id);
+if ( !function_exists('get_the_intelliwidget_date') ) {
+    /**
+     * Get the event date for the post if it exists, otherwise return the post date.
+     *
+     * @global <object> $iwgt_post
+     * @param <string> $format
+     * @return <string>
+     */
+    function get_the_intelliwidget_date($format = 'j') {
+        global $iwgt_post;
+        $date = empty($iwgt_post->event_date) ? $iwgt_post->post_date : $iwgt_post->event_date;
+        return date($format, strtotime($date));
+    }
+}
+    /**
+     * Display the event date if it exists otherwise display post date.
+     */
+
+if ( !function_exists('the_intelliwidget_date') ) {
+    function the_intelliwidget_date($format = 'j') {
+        echo get_the_intelliwidget_date($format);
     }
 }
 
@@ -174,18 +228,14 @@ if ( !function_exists('_intelliwidget_trim_excerpt') ) {
     /**
      * Trim the content to a set number of words.
      *
-     * @global <object> $post
      * @param <string> $text
      * @param <integer> $length
      * @return <string>
      */
     function _intelliwidget_trim_excerpt($text, $length = 15) {
-        global $post;
         $text = apply_filters('the_content', $text);
         $text = str_replace(']]>', ']]&gt;', $text);
-        $text = preg_replace('@<script[^>]*?>
-
-.*?</script>@si', '', $text);
+        $text = preg_replace('@<script[^>]*?>.*?</script>@si', '', $text);
         $text = strip_tags($text);
         $words = preg_split("#\s+#s", $text, $length + 1);
         if ( count($words) > $length ) {
@@ -202,15 +252,12 @@ if ( !function_exists('intelliwidget_shortcode') ) {
     /**
      * Shortcode handler
      *
-     * @global
-        <object>
-$post
-     * @param
-<array>
-$atts
-     * @return
-<string>
-*/
+     * @global <object> $intelliwidget
+     * @global <object> $post
+     * @global <array> $this_instance
+     * @param <array> $atts
+     * @return <string>
+     */
 
     function intelliwidget_shortcode($atts) {
         global $intelliwidget, $post, $this_instance;
