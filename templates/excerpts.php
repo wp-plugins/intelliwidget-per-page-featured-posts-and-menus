@@ -15,18 +15,18 @@ if ( !defined('ABSPATH')) exit;
 global $iwgt_post;
 if ( !empty($selected)) : foreach($selected as $iwgt_post) : 
 ?>
-<div id="intelliwidget_<?php the_intelliwidget_ID(); ?>" class="intelliwidget-excerpt-container">
+<div id="intelliwidget_<?php the_iwgt_ID(); ?>" class="intelliwidget-excerpt-container">
   <?php if ( has_intelliwidget_image() ) : ?>
   <div class="intelliwidget-image-container-<?php echo $instance['image_size'];?> intelliwidget-align-<?php echo $instance['imagealign']; ?>">
     <?php the_intelliwidget_image(); ?>
   </div>
   <?php endif; ?>
-  <h3 id="intelliwidget_title_<?php the_intelliwidget_ID(); ?>" class="intelliwidget-title">
+  <h3 id="intelliwidget_title_<?php the_iwgt_ID(); ?>" class="intelliwidget-title">
     <?php the_intelliwidget_link(); ?>
   </h3>
-  <div id="intelliwidget_excerpt_<?php the_intelliwidget_ID(); ?>" class="intelliwidget-excerpt">
+  <div id="intelliwidget_excerpt_<?php the_iwgt_ID(); ?>" class="intelliwidget-excerpt">
     <?php the_intelliwidget_excerpt();?>
-    <span id="intelliwidget_more_link_<?php the_intelliwidget_ID(); ?>" class="intelliwidget-more-link">
+    <span id="intelliwidget_more_link_<?php the_iwgt_ID(); ?>" class="intelliwidget-more-link">
     <?php the_intelliwidget_link(iwgt_id(), $instance['link_text']); ?>
     </span> </div>
 </div>
