@@ -45,20 +45,21 @@ class IntelliWidget_Widget extends WP_Widget {
             // save global post object for later
         $old_post = $post;
         if (is_object($post)):
-            // if there are page-specific settings for this widget, use them
-            if ($page_data = $this->get_page_data($post->ID, $args['widget_id'])):
-                $this->build_widget($args, $page_data);
-                // done -- restore original post object and return
-                $post = $old_post;
-                return;
             // if this page is using another page's settings and they exist for this widget, use them
-            elseif (($other_page_id = get_post_meta($post->ID, '_intelliwidget_widget_page_id', true))) :
+            if (($other_page_id = get_post_meta($post->ID, '_intelliwidget_widget_page_id', true))) :
                 if ($page_data = $this->get_page_data($other_page_id, $args['widget_id'])):
                     $this->build_widget($args, $page_data);
                     // done -- restore original post object and return
                     $post = $old_post;
                     return;
                 endif;
+            endif;
+            // if there are page-specific settings for this widget, use them
+            if ($page_data = $this->get_page_data($post->ID, $args['widget_id'])):
+                $this->build_widget($args, $page_data);
+                // done -- restore original post object and return
+                $post = $old_post;
+                return;
             endif;
         endif;
         // no page-specific settings, should we hide?
@@ -140,7 +141,7 @@ class IntelliWidget_Widget extends WP_Widget {
             echo $before_title;
             if ( $instance['link_title'] && !empty($selected)) {
                 // @params $post_ID, $text, $category_ID
-                the_iwgt_link($selected[0]->ID, $title, $instance['category']);
+                the_intelliwidget_link($selected[0]->ID, $title, $instance['category']);
             } else {
                 echo $title;
             }
@@ -187,7 +188,7 @@ class IntelliWidget_Widget extends WP_Widget {
             $instance['custom_text'] = stripslashes( wp_filter_post_kses( addslashes($new_instance['custom_text']) ) ); 
         endif;
         // special handling for checkboxes: //'replace_widget', 
-        foreach(array('skip_expired', 'skip_post', 'link_title', 'hide_if_empty', 'filter', 'future_only') as $cb):
+        foreach(array('skip_expired', 'skip_post', 'link_title', 'hide_if_empty', 'filter', 'future_only', 'active_only') as $cb):
             $instance[$cb] = isset($new_instance[$cb]);
         endforeach;
         return $instance;
@@ -221,9 +222,9 @@ SELECT
     p1.post_date,
     p1.post_author,
 	pm2.meta_value AS event_date, 
-	pm3.meta_value AS classes,
+	pm3.meta_value AS link_classes,
 	pm4.meta_value AS alt_title,
-	pm5.meta_value AS target,
+	pm5.meta_value AS link_target,
 	pm6.meta_value AS external_url,
 	pm7.meta_value AS thumbnail_id
  FROM {$wpdb->posts} p1
@@ -238,7 +239,7 @@ LEFT OUTER JOIN (
 LEFT OUTER JOIN (
 	SELECT post_id, meta_value
 	FROM {$wpdb->postmeta}
-	WHERE meta_key = 'intelliwidget_classes'
+	WHERE meta_key = 'intelliwidget_link_classes'
 ) pm3 ON pm3.post_id = p1.ID
             ", "
 LEFT OUTER JOIN (
@@ -250,7 +251,7 @@ LEFT OUTER JOIN (
 LEFT OUTER JOIN (
 	SELECT post_id, meta_value
 	FROM {$wpdb->postmeta}
-	WHERE meta_key = 'intelliwidget_target'
+	WHERE meta_key = 'intelliwidget_link_target'
 ) pm5 ON pm5.post_id = p1.ID
             ", "
 LEFT OUTER JOIN (
@@ -287,7 +288,7 @@ LEFT OUTER JOIN (
         $time_adj = gmdate('Y-m-d H:i', current_time('timestamp') );
 
         // skip expired posts
-        if ($instance['skip_expired']):
+        if ($instance['skip_expired'] || $instance['future_only']):
             $joins[] = "
 LEFT OUTER JOIN (
 	SELECT post_id, meta_value
@@ -295,13 +296,21 @@ LEFT OUTER JOIN (
 	WHERE meta_key = 'intelliwidget_expire_date'
 ) pm1 ON pm1.post_id = p1.ID
             ";
-            $clauses[] = "(  pm1.meta_value IS NULL  OR CAST( pm1.meta_value AS CHAR ) > '" . $time_adj . "' )";
+            if ($instance['skip_expired'])
+                $clauses[] = "(  pm1.meta_value IS NULL  OR CAST( pm1.meta_value AS CHAR ) > '" . $time_adj . "' )";
         endif;
         // use future events only
 		// note postmeta intelliwidget_event_date date format 
 		// MUST be YYYY-MM-DD HH:MM for this to work correctly!
-        if ($instance['future_only']):
-			$clauses[] = "(CAST( pm2.meta_value AS CHAR ) > '" . $time_adj . "')";
+        if ($instance['future_only'] ):
+			$clauses[] = "((pm1.meta_value IS NULL AND CAST( pm2.meta_value AS CHAR ) > '" . $time_adj . "')
+            OR (pm1.meta_value IS NOT NULL AND CAST( pm1.meta_value AS CHAR ) > '" . $time_adj . "'))";
+        endif;
+        // use started events only
+		// note postmeta intelliwidget_event_date date format 
+		// MUST be YYYY-MM-DD HH:MM for this to work correctly!
+        if ($instance['active_only'] ):
+			$clauses[] = "(pm2.meta_value IS NOT NULL AND CAST( pm2.meta_value AS CHAR ) < '" . $time_adj . "')";
         endif;
 
         $order = $instance['sortorder'] == 'ASC' ? 'ASC' : 'DESC';

@@ -103,7 +103,7 @@ global $_wp_additional_image_sizes;
         <option value="" <?php selected( $intelliwidget_data['nav_menu'], '' ); ?>>None</option>
         <?php
 			// Get menus
-			foreach ( $intelliwidget->menus as $menu ):
+			foreach ( $this->menus as $menu ):
 				echo '<option value="' . $menu->term_id . '"'
 					. selected( $intelliwidget_data['nav_menu'], $menu->term_id, false )
 					. '>'. $menu->name . '</option>';
@@ -188,6 +188,13 @@ global $_wp_additional_image_sizes;
         <input id="<?php echo 'intelliwidget_' . $pagesection . '_future_only'; ?>" name="<?php echo 'intelliwidget_' . $pagesection . '_future_only'; ?>" type="checkbox" <?php checked($intelliwidget_data['future_only'], 1); ?> />
         &nbsp;
         <?php _e('Only future events', 'intelliwidget'); ?>
+      </label>
+    </p>
+    <p>
+      <label for="<?php echo 'intelliwidget_' . $pagesection . '_active_only'; ?>">
+        <input id="<?php echo 'intelliwidget_' . $pagesection . '_active_only'; ?>" name="<?php echo 'intelliwidget_' . $pagesection . '_active_only'; ?>" type="checkbox" <?php checked($intelliwidget_data['active_only'], 1); ?> />
+        &nbsp;
+        <?php _e('Only active events', 'intelliwidget'); ?>
       </label>
     </p>
     <p>

@@ -14,7 +14,7 @@ if ( !defined('ABSPATH')) exit;
  */
 global $iwgt_post;
 if ( !empty($selected)) : foreach($selected as $iwgt_post) : 
-    the_iwgt_content(); 
+    the_intelliwidget_content(); 
 endforeach; endif; 
 
 ?>

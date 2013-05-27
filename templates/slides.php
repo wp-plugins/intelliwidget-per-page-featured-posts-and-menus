@@ -17,8 +17,8 @@ if ( !defined('ABSPATH')) exit;
 <ul class="slides">
 <?php global $iwgt_post;
 if ( !empty($selected)) : foreach($selected as $iwgt_post) : ?>
-  <li id="intelliwidget_<?php the_iwgt_ID(); ?>" class="slide">
-    <?php the_iwgt_content(); ?>
+  <li id="intelliwidget_<?php the_intelliwidget_ID(); ?>" class="slide">
+    <?php the_intelliwidget_content(); ?>
   </li>
   <?php endforeach; endif; ?>
 </ul>

@@ -185,6 +185,13 @@ name="<?php echo $this->get_field_name('custom_text'); ?>">
     </p>
     <p>
       <label>
+        <input name="<?php echo $this->get_field_name('active_only'); ?>" id="<?php echo $this->get_field_id('active_only'); ?>" type="checkbox" <?php checked($instance['active_only'], 1); ?> />
+        &nbsp;
+        <?php _e('Only active events', 'intelliwidget'); ?>
+      </label>
+    </p>
+    <p>
+      <label>
         <input name="<?php echo $this->get_field_name('skip_expired'); ?>" id="<?php echo $this->get_field_id('skip_expired'); ?>" type="checkbox" <?php checked($instance['skip_expired'], 1); ?> />
         &nbsp;
         <?php _e('Exclude expired posts', 'intelliwidget'); ?>

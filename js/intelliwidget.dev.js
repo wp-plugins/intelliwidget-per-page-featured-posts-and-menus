@@ -22,7 +22,7 @@ jQuery(document).ready(function($) {
     $('body').on('click', '.iw-copy', iw_copy_page);    
     $('body').on('click', '.iw-add', iw_add_meta_box);    
     $('body').on('click', '.iw-delete', iw_delete_meta_box);    
-
+    // bind click event to edit timestamp links
     $('body').on('click', 'a.intelliwidget-edit-timestamp', function() {
         var field = $(this).attr('id').split('-', 1);
         if ($('#'+field+'_div').is(":hidden")) {
@@ -32,7 +32,7 @@ jQuery(document).ready(function($) {
         }
         return false;
     });
-
+    // bind click to clear timestamp (resets form to current date/time and clears date fields)
     $('body').on('click', '.intelliwidget-clear-timestamp', function() {
         var field = $(this).attr('id').split('-', 1);
         $('#'+field+'_div').slideUp('fast');
@@ -46,6 +46,7 @@ jQuery(document).ready(function($) {
         $('a#'+field+'-edit').show();
         return false;
     });
+    // bind click to cancel edit (resets form and date fields to original date/time)
     $('body').on('click', '.intelliwidget-cancel-timestamp', function() {
         var field = $(this).attr('id').split('-', 1);
         $('#'+field+'_div').slideUp('fast');
@@ -58,7 +59,7 @@ jQuery(document).ready(function($) {
         iwUpdateTimestampText(field, false);
         return false;
     });
-
+    // bind click to save edit (sets date fields to form values)
     $('body').on('click', '.intelliwidget-save-timestamp', function () { 
         var field = $(this).attr('id').split('-', 1);
         if ( iwUpdateTimestampText(field, true) ) {
@@ -67,51 +68,46 @@ jQuery(document).ready(function($) {
         }
         return false;
     });
-        
+    // combine date field and displayed date into single string from form values        
     function iwUpdateTimestampText(field, validate) {
+        // save current values
         var stamp     = $('#'+field+'_timestamp').html();
         var dateField = $('#'+field).val();
         var clearForm = false;
         var div       = '#' + field + '_div';
         if ( ! $(div).length )
             return true;
-
-        var attemptedDate, originalDate, currentDate, 
+        // retrieve values from form
+        var attemptedDate, 
             aa = $('#'+field+'_aa').val(),
             mm = $('#'+field+'_mm').val(), 
             jj = $('#'+field+'_jj').val(), 
             hh = $('#'+field+'_hh').val(), 
             mn = $('#'+field+'_mn').val();
-
+        // construct date object
         attemptedDate = new Date( aa, mm - 1, jj, hh, mn );
-        originalDate  = new Date( 
-            $('#'+field+'_hidden_aa').val(), 
-            $('#'+field+'_hidden_mm').val() -1, 
-            $('#'+field+'_hidden_jj').val(), 
-            $('#'+field+'_hidden_hh').val(), 
-            $('#'+field+'_hidden_mn').val() );
-        currentDate   = new Date( 
-            $('#'+field+'_cur_aa').val(), 
-            $('#'+field+'_cur_mm').val() -1, 
-            $('#'+field+'_cur_jj').val(), 
-            $('#'+field+'_cur_hh').val(), 
-            $('#'+field+'_cur_mn').val() );
-
+        // validate inputs by comparing to date object
         if ( attemptedDate.getFullYear() != aa || 
             (1 + attemptedDate.getMonth()) != mm || 
             attemptedDate.getDate() != jj ||
             attemptedDate.getMinutes() != mn ) {
+            // date object returned invalid
+            // if validating, display error and return invalid
             if (validate == true) {
                 $(div).addClass('form-invalid');
                 return false;
             }
+            // otherwise clear form (value is/was null)  
             clearForm = true;
         }
+        // date validated or ignored, reset invalid class
         $(div).removeClass('form-invalid');
         if (clearForm) {
+            // replace date fields with empty string
             $('#'+field+'_timestamp').html('');
             $('#'+field).val('');
         } else {
+            // format displayed date string from form values
             $('#'+field+'_timestamp').html(
                 '<b>' +
                 $('option[value="' + $('#'+field+'_mm').val() + '"]', '#'+field+'_mm').text() + ' ' +
@@ -120,6 +116,7 @@ jQuery(document).ready(function($) {
                 hh + ':' +
                 mn + '</b> '
             );
+            // format date field from form values
             $('#'+field).val(
                 aa + '-' +
                 $('#'+field+'_mm').val() + '-' +
@@ -131,6 +128,7 @@ jQuery(document).ready(function($) {
         return true;
     }
 });
+// we call this form cptdata (custom post type) although it applies to pages/posts as well
 var iw_save_cptdata = function(){
     // disable the button until ajax returns
     jQuery(this).attr('disabled', 'disabled');
