@@ -138,9 +138,6 @@ name="<?php echo $this->get_field_name('custom_text'); ?>">
         <?php _e( 'Random', 'intelliwidget'); ?>
         </option>
       </select>
-      <label for="<?php echo $this->get_field_id('sortorder'); ?>">
-        <?php _e( 'Order:', 'intelliwidget'); ?>
-      </label>
       <select name="<?php echo $this->get_field_name('sortorder'); ?>" id="<?php echo $this->get_field_id('sortorder'); ?>">
         <option value="ASC"<?php selected( $instance['sortorder'], 'ASC' ); ?>>
         <?php _e('ASC', 'intelliwidget'); ?>

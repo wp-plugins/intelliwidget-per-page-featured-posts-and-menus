@@ -1,9 +1,22 @@
+<?php
+// Exit if accessed directly
+if ( !defined('ABSPATH')) exit;
+/**
+ * post-form.php - Outputs Custom Data Fields form and admin styles
+ *
+ * @package IntelliWidget
+ * @subpackage includes
+ * @author Lilaea Media
+ * @copyright 2013
+ * @access public
+ */
+?>
 <style>
-.iw-save-container, .iw-copy-container, .iw-cpt-container {
+.iw-save-container, .iw-copy-container, .iw-cdf-container {
     position: relative;
     float: right;
 }
-.iw-save-container.success:before, .iw-copy-container.success:before, .iw-cpt-container.success:before {
+.iw-save-container.success:before, .iw-copy-container.success:before, .iw-cdf-container.success:before {
     content: "";
     display: block;
     position: absolute;
@@ -109,8 +122,8 @@ input.intelliwidget-input, select.intelliwidget-input {
       <option value="_top"<?php selected( $fields['intelliwidget_link_target'], '_top' ); ?>>_top</option>
     </select>
 </p>
-<div class="iw-cpt-container">
-  <input name="save" class="iw-cptsave button button-primary button-large" id="iw_cptsave" value="Save" type="button" style="float:right" />
+<div class="iw-cdf-container">
+  <input name="save" class="iw-cdfsave button button-primary button-large" id="iw_cdfsave" value="Save" type="button" style="float:right" />
   <span class="spinner" id="intelliwidget_cpt_spinner"></span> </div>
 <?php wp_nonce_field('iwpage_' . $post->ID,'iwpage'); ?>
 <div style="clear:both"></div>

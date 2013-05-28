@@ -18,11 +18,21 @@ jQuery(document).ready(function($) {
     });
     // bind click events to edit page meta box buttons
     $('body').on('click', '.iw-save', iw_save_postdata);    
-    $('body').on('click', '.iw-cptsave', iw_save_cptdata);    
+    $('body').on('click', '.iw-cdfsave', iw_save_cdfdata);    
     $('body').on('click', '.iw-copy', iw_copy_page);    
     $('body').on('click', '.iw-add', iw_add_meta_box);    
     $('body').on('click', '.iw-delete', iw_delete_meta_box);    
-    // bind click event to edit timestamp links
+
+    /**
+     * manipulate IntelliWidget timestamp inputs
+     * Adapted from wp-admin/js/post.js in Wordpress Core
+     */
+     
+    // format visible timestamp values
+    iwUpdateTimestampText('intelliwidget_event_date', false);
+    iwUpdateTimestampText('intelliwidget_expire_date', false);
+    
+    // bind edit links to reveal timestamp input form
     $('body').on('click', 'a.intelliwidget-edit-timestamp', function() {
         var field = $(this).attr('id').split('-', 1);
         if ($('#'+field+'_div').is(":hidden")) {
@@ -44,9 +54,10 @@ jQuery(document).ready(function($) {
         $('#'+field+'_timestamp').html('');
         $('#'+field).val('');
         $('a#'+field+'-edit').show();
+        iwUpdateTimestampText(field, false);
         return false;
     });
-    // bind click to cancel edit (resets form and date fields to original date/time)
+    // bind cancel button to reset values (or empty string if orig field is empty) 
     $('body').on('click', '.intelliwidget-cancel-timestamp', function() {
         var field = $(this).attr('id').split('-', 1);
         $('#'+field+'_div').slideUp('fast');
@@ -59,7 +70,8 @@ jQuery(document).ready(function($) {
         iwUpdateTimestampText(field, false);
         return false;
     });
-    // bind click to save edit (sets date fields to form values)
+
+    // bind 'Ok' button to update timestamp to inputs
     $('body').on('click', '.intelliwidget-save-timestamp', function () { 
         var field = $(this).attr('id').split('-', 1);
         if ( iwUpdateTimestampText(field, true) ) {
@@ -68,22 +80,21 @@ jQuery(document).ready(function($) {
         }
         return false;
     });
-    // combine date field and displayed date into single string from form values        
+    // set visible timestamp and timestamp hidden inputs to form inputs 
+    // only validates form if validate param is true
+    // this allows values to be reset/cleared
     function iwUpdateTimestampText(field, validate) {
-        // save current values
-        var stamp     = $('#'+field+'_timestamp').html();
-        var dateField = $('#'+field).val();
-        var clearForm = false;
-        var div       = '#' + field + '_div';
-        if ( ! $(div).length )
-            return true;
+
         // retrieve values from form
         var attemptedDate, 
-            aa = $('#'+field+'_aa').val(),
-            mm = $('#'+field+'_mm').val(), 
-            jj = $('#'+field+'_jj').val(), 
-            hh = $('#'+field+'_hh').val(), 
-            mn = $('#'+field+'_mn').val();
+            div         = '#' + field + '_div', 
+            clearForm   = (!validate && !$('#'+field).val()),  
+            aa          = $('#'+field+'_aa').val(),
+            mm          = ('00'+$('#'+field+'_mm').val()).slice(-2), 
+            jj          = ('00'+$('#'+field+'_jj').val()).slice(-2), 
+            hh          = ('00'+$('#'+field+'_hh').val()).slice(-2), 
+            mn          = ('00'+$('#'+field+'_mn').val()).slice(-2);
+        if (! $(div).length) return true;
         // construct date object
         attemptedDate = new Date( aa, mm - 1, jj, hh, mn );
         // validate inputs by comparing to date object
@@ -95,6 +106,7 @@ jQuery(document).ready(function($) {
             // if validating, display error and return invalid
             if (validate == true) {
                 $(div).addClass('form-invalid');
+                $('.iw-cdfsave').attr('disabled', 'disabled');
                 return false;
             }
             // otherwise clear form (value is/was null)  
@@ -102,6 +114,7 @@ jQuery(document).ready(function($) {
         }
         // date validated or ignored, reset invalid class
         $(div).removeClass('form-invalid');
+        $('.iw-cdfsave').removeAttr('disabled');
         if (clearForm) {
             // replace date fields with empty string
             $('#'+field+'_timestamp').html('');
@@ -128,14 +141,16 @@ jQuery(document).ready(function($) {
         return true;
     }
 });
-// we call this form cptdata (custom post type) although it applies to pages/posts as well
-var iw_save_cptdata = function(){
+/**
+ * Ajax Save Custom Post Type Data
+ */
+var iw_save_cdfdata = function(){
     // disable the button until ajax returns
     jQuery(this).attr('disabled', 'disabled');
     // clear previous success/fail icons
-    jQuery('.iw-copy-container,.iw-save-container,.iw-cpt-container').removeClass('success failure');
+    jQuery('.iw-copy-container,.iw-save-container,.iw-cdf-container').removeClass('success failure');
     // unbind button from click event
-    jQuery('body').off('click', '#iw_cptsave', iw_save_cptdata);
+    jQuery('body').off('click', '#iw_cdfsave', iw_save_cdfdata);
     // show spinner
     jQuery('#intelliwidget_cpt_spinner').show();
     // build post data array
@@ -147,7 +162,7 @@ var iw_save_cptdata = function(){
         postData[fieldID] = jQuery(this).val();
     });
     // add wp ajax action to array
-    postData['action'] = 'iw_cptsave';
+    postData['action'] = 'iw_cdfsave';
     // send to wp
     jQuery.post(  
         // get ajax url from localized object
@@ -157,32 +172,35 @@ var iw_save_cptdata = function(){
         //on success function  
         function(response){
             // release button
-            jQuery('#iw_cptsave').removeAttr('disabled');
+            jQuery('#iw_cdfsave').removeAttr('disabled');
             // hide spinner
             jQuery('#intelliwidget_cpt_spinner').hide();
             // show check mark
-            jQuery('.iw-cpt-container').addClass('success');
+            jQuery('.iw-cdf-container').addClass('success');
             return false;  
         }
     );  
     return false;  
-}
-var iw_save_postdata = function (){ 
+},
+/**
+ * Ajax Save IntelliWidget Meta Box Data
+ */
+iw_save_postdata = function (){ 
     // disable the button until ajax returns
     jQuery(this).attr('disabled', 'disabled');;
-    jQuery('.iw-copy-container,.iw-save-container,.iw-cpt-container').removeClass('success failure');
+    jQuery('.iw-copy-container,.iw-save-container,.iw-cdf-container').removeClass('success failure');
     // get id of button
-    var thisID = jQuery(this).attr('id');
-    // munge selector
-    var sel = '#' + thisID;
-    // unbind button from click event
-    jQuery('body').off('click', sel, iw_save_postdata);
-    // parse id to get section number
-    var pre = 'intelliwidget_' + thisID.split('_')[1];
+    var thisID   = jQuery(this).attr('id')
+        // munge selector
+        sel      = '#' + thisID,
+        // parse id to get section number
+        pre      = 'intelliwidget_' + thisID.split('_')[1],
+        // build post data array
+        postData = {};
     // show spinner
     jQuery('#' + pre + '_spinner').show();
-    // build post data array
-    var postData = {};
+    // unbind button from click event
+    jQuery('body').off('click', sel, iw_save_postdata);
     // special handling for post types (array of checkboxes)
     postData[ pre + '_post_types'] = [];
     // find inputs for this section
@@ -218,13 +236,16 @@ var iw_save_postdata = function (){
         }
     );  
     return false;  
-}
+},
 
-var iw_copy_page = function (){ 
+/**
+ * Ajax Save Copy Page Input
+ */
+iw_copy_page = function (){ 
     // disable the button until ajax returns
     jQuery(this).attr('disabled', 'disabled');
     // clear previous success/fail icons
-    jQuery('.iw-copy-container,.iw-save-container,.iw-cpt-container').removeClass('success failure');
+    jQuery('.iw-copy-container,.iw-save-container,.iw-cdf-container').removeClass('success failure');
     // unbind button from click event
     jQuery('body').off('click', '#iw_copy', iw_copy_page);
     // show spinner
@@ -257,9 +278,12 @@ var iw_copy_page = function (){
         }
     );  
     return false;  
-}
+},
 
-var iw_add_meta_box = function (e){ 
+/**
+ * Ajax Add new IntelliWidget Meta Box Section
+ */
+iw_add_meta_box = function (e){ 
     // don't act like a link
     e.stopPropagation();
     // ignore click if we are in process
@@ -267,15 +291,15 @@ var iw_add_meta_box = function (e){
     // disable the button until ajax returns
     jQuery(this).addClass('disabled');
     // clear previous success/fail icons
-    jQuery('.iw-copy-container,.iw-save-container,.iw-cpt-container').removeClass('success failure');
+    jQuery('.iw-copy-container,.iw-save-container,.iw-cdf-container').removeClass('success failure');
     // get id of button
-    var thisID = jQuery(this).attr('id');
-    // munge selector
-    var sel = '#' + thisID;
-    // get href from link
-    var href = jQuery(this).attr('href');
-    // build post data array from query string
-    var postData = URLToArray(href);
+    var thisID   = jQuery(this).attr('id'),
+        // munge selector
+        sel      = '#' + thisID,
+        // get href from link
+        href     = jQuery(this).attr('href'),
+        // build post data array from query string
+        postData = URLToArray(href);
     // show spinner
     jQuery('#intelliwidget_spinner').show();
     // add wp ajax action to array
@@ -316,9 +340,12 @@ var iw_add_meta_box = function (e){
         }
     );  
     return false;  
-}
+},
 
-var iw_delete_meta_box = function (e){ 
+/**
+ * Ajax Delete IntelliWidget Meta Box Section
+ */
+iw_delete_meta_box = function (e){ 
     // don't act like a link
     e.stopPropagation();
     // ignore click if we are in process
@@ -326,17 +353,17 @@ var iw_delete_meta_box = function (e){
     // disable the button until ajax returns
     jQuery(this).addClass('disabled');
     // clear previous success/fail icons
-    jQuery('.iw-copy-container,.iw-save-container,.iw-cpt-container').removeClass('success failure');
+    jQuery('.iw-copy-container,.iw-save-container,.iw-cdf-container').removeClass('success failure');
     // get id of button
-    var thisID = jQuery(this).attr('id');
-    // munge selector
-    var sel = '#' + thisID;
-    // get href from link
-    var href = jQuery(this).attr('href');
-    // build post data array from query string
-    var postData = URLToArray(href);
-    // get box id 
-    var pre = postData['iwdelete'];
+    var thisID = jQuery(this).attr('id'),
+        // munge selector
+        sel      = '#' + thisID,
+        // get href from link
+        href     = jQuery(this).attr('href'),
+        // build post data array from query string
+        postData = URLToArray(href),
+        // get box id 
+        pre      = postData['iwdelete'];
     // show spinner
     jQuery('#intelliwidget_' + pre + '_spinner').show();
     // add wp ajax action to array
@@ -365,10 +392,10 @@ var iw_delete_meta_box = function (e){
  * nice little url -> name:value pairs codex
  */
 function URLToArray(url) {
-    var request = {};
-    var pairs = url.substring(url.indexOf('?') + 1).split('&');
-    for (var i = 0; i < pairs.length; i++) {
-        var pair = pairs[i].split('=');
+    var pair, i, request = {},
+        pairs = url.substring(url.indexOf('?') + 1).split('&');
+    for (i = 0; i < pairs.length; i++) {
+        pair = pairs[i].split('=');
         request[decodeURIComponent(pair[0])] = decodeURIComponent(pair[1]);
     }
     return request;

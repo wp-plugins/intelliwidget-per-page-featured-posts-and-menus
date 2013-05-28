@@ -1,10 +1,10 @@
 === IntelliWidget Per Page Featured Posts and Menus ===
 Contributors: lilaeamedia
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=DE4W9KW7HQJNA
-Tags: custom post types, custom sidebar, featured post, per page menu, plugin, textwidget, widget 
+Tags: featured post, events, page menu, plugin, textwidget, widget, custom post types, custom sidebar
 Requires at least: 3.5
 Tested up to: 3.5.1
-Stable tag: 1.1.0
+Stable tag: 2.0.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -30,6 +30,10 @@ Why use IntelliWidget as your Featured Post plugin?
 IntelliWidget eliminates the need for multiple sidebars to accommodate page-specific content. Instead, you use one set of dynamic sidebars, load a few IntelliWidgets and then customize on a per-page basis. If you don’t customize a page, the default widget (the one you configured on the widgets page) displays instead.
 
 IntelliWidgets can include but are not limited to: custom page menus, featured posts, slider lists, arbitrary text/html (textwidgets), calendars, testimonials, categories and more.
+
+IntelliWidget now supports Wordpress Custom Menus! Use the Nav Menu template option and select any Nav Menu to use on specific pages. Standard IntelliWidget Menus continue to work as before.
+
+Expire posts on a specific date/time using the new date features. Also, you can combine active posts and expired posts to show only events going on currently.
 
 Because the lists are generated using active titles and permalinks, your site is always current with the latest versions of your content.
 
@@ -62,6 +66,19 @@ Docs can be found at http://www.lilaeamedia.com/plugins/intelliwidget/
 
 == Changelog ==
 
+= 2.0.1 =
+* Supports Custom Nav Menus as well as IntelliWidget menus
+* Support for Event Date and Expire Date on posts
+* Hide Expired post option
+* Show only active posts option
+* Changed the way IW treats event dates (now separate custom data field)
+* Added custom query separate from The Loop to retrieve all data in a single database call
+* Reduced the number of database queries per widget instance
+* Changed custom data field names so they don't conflict with existing data fields
+* Refactored template tags to be more efficient
+* Added Custom Data Fields meta box for easy editing of IW post data fields (especially dates)
+* Fixed replace widget bug
+
 = 1.1.0 =
 * Improved the overall interface.
 * Fixed bug in the way IW saves per-page widgets 
@@ -79,6 +96,10 @@ Docs can be found at http://www.lilaeamedia.com/plugins/intelliwidget/
 
 
 == Upgrade Notice ==
+
+= 2.0.1 =
+
+Custom Data Field names have been changed to elminate conflicts with other plugins/themes. You may need to update your post meta data to use the new names. Some Template Tags function names have changed. Check the documentation for more information.
 
 = 1.1.0 =
 

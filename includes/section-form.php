@@ -133,9 +133,6 @@ global $_wp_additional_image_sizes;
         <?php _e( 'Random', 'intelliwidget'); ?>
         </option>
       </select>
-      <label for="<?php echo 'intelliwidget_' . $pagesection . '_sortorder'; ?>">
-        <?php _e( 'Order:', 'intelliwidget'); ?>
-      </label>
       <select name="<?php echo 'intelliwidget_' . $pagesection . '_sortorder'; ?>" id="<?php echo 'intelliwidget_' . $pagesection . '_sortorder'; ?>">
         <option value="ASC"<?php selected( $intelliwidget_data['sortorder'], 'ASC' ); ?>>
         <?php _e('ASC', 'intelliwidget'); ?>

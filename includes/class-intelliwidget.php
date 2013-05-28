@@ -12,7 +12,7 @@ if ( !defined('ABSPATH')) exit;
  */
 class IntelliWidget {
 
-    var $version     = '1.0';
+    var $version     = '2.0.1';
     var $pluginName;
     var $pluginPath;
     var $pluginURL;
@@ -49,7 +49,7 @@ class IntelliWidget {
             add_action('add_meta_boxes',      array(&$this, 'section_meta_box') );
             add_action('add_meta_boxes',      array(&$this, 'post_meta_box') );
             add_action('save_post',           array(&$this, 'save_postdata'), 1, 2 );
-            add_action('wp_ajax_iw_cptsave',  array(&$this, 'ajax_save_cptdata' ));
+            add_action('wp_ajax_iw_cdfsave',  array(&$this, 'ajax_save_cdfdata' ));
             add_action('wp_ajax_iw_save',     array(&$this, 'ajax_save_postdata' ));
             add_action('wp_ajax_iw_copy',     array(&$this, 'ajax_copy_page' ));
             add_action('wp_ajax_iw_delete',   array(&$this, 'ajax_delete_meta_box' ));
@@ -305,7 +305,7 @@ class IntelliWidget {
             // if we have updates, serialize and save new map
             update_post_meta($post_ID, '_intelliwidget_map', serialize($box_map));
         // save custom post data if it exists
-        $this->save_cptdata();
+        $this->save_cdfdata();
         // save copy page id (i.e., "use settings from ..." ) if it exists
         $this->save_copy_page($post_ID);
         return true;
@@ -315,11 +315,11 @@ class IntelliWidget {
         if ($this->save_postdata() === false) die('fail');
         die('success');
     }
-    function ajax_save_cptdata() {
-        if ($this->save_cptdata() === false) die('fail');
+    function ajax_save_cdfdata() {
+        if ($this->save_cdfdata() === false) die('fail');
         die('success');
     }
-    function save_cptdata() {
+    function save_cdfdata() {
         if (empty($_POST['iwpage']) ) return false;
         
         $post_ID   = intval($_POST['post_ID']);
