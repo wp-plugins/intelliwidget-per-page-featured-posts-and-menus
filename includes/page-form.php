@@ -13,32 +13,6 @@ if ( !defined('ABSPATH')) exit;
 
 ?>
 <?php echo $this->docsLink; ?>
-<style>
-.iw-save-container, .iw-copy-container {
-    position: relative;
-    float: right;
-}
-.iw-save-container.success:before, .iw-copy-container.success:before {
-    content: "";
-    display: block;
-    position: absolute;
-    height: 16px;
-    width: 16px;
-    top: 8px;
-    left: -26px;
-	background:url(<?php echo admin_url( 'images/yes.png' ); ?>) no-repeat;
-}
-input.iw-save.failure:before, input.iw-copy.failure:before {
-    content: "";
-    display: block;
-    position: absolute;
-    height: 16px;
-    width: 16px;
-    top: 8px;
-    left: -26px;
-	background:url(<?php echo admin_url( 'images/no.png') ; ?>) no-repeat;
-}
-</style>
 <p>
   <label for="<?php echo 'intelliwidget_widget_page_id'; ?>">
     <?php _e('Use settings from:', 'intelliwidget'); ?>
