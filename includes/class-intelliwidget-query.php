@@ -158,8 +158,9 @@ LEFT OUTER JOIN (
             $clauses[] = '( tx1.term_taxonomy_id IN (' . $instance['category'] . ') )';
             $joins[] = "INNER JOIN {$wpdb->term_relationships} tx1 ON p1.ID = tx1.object_id"; 
         endif;
-        if (!empty($instance['page'])):
+        //if (!empty($instance['page'])):
             $pages = is_array($instance['page']) ? implode(',', $instance['page']) : $instance['page'];
+        if (!empty($pages)):
             $clauses[] = '(p1.ID IN (' . $pages . ') )'; 
         endif;
         /* Remove current page from list of pages if set */

@@ -299,7 +299,7 @@ iw_add_meta_box = function (e){
         // get href from link
         href     = jQuery(this).attr('href'),
         // build post data array from query string
-        postData = URLToArray(href);
+        postData = iw_url_to_array(href);
     // show spinner
     jQuery('#intelliwidget_spinner').show();
     // add wp ajax action to array
@@ -361,7 +361,7 @@ iw_delete_meta_box = function (e){
         // get href from link
         href     = jQuery(this).attr('href'),
         // build post data array from query string
-        postData = URLToArray(href),
+        postData = iw_url_to_array(href),
         // get box id 
         pre      = postData['iwdelete'];
     // show spinner
@@ -391,7 +391,7 @@ iw_delete_meta_box = function (e){
 /**
  * nice little url -> name:value pairs codex
  */
-function URLToArray(url) {
+function iw_url_to_array(url) {
     var pair, i, request = {},
         pairs = url.substring(url.indexOf('?') + 1).split('&');
     for (i = 0; i < pairs.length; i++) {
