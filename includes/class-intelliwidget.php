@@ -14,7 +14,7 @@ require_once( 'class-intelliwidget-query.php' );
 require_once( 'class-walker-intelliwidget.php' );
 class IntelliWidget {
 
-    var $version     = '1.2.0';
+    var $version     = '1.2.1';
     var $pluginName;
     var $pluginPath;
     var $pluginURL;
@@ -47,7 +47,7 @@ class IntelliWidget {
         if (is_admin()):
             $this->menus = get_terms( 'nav_menu', array( 'hide_empty' => false ) );
             $this->templates  = $this->get_widget_templates();
-            add_action('admin_init',          array(&$this, 'admin_init'));
+            add_action('admin_init',          array(&$this, 'admin_scripts'));
             add_action('add_meta_boxes',      array(&$this, 'main_meta_box') );
             add_action('add_meta_boxes',      array(&$this, 'section_meta_box') );
             add_action('add_meta_boxes',      array(&$this, 'post_meta_box') );
@@ -58,7 +58,7 @@ class IntelliWidget {
             add_action('wp_ajax_iw_delete',   array(&$this, 'ajax_delete_meta_box' ));
             add_action('wp_ajax_iw_add',      array(&$this, 'ajax_add_meta_box' ));
             //add_action('admin_print_styles', array(&$this, 'admin_styles'));
-            add_action('admin_print_scripts', array(&$this, 'admin_scripts'));
+            //add_action('admin_print_scripts', array(&$this, 'admin_scripts'));
         endif;
         // thanks to woothemes for this
         add_action( 'after_setup_theme', array( &$this, 'ensure_post_thumbnails_support' ) );
@@ -76,7 +76,7 @@ class IntelliWidget {
         // we only use session for persisting notices across redirects FIXME: need better way
         //if (!session_id()) session_start();
         //wp_register_style('intelliwidget-admin-css', $this->pluginURL . 'includes/intelliwidget-admin.css');
-        wp_register_script('intelliwidget-js', $this->pluginURL . 'js/intelliwidget.js');
+        //wp_register_script('intelliwidget-js', $this->pluginURL . 'js/intelliwidget.js', array('jquery'), '1.2.0', false);
     }
     
     /**
@@ -90,7 +90,7 @@ class IntelliWidget {
      * Stub for printing the scripts needed for the admin.
      */
     function admin_scripts() {
-        wp_enqueue_script('intelliwidget-js');
+        wp_enqueue_script('intelliwidget-js', $this->pluginURL . 'js/intelliwidget.js', array('jquery'), '1.2.0', false);
         wp_localize_script( 'intelliwidget-js', 'IWAjax', array(
             'ajaxurl' => admin_url( 'admin-ajax.php' )
         ));

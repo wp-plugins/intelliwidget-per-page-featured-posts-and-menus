@@ -4,7 +4,7 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_i
 Tags: featured posts, events, page menu, plugin, textwidget, widget, custom post types, custom sidebar
 Requires at least: 3.5
 Tested up to: 3.5.1
-Stable tag: 1.2.0
+Stable tag: 1.2.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -70,6 +70,10 @@ Docs can be found at http://www.lilaeamedia.com/plugins/intelliwidget/
 5. Example of the Custom Data Fields Panel.
 
 == Changelog ==
+
+= 1.2.1 =
+* Fixed bug that horked the query generator when no specific posts are selected
+* Renamed the url to array function to prevent JS namespace collisions
 
 = 1.2.0 =
 * Supports Custom Nav Menus as well as IntelliWidget menus
