@@ -96,10 +96,11 @@ global $_wp_additional_image_sizes;
   <div class="inside">
     <p>
       <label for="<?php echo 'intelliwidget_' . $pagesection . '_nav_menu'; ?>">
-        <?php _e('WP Nav Menu:'); ?>
+        <?php _e('WP Nav Menu'); ?>
       </label>
       <select id="<?php echo 'intelliwidget_' . $pagesection . '_nav_menu'; ?>" name="<?php echo 'intelliwidget_' . $pagesection . '_nav_menu'; ?>">
         <option value="" <?php selected( $intelliwidget_data['nav_menu'], '' ); ?>>None</option>
+        <option value="-1" <?php selected( $intelliwidget_data['nav_menu'], '-1' ); ?>>Page Menu</option>
         <?php
             // Get menus
             foreach ( $this->menus as $menu ):
@@ -113,7 +114,7 @@ global $_wp_additional_image_sizes;
     </p>
     <p>
       <label for="<?php echo 'intelliwidget_' . $pagesection . '_sortby'; ?>">
-        <?php _e( 'Sort by:', 'intelliwidget'); ?>
+        <?php _e( 'Sort by', 'intelliwidget'); ?>
       </label>
       <select name="<?php echo 'intelliwidget_' . $pagesection . '_sortby'; ?>" id="<?php echo 'intelliwidget_' . $pagesection . '_sortby'; ?>">
         <option value="date"<?php selected( $intelliwidget_data['sortby'], 'date' ); ?>>
@@ -143,7 +144,7 @@ global $_wp_additional_image_sizes;
     </p>
     <p>
       <label for="<?php echo 'intelliwidget_' . $pagesection . '_items'; ?>">
-        <?php _e('Posts per section:', 'intelliwidget'); ?>
+        <?php _e('Posts per section', 'intelliwidget'); ?>
         : </label>
       <select name="<?php echo 'intelliwidget_' . $pagesection . '_items'; ?>" id="<?php echo 'intelliwidget_' . $pagesection . '_items'; ?>">
         <option value="all" <?php selected($intelliwidget_data['items'], 'all'); ?>>
@@ -156,7 +157,7 @@ global $_wp_additional_image_sizes;
     </p>
     <p>
       <label for="<?php echo 'intelliwidget_' . $pagesection . '_length'; ?>">
-        <?php _e('Words per post:', 'intelliwidget'); ?>
+        <?php _e('Words per post', 'intelliwidget'); ?>
       </label>
       <input id="<?php echo 'intelliwidget_' . $pagesection . '_length'; ?>" name="<?php echo 'intelliwidget_' . $pagesection . '_length'; ?>" size="3" type="text" value="<?php echo esc_attr($intelliwidget_data['length']); ?>" />
     </p>
@@ -165,6 +166,12 @@ global $_wp_additional_image_sizes;
         <?php _e('Link Text', 'intelliwidget'); ?>
       </label>
       <input name="<?php echo 'intelliwidget_' . $pagesection . '_link_text'; ?>" id="<?php echo 'intelliwidget_' . $pagesection . '_link_text'; ?>" type="text" value="<?php echo esc_attr($intelliwidget_data['link_text']); ?>" />
+    </p>
+    <p>
+      <label for="<?php echo 'intelliwidget_' . $pagesection . '_container_id'; ?>">
+        <?php _e('ID', 'intelliwidget'); ?>
+      </label>
+      <input name="<?php echo 'intelliwidget_' . $pagesection . '_container_id'; ?>" id="<?php echo 'intelliwidget_' . $pagesection . '_container_id'; ?>" type="text" value="<?php echo esc_attr($intelliwidget_data['container_id']); ?>" />
     </p>
     <p>
       <label for="<?php echo 'intelliwidget_' . $pagesection . '_classes'; ?>">
@@ -209,7 +216,7 @@ global $_wp_additional_image_sizes;
     </p>
     <p>
       <label for="<?php echo 'intelliwidget_' . $pagesection . '_imagealign'; ?>">
-        <?php _e('Image Align:', 'intelliwidget'); ?>
+        <?php _e('Image Align', 'intelliwidget'); ?>
       </label>
       <select name="<?php echo 'intelliwidget_' . $pagesection . '_imagealign'; ?>" id="<?php echo 'intelliwidget_' . $pagesection . '_imagealign'; ?>">
         <option value="none" <?php selected($intelliwidget_data['imagealign'], 'none'); ?> >
@@ -228,7 +235,7 @@ global $_wp_additional_image_sizes;
     </p>
     <p>
       <label for="<?php echo 'intelliwidget_' . $pagesection . '_image_size'; ?>">
-        <?php _e('Image Size:', 'intelliwidget'); ?>
+        <?php _e('Image Size', 'intelliwidget'); ?>
       </label>
       <select id="<?php echo 'intelliwidget_' . $pagesection . '_image_size'; ?>" name="<?php  echo 'intelliwidget_' . $pagesection . '_image_size'; ?>">
         <option value="none" <?php selected($intelliwidget_data['image_size'], 'none'); ?> >
@@ -251,7 +258,7 @@ global $_wp_additional_image_sizes;
         <?php endforeach; endif; ?>
       </select>
     </p>
-    <p> Post Types:<br/>
+    <p> Post Types<br/>
       <?php foreach ( $this->get_eligible_post_types() as $type ) : ?>
       <label>
         <input id="<?php echo 'intelliwidget_' . $pagesection . '_post_types'; ?>" type="checkbox" name="<?php echo 'intelliwidget_' . $pagesection . '_post_types[]'; ?>" value="<?php echo $type; ?>" <?php checked(in_array($type, $intelliwidget_data['post_types']), 1); ?> />

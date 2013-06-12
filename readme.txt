@@ -4,7 +4,7 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_i
 Tags: featured posts, events, page menu, plugin, textwidget, widget, custom post types, custom sidebar
 Requires at least: 3.5
 Tested up to: 3.5.1
-Stable tag: 1.2.1
+Stable tag: 1.2.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -70,6 +70,12 @@ Docs can be found at http://www.lilaeamedia.com/plugins/intelliwidget/
 5. Example of the Custom Data Fields Panel.
 
 == Changelog ==
+
+= 1.2.2 =
+* Fixed bug that created invalid path to the admin JavaScript include 
+* Thanks to Spokesrider on Wordpress.org for finding this!
+* Added Page Menu as option for Nav Menu (to automatically generate menu from pages)
+* Added ID field option to override default 'intelliwidget' id
 
 = 1.2.1 =
 * Fixed bug that horked the query generator when no specific posts are selected

@@ -116,10 +116,15 @@ if ( !function_exists('get_the_intelliwidget_content') ) {
         if ( strpos( $content, '<!--nextpage-->' ) ) {
             $content = preg_replace("#\s*<!\-\-nextpage\-\->.*#s", '', $content);
         }
-        return $content;
+        // remove intelliwidget shortcode to stop endless recursion
+        if ( strpos( $content, '[intelliwidget' )) {
+            $content = preg_replace("#\[intelliwidget.*?\]#s", '', $content);
+        }
+        // otherwise, parse shortcodes
+        return do_shortcode($content);
     }
 }
-
+    
 if ( !function_exists('the_intelliwidget_content') ) {
     /**
      * Display the excerpt for the featured post.
@@ -254,10 +259,9 @@ if ( !function_exists('_intelliwidget_trim_excerpt') ) {
      * @return <string>
      */
     function _intelliwidget_trim_excerpt($text, $length = 15) {
-        $text = apply_filters('the_content', $text);
-        $text = str_replace(']]>', ']]&gt;', $text);
-        $text = preg_replace('@<script[^>]*?>.*?</script>@si', '', $text);
+        $text = strip_shortcodes($text);
         $text = strip_tags($text);
+        $text = str_replace(']]>', ']]&gt;', $text);
         $words = preg_split("#\s+#s", $text, $length + 1);
         if ( count($words) > $length ) {
             array_pop($words);
