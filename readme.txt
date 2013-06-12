@@ -72,7 +72,7 @@ Docs can be found at http://www.lilaeamedia.com/plugins/intelliwidget/
 == Changelog ==
 
 = 1.2.2 =
-* Fixed bug that created invalid path to the admin JavaScript include 
+* Fixed bug that created invalid path to the admin JavaScript include on Windows
 * Thanks to Spokesrider on Wordpress.org for finding this!
 * Added Page Menu as option for Nav Menu (to automatically generate menu from pages)
 * Added ID field option to override default 'intelliwidget' id
