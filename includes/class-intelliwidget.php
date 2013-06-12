@@ -14,7 +14,7 @@ require_once( 'class-intelliwidget-query.php' );
 require_once( 'class-walker-intelliwidget.php' );
 class IntelliWidget {
 
-    var $version     = '1.2.1';
+    var $version     = '1.2.2';
     var $pluginName;
     var $pluginPath;
     var $pluginURL;
@@ -36,9 +36,13 @@ class IntelliWidget {
         /* Plugin Details */
         $this->pluginName = __('IntelliWidget', 'intelliwidget');
         $this->pluginPath    = $this->dir . '/';
-        $this->pluginURL     = esc_url( str_replace( WP_PLUGIN_DIR, WP_PLUGIN_URL, $this->pluginPath) );
-        $this->templatesPath = $this->dir . '/templates/';
-        $this->templatesURL  = esc_url( str_replace( WP_PLUGIN_DIR, WP_PLUGIN_URL, $this->templatesPath) );
+        /* get url to this directory 
+         * Thanks to Spokesrider for finding this bug! 
+         */
+        $this->pluginURL     = plugin_dir_url($file) . '/';
+        $this->templatesPath = $this->pluginPath . 'templates/';
+        $this->templatesURL  = $this->pluginURL . 'templates/';        
+
         $this->docsLink      = '<a href="http://www.lilaeamedia.com/plugins/intelliwidget/" target="_blank" title="Help" style="float:right">Help</a>';
         $this->load_settings();
         add_shortcode('intelliwidget', array(&$this, 'intelliwidget_shortcode'));
@@ -566,6 +570,7 @@ class IntelliWidget {
             'custom_text'    => '',
             'text_position'  => '',
             'classes'        => '',
+            'container_id'   => '',
             'skip_expired'   => 0,
             'link_title'     => 0,
             'skip_post'      => 0,
@@ -619,6 +624,9 @@ class IntelliWidget {
         if (!empty($instance['classes'])) :
             $classes = preg_split("/[, ;]+/", $instance['classes']);
         endif;
+        if (!empty($instance['container_id'])):
+            $before_widget = preg_replace('/id=".+?"/', 'id="' . $instance['container_id'] . '"', $before_widget);
+        endif;
         if (!empty($classes)):
             $before_widget = preg_replace('/class="/', 'class="' . implode(" ", $classes) . ' ', $before_widget);
         endif;
@@ -647,8 +655,12 @@ class IntelliWidget {
             return;
         endif;
         // if this is a nav menu, use default WP menu output
-        if (!empty($nav_menu)):
-            wp_nav_menu( array( 'fallback_cb' => '', 'menu' => $nav_menu, 'menu_class' => 'iw-menu'));
+        if (!empty($instance['nav_menu'])):
+            if ($instance['nav_menu'] == '-1'):
+                wp_page_menu( array( 'show_home' => true ));
+            else:
+                wp_nav_menu( array( 'fallback_cb' => '', 'menu' => $nav_menu, 'menu_class' => 'iw-menu'));
+            endif;
         // otherwise load IW template
         else:
             if ($template = $this->get_template($instance['template'])):

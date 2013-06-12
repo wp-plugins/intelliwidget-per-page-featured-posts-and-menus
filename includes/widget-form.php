@@ -105,6 +105,7 @@ name="<?php echo $this->get_field_name('custom_text'); ?>">
       </label>
       <select id="<?php echo $this->get_field_id('nav_menu'); ?>" name="<?php echo $this->get_field_name('nav_menu'); ?>">
         <option value="" <?php selected($instance['nav_menu'], ""); ?>>None</option>
+        <option value="-1" <?php selected($instance['nav_menu'], "-1"); ?>>Page Menu</option>
         <?php
             // Get menus
             foreach ( $intelliwidget->menus as $menu ):
@@ -205,6 +206,12 @@ name="<?php echo $this->get_field_name('custom_text'); ?>">
         <?php _e('Link Text', 'intelliwidget'); ?>
         : </label>
       <input name="<?php echo $this->get_field_name('link_text'); ?>" id="<?php echo $this->get_field_id('link_text'); ?>" type="text" value="<?php echo esc_attr($instance['link_text']); ?>" />
+    </p>
+    <p>
+      <label for="<?php echo $this->get_field_id('container_id'); ?>">
+        <?php _e('ID', 'intelliwidget'); ?>
+      </label>
+      <input name="<?php echo $this->get_field_name('container_id'); ?>" id="<?php echo $this->get_field_id('container_id'); ?>" type="text" value="<?php echo esc_attr($instance['container_id']); ?>" />
     </p>
     <p>
       <label for="<?php echo $this->get_field_id('classes'); ?>">
