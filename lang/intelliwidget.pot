@@ -1,203 +1,313 @@
-# Copyright (C) 2013 Lilaea Media LLC
-# This file is distributed under the same license as the IntelliWidget package.
+# Copyright (C) 2013 
+# This file is distributed under the same license as the  package.
 msgid ""
 msgstr ""
-"Project-Id-Version: IntelliWidget 1.0\n"
-"Report-Msgid-Bugs-To: http://wordpress.org/tag/intelliwidget\n"
-"POT-Creation-Date: 2013-04-15 00:00:00:18+00:00\n"
+"Project-Id-Version:  \n"
+"Report-Msgid-Bugs-To: http://wordpress.org/tag/intelliwidget-per-page-"
+"featured-posts-and-menus\n"
+"POT-Creation-Date: 2013-06-13 00:18:01+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"PO-Revision-Date: 2010-MO-DA HO:MI+ZONE\n"
+"PO-Revision-Date: 2013-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 
-#. #-#-#-#-#  intelliwidget.pot (IntelliWidget 1.0)  #-#-#-#-#
-
-#: includes/widget-form.php:61
-msgid "Above Posts"
+#: includes/class-intelliwidget.php:37 includes/class-intelliwidget.php:171
+msgid "IntelliWidget"
 msgstr ""
 
-#: includes/widget-form.php:106
-msgid "ASC"
+#: includes/class-intelliwidget.php:151
+msgid "IntelliWidget Section "
 msgstr ""
 
-#: includes/widget-form.php:148
-msgid "Auto-format Custom Text"
+#: includes/class-intelliwidget.php:188
+msgid "IntelliWidget Custom Fields"
 msgstr ""
 
-#: includes/widget-form.php:169
-msgid "Auto"
+#: includes/class-intelliwidget.php:561
+msgid "Read More"
 msgstr ""
 
-#: includes/widget-form.php:64
-msgid "Below Posts"
+#: includes/class-widget-intelliwidget.php:22
+msgid "Menus, Featured Posts, HTML and more, customized per page or site-wide."
 msgstr ""
 
-#: /widget-form.php:79
+#: includes/page-form.php:19
+msgid "Use settings from"
+msgstr ""
+
+#: includes/page-form.php:22
+msgid "This Page"
+msgstr ""
+
+#: includes/page-form.php:28 includes/post-form.php:126
+#: includes/section-form.php:270
+msgid "Save"
+msgstr ""
+
+#: includes/page-form.php:31
+msgid "Add New Section"
+msgstr ""
+
+#: includes/post-form.php:94 includes/section-form.php:127
+#: includes/widget-form.php:128
+msgid "Event Date"
+msgstr ""
+
+#: includes/post-form.php:95 includes/post-form.php:101
+msgid "Edit"
+msgstr ""
+
+#: includes/post-form.php:100
+msgid "Expire Date"
+msgstr ""
+
+#: includes/post-form.php:107
+msgid "Alt Title"
+msgstr ""
+
+#: includes/post-form.php:110
+msgid "External URL"
+msgstr ""
+
+#: includes/post-form.php:113
+msgid "Link Classes"
+msgstr ""
+
+#: includes/post-form.php:116
+msgid "Link Target"
+msgstr ""
+
+#. translators: 1: month input, 2: day input, 3: year input, 4: hour input, 5:
+#. minute input
+#: includes/post-form.php:173
+msgid "%1$s%2$s, %3$s @ %4$s : %5$s"
+msgstr ""
+
+#: includes/post-form.php:186
+msgid "OK"
+msgstr ""
+
+#: includes/post-form.php:187
+msgid "Clear"
+msgstr ""
+
+#: includes/post-form.php:188
+msgid "Cancel"
+msgstr ""
+
+#: includes/section-form.php:18
+msgid "Replaces"
+msgstr ""
+
+#: includes/section-form.php:21
+msgid "No Widget Selected"
+msgstr ""
+
+#: includes/section-form.php:34
+msgid "Section"
+msgstr ""
+
+#: includes/section-form.php:34 includes/section-form.php:133
+#: includes/widget-form.php:24 includes/widget-form.php:134
+msgid "Title"
+msgstr ""
+
+#: includes/section-form.php:34 includes/widget-form.php:24
+msgid "(Leave blank to omit)"
+msgstr ""
+
+#: includes/section-form.php:38 includes/widget-form.php:29
+msgid "Link to Archive"
+msgstr ""
+
+#: includes/section-form.php:43 includes/widget-form.php:34
+msgid "Template"
+msgstr ""
+
+#: includes/section-form.php:52 includes/widget-form.php:41
 msgid "Category"
 msgstr ""
 
-#: includes/widget-form.php:175
-msgid "Center"
+#: includes/section-form.php:53 includes/section-form.php:74
+#: includes/section-form.php:102 includes/widget-form.php:42
+#: includes/widget-form.php:71 includes/widget-form.php:104
+msgid "None"
 msgstr ""
 
-#: includes/widget-form.php:159
-msgid "Classes"
+#: includes/section-form.php:56 includes/section-form.php:67
+#: includes/section-form.php:91 includes/widget-form.php:45
+#: includes/widget-form.php:46 includes/widget-form.php:59
+#: includes/widget-form.php:60 includes/widget-form.php:92
+#: includes/widget-form.php:93
+msgid "Click to toggle"
 msgstr ""
 
-#: includes/widget-form.php:54
-msgid "Custom Text/HTML:"
+#: includes/section-form.php:58
+msgid "Specific Posts"
 msgstr ""
 
-#: /widget-form.php:89
-msgid "Date"
+#: includes/section-form.php:69 includes/widget-form.php:62
+msgid "Custom Text/HTML"
 msgstr ""
 
-#: includes/widget-form.php:109
+#: includes/section-form.php:77 includes/widget-form.php:74
+msgid "Above Posts"
+msgstr ""
+
+#: includes/section-form.php:80 includes/widget-form.php:77
+msgid "Below Posts"
+msgstr ""
+
+#: includes/section-form.php:83 includes/widget-form.php:80
+msgid "Text Only-No Posts"
+msgstr ""
+
+#: includes/section-form.php:93 includes/widget-form.php:95
+msgid "Advanced Settings"
+msgstr ""
+
+#: includes/section-form.php:98 includes/widget-form.php:101
+msgid "WP Nav Menu"
+msgstr ""
+
+#: includes/section-form.php:105 includes/widget-form.php:107
+msgid "Page Menu"
+msgstr ""
+
+#: includes/section-form.php:120 includes/widget-form.php:122
+msgid "Sort by"
+msgstr ""
+
+#: includes/section-form.php:124 includes/widget-form.php:125
+msgid "Post Date"
+msgstr ""
+
+#: includes/section-form.php:130 includes/widget-form.php:131
+msgid "Menu Order"
+msgstr ""
+
+#: includes/section-form.php:136 includes/widget-form.php:137
+msgid "Random"
+msgstr ""
+
+#: includes/section-form.php:141 includes/widget-form.php:142
+msgid "ASC"
+msgstr ""
+
+#: includes/section-form.php:144 includes/widget-form.php:145
 msgid "DESC"
 msgstr ""
 
-#: includes/widget-form.php:135
+#: includes/section-form.php:150 includes/widget-form.php:151
+msgid "Posts per section"
+msgstr ""
+
+#: includes/section-form.php:153 includes/widget-form.php:154
+msgid "Show All"
+msgstr ""
+
+#: includes/section-form.php:162 includes/widget-form.php:163
+msgid "Words per post"
+msgstr ""
+
+#: includes/section-form.php:167 includes/widget-form.php:203
+msgid "Link Text"
+msgstr ""
+
+#: includes/section-form.php:172 includes/widget-form.php:208
+msgid "ID"
+msgstr ""
+
+#: includes/section-form.php:177 includes/widget-form.php:214
+msgid "Classes"
+msgstr ""
+
+#: includes/section-form.php:184 includes/widget-form.php:170
 msgid "Exclude current post"
+msgstr ""
+
+#: includes/section-form.php:191 includes/widget-form.php:177
+msgid "Only future events"
+msgstr ""
+
+#: includes/section-form.php:198 includes/widget-form.php:184
+msgid "Only active events"
+msgstr ""
+
+#: includes/section-form.php:205 includes/widget-form.php:191
+msgid "Exclude expired posts"
+msgstr ""
+
+#: includes/section-form.php:212 includes/widget-form.php:198
+msgid "Auto-format Custom Text"
+msgstr ""
+
+#: includes/section-form.php:217 includes/widget-form.php:219
+msgid "Image Align"
+msgstr ""
+
+#: includes/section-form.php:221 includes/widget-form.php:222
+msgid "Auto"
+msgstr ""
+
+#: includes/section-form.php:224 includes/widget-form.php:225
+msgid "Left"
+msgstr ""
+
+#: includes/section-form.php:227 includes/widget-form.php:228
+msgid "Center"
+msgstr ""
+
+#: includes/section-form.php:230 includes/widget-form.php:231
+msgid "Right"
+msgstr ""
+
+#: includes/section-form.php:236 includes/widget-form.php:237
+msgid "Image Size"
+msgstr ""
+
+#: includes/section-form.php:239 includes/widget-form.php:240
+msgid "No Image"
+msgstr ""
+
+#: includes/section-form.php:242 includes/widget-form.php:243
+msgid "Thumbnail"
+msgstr ""
+
+#: includes/section-form.php:245 includes/widget-form.php:246
+msgid "Medium"
+msgstr ""
+
+#: includes/section-form.php:248 includes/widget-form.php:249
+msgid "Large"
+msgstr ""
+
+#: includes/section-form.php:251 includes/widget-form.php:252
+msgid "Full"
+msgstr ""
+
+#: includes/section-form.php:259 includes/widget-form.php:260
+msgid "Post Types"
+msgstr ""
+
+#: includes/section-form.php:273
+msgid "Delete"
 msgstr ""
 
 #: includes/widget-form.php:20
 msgid "Hide if no Page Data is available"
 msgstr ""
 
-#: includes/widget-form.php:165
-msgid "Image Align:"
-msgstr ""
-
-#: includes/widget-form.php:184
-msgid "Image Size:"
-msgstr ""
-
-#: includes/class-intelliwidget.php:125
-msgid "IntelliWidget deleted."
-msgstr ""
-
-#: includes/class-intelliwidget.php:153
-msgid "IntelliWidget Section "
-msgstr ""
-
-#: includes/class-intelliwidget.php:173
-msgid "IntelliWidget"
-msgstr ""
-
-#: includes/widget-form.php:46
-msgid "IntelliWidget(s) (CTRL-Click to select multiple)"
-msgstr ""
-
-#: includes/widget-form.php:197
-msgid "Large"
-msgstr ""
-
-#: includes/widget-form.php:172
-msgid "Left"
-msgstr ""
-
-#: includes/widget-form.php:153
-msgid "Link Text"
-msgstr ""
-
-#: includes/widget-form.php:31
-msgid "Link to Archive"
-msgstr ""
-
-#: includes/widget-form.php:194
-msgid "Medium"
-msgstr ""
-
-#: includes/class-widget-intelliwidget.php:28
-msgid "Menus, Featured Posts, HTML, slideshows, customized per page or site-wide."
-msgstr ""
-
-#: includes/class-intelliwidget.php:137
-msgid "New IntelliWidget added."
-msgstr ""
-
-#: includes/section-form.php:198
-msgid "No Image"
-msgstr ""
-
-#: includes/widget-form.php:188
-msgid "No Thumbnail"
-msgstr ""
-
-#:
-msgid "None"
-msgstr ""
-
-#: includes/widget-form.php:141
-msgid "Only future posts (upcoming events)"
-msgstr ""
-
-#: /widget-form.php:92
-msgid "Order"
-msgstr ""
-
-#: includes/widget-form.php:115
-msgid "Posts per section:"
-msgstr ""
-
-#: /widget-form.php:98
-msgid "Random"
-msgstr ""
-
-#: includes/class-intelliwidget.php:389
-msgid "Read More"
-msgstr ""
-
-#: includes/section-form.php:19
-msgid "Replaces:"
-msgstr ""
-
-#: includes/widget-form.php:178
-msgid "Right"
-msgstr ""
-
-#: includes/section-form.php:35
-msgid "Section"
-msgstr ""
-
-#: includes/widget-form.php:119
-msgid "Show All"
-msgstr ""
-
-#: /widget-form.php:85
-msgid "Sort by:"
-msgstr ""
-
-#: includes/widget-form.php:36
-msgid "Template"
-msgstr ""
-
-#: /widget-form.php:67
-msgid "Text Only-No Posts"
-msgstr ""
-
-#: includes/widget-form.php:191
-msgid "Thumbnail"
-msgstr ""
-
-#: /widget-form.php:95
-msgid "Title"
-msgstr ""
-
-#: includes/widget-form.php:25
-msgid "(Leave blank to omit)"
-msgstr ""
-
-#: includes/page-form.php:8
-msgid "Use settings from:"
-msgstr ""
-
-#: includes/widget-form.php:128
+#: includes/widget-form.php:24
 msgid "Widget"
 msgstr ""
 
-#: includes/widget-form.php:128
-msgid "Words per post:"
+#: includes/widget-form.php:48
+msgid "Specific Post(s)"
+msgstr ""
+
+#: includes/widget-form.php:68
+msgid "Display"
 msgstr ""
