@@ -91,29 +91,29 @@ input.intelliwidget-input, select.intelliwidget-input {
                 $fields[$key] = $custom_data[$key][0];
         endforeach;
 ?>
-<p>    <label for="intelliwidget_event_date"><?php echo __('Event Date', 'intelliwidget') . ': '; ?>
-    <a href="#edit_timestamp" id="intelliwidget_event_date-edit" class="intelliwidget-edit-timestamp hide-if-no-js"><?php _e('Edit') ?></a>
+<p>    <label for="intelliwidget_event_date"><?php _e('Event Date', 'intelliwidget');?>:
+    <a href="#edit_timestamp" id="intelliwidget_event_date-edit" class="intelliwidget-edit-timestamp hide-if-no-js"><?php _e('Edit', 'intelliwidget') ?></a>
 <span id="intelliwidget_event_date_timestamp" class="intelliwidget-timestamp">
     <?php echo $fields['intelliwidget_event_date'] ?></span></label>
     <input type="hidden" class="intelliwidget-input" id="intelliwidget_event_date" name="intelliwidget_event_date" value="<?php echo $fields['intelliwidget_event_date'] ?>" />
     <div id="intelliwidget_event_date_div" class="intelliwidget-timestamp-div hide-if-js"><?php intelliwidget_timestamp('intelliwidget_event_date', $fields['intelliwidget_event_date']); ?></div></p>
-<p>    <label for="intelliwidget_expire_date"><?php echo __('Expire Date', 'intelliwidget') . ': '; ?>
+<p>    <label for="intelliwidget_expire_date"><?php _e('Expire Date', 'intelliwidget');?>:
     <a href="#edit_timestamp" id="intelliwidget_expire_date-edit" class="intelliwidget-edit-timestamp hide-if-no-js"><?php _e('Edit') ?></a>
 <span id="intelliwidget_expire_date_timestamp" class="intelliwidget-timestamp">
     <?php echo $fields['intelliwidget_expire_date']; ?></span></label>
     <input type="hidden" class="intelliwidget-input" id="intelliwidget_expire_date" name="intelliwidget_expire_date" value="<?php echo $fields['intelliwidget_expire_date'] ?>" />
     <div id="intelliwidget_expire_date_div" class="intelliwidget-timestamp-div hide-if-js"><?php intelliwidget_timestamp('intelliwidget_expire_date', $fields['intelliwidget_expire_date']); ?></div>
 </p>
-<p>    <label for="intelliwidget_alt_title"><?php echo __('Alt Title', 'intelliwidget') . ': '; ?></label>
+<p>    <label for="intelliwidget_alt_title"><?php _e('Alt Title', 'intelliwidget');?>:</label>
     <input class="intelliwidget-input" type="text" id="intelliwidget_alt_title" name="intelliwidget_alt_title" value="<?php echo $fields['intelliwidget_alt_title'] ?>" />
 </p>
-<p>    <label for="intelliwidget_external_url"><?php echo __('External URL', 'intelliwidget') . ': '; ?></label>
+<p>    <label for="intelliwidget_external_url"><?php _e('External URL', 'intelliwidget');?>:</label>
     <input class="intelliwidget-input" type="text" id="intelliwidget_external_url" name="intelliwidget_external_url" value="<?php echo $fields['intelliwidget_external_url'] ?>" />
 </p>
-<p>    <label for="intelliwidget_classes"><?php echo __('Link Classes', 'intelliwidget') . ': '; ?></label>
+<p>    <label for="intelliwidget_classes"><?php _e('Link Classes', 'intelliwidget');?>:</label>
     <input class="intelliwidget-input" type="text" id="intelliwidget_classes" name="intelliwidget_classes" value="<?php echo $fields['intelliwidget_classes'] ?>" />
 </p>
-<p>    <label for="intelliwidget_target"><?php echo __('Link Target', 'intelliwidget') . ': '; ?></label>
+<p>    <label for="intelliwidget_target"><?php _e('Link Target', 'intelliwidget');?>:</label>
     <select class="intelliwidget-input" id="intelliwidget_target" name="intelliwidget_target">
       <option value=""<?php selected( $fields['intelliwidget_target'], '' ); ?>>None</option>
       <option value="_new"<?php selected( $fields['intelliwidget_target'], '_new' ); ?>>_new</option>
@@ -123,7 +123,7 @@ input.intelliwidget-input, select.intelliwidget-input {
     </select>
 </p>
 <div class="iw-cdf-container">
-  <input name="save" class="iw-cdfsave button button-primary button-large" id="iw_cdfsave" value="Save" type="button" style="float:right" />
+  <input name="save" class="iw-cdfsave button button-primary button-large" id="iw_cdfsave" value="<?php _e('Save', 'intelliwidget');?>" type="button" style="float:right" />
   <span class="spinner" id="intelliwidget_cpt_spinner"></span> </div>
 <?php wp_nonce_field('iwpage_' . $post->ID,'iwpage'); ?>
 <div style="clear:both"></div>

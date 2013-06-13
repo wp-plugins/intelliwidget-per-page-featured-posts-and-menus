@@ -4,7 +4,7 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_i
 Tags: featured posts, events, page menu, plugin, textwidget, widget, custom post types, custom sidebar
 Requires at least: 3.5
 Tested up to: 3.5.1
-Stable tag: 1.2.2
+Stable tag: 1.2.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -71,6 +71,10 @@ Docs can be found at http://www.lilaeamedia.com/plugins/intelliwidget/
 
 == Changelog ==
 
+= 1.2.3 =
+* Fixed SQL bug that caused duplicate results in the post data. 
+* Cleaned up i18l functions and created new .pot file.
+
 = 1.2.2 =
 * Fixed bug that created invalid path to the admin JavaScript include on Windows
 * Thanks to Spokesrider on Wordpress.org for finding this!
@@ -112,6 +116,10 @@ Docs can be found at http://www.lilaeamedia.com/plugins/intelliwidget/
 
 
 == Upgrade Notice ==
+
+= 1.2.3 =
+
+This upgrade fixes an issue in the query class that caused multiple rows to be returned for posts with duplicate thumbnail rows in the postmeta table. It also fixes a problem with the excerpts template showing debug output. We also added a Page Menu option, wrapper id field and cleaned up the i18l functions.
 
 = 1.2.0 =
 

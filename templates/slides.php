@@ -15,10 +15,9 @@ if ( !defined('ABSPATH')) exit;
  ?>
 
 <ul class="slides">
-<?php if ( $selected->have_posts() ) : while ($selected->have_posts()) : $selected->the_post();?>
-
-  <li id="intelliwidget_<?php the_intelliwidget_ID(); ?>" class="slide">
-    <?php the_intelliwidget_content(); ?>
-  </li>
-  <?php endwhile; endif; ?>
+    <?php if ( $selected->have_posts() ) : while ($selected->have_posts()) : $selected->the_post();?>
+    <li id="intelliwidget_<?php the_intelliwidget_ID(); ?>" class="slide">
+        <?php the_intelliwidget_content(); ?>
+    </li>
+    <?php endwhile; endif; ?>
 </ul>

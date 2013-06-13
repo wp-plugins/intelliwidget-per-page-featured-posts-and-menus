@@ -118,36 +118,42 @@ LEFT OUTER JOIN (
     SELECT post_id, meta_value
     FROM {$wpdb->postmeta}
     WHERE meta_key = 'intelliwidget_event_date'
+    GROUP BY post_id, meta_value
 ) pm2 ON pm2.post_id = p1.ID
             ", "
 LEFT OUTER JOIN (
     SELECT post_id, meta_value
     FROM {$wpdb->postmeta}
     WHERE meta_key = 'intelliwidget_classes'
+    GROUP BY post_id, meta_value
 ) pm3 ON pm3.post_id = p1.ID
             ", "
 LEFT OUTER JOIN (
     SELECT post_id, meta_value
     FROM {$wpdb->postmeta}
     WHERE meta_key = 'intelliwidget_alt_title'
+    GROUP BY post_id, meta_value
 ) pm4 ON pm4.post_id = p1.ID
             ", "
 LEFT OUTER JOIN (
     SELECT post_id, meta_value
     FROM {$wpdb->postmeta}
     WHERE meta_key = 'intelliwidget_target'
+    GROUP BY post_id, meta_value
 ) pm5 ON pm5.post_id = p1.ID
             ", "
 LEFT OUTER JOIN (
     SELECT post_id, meta_value
     FROM {$wpdb->postmeta}
     WHERE meta_key = 'intelliwidget_external_url'
+    GROUP BY post_id, meta_value
 ) pm6 ON pm6.post_id = p1.ID
             ", "
 LEFT OUTER JOIN (
     SELECT post_id, meta_value
     FROM {$wpdb->postmeta}
     WHERE meta_key = '_thumbnail_id'
+    GROUP BY post_id, meta_value
 ) pm7 ON pm7.post_id = p1.ID
 ");
         $clauses = array(
@@ -179,6 +185,7 @@ LEFT OUTER JOIN (
     SELECT post_id, meta_value
     FROM {$wpdb->postmeta}
     WHERE meta_key = 'intelliwidget_expire_date'
+    GROUP BY post_id, meta_value
 ) pm1 ON pm1.post_id = p1.ID
             ";
             if ($instance['skip_expired'])
