@@ -1,10 +1,9 @@
-# Copyright (C) 2013 
-# This file is distributed under the same license as the  package.
+# Copyright (C) 2013 Lilaea Media LLC
+# This file is distributed under the same license as the IntelliWidget package.
 msgid ""
 msgstr ""
-"Project-Id-Version:  \n"
-"Report-Msgid-Bugs-To: http://wordpress.org/tag/intelliwidget-per-page-"
-"featured-posts-and-menus\n"
+"Project-Id-Version: IntelliWidget 1.2.3\n"
+"Report-Msgid-Bugs-To: http://wordpress.org/tag/intelliwidget\n"
 "POT-Creation-Date: 2013-06-13 00:18:01+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
