@@ -119,7 +119,7 @@ Docs can be found at http://www.lilaeamedia.com/plugins/intelliwidget/
 
 = 1.2.3 =
 
-This upgrade fixes an issue in the query class that caused multiple rows to be returned for posts with duplicate thumbnail rows in the postmeta table. It also fixes a problem with the excerpts template showing debug output. We also added a Page Menu option, wrapper id field and cleaned up the i18l functions.
+This upgrade fixes an issue in the query class that caused multiple rows to be returned for posts with duplicate thumbnail rows in the postmeta table. It also fixes a problem with the excerpts template showing debug output.
 
 = 1.2.0 =
 
