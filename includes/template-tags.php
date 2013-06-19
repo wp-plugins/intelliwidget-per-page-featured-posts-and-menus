@@ -260,8 +260,11 @@ if ( !function_exists('_intelliwidget_trim_excerpt') ) {
      */
     function _intelliwidget_trim_excerpt($text, $length = 15) {
         $text = strip_shortcodes($text);
-        $text = strip_tags($text);
+        $text = preg_replace('@<(style|script).*?>
+.*?</(style|script)>@si', '', $text);
+        $text = apply_filters('the_content', $text);
         $text = str_replace(']]>', ']]&gt;', $text);
+        $text= strip_tags($text);
         $words = preg_split("#\s+#s", $text, $length + 1);
         if ( count($words) > $length ) {
             array_pop($words);
@@ -269,6 +272,11 @@ if ( !function_exists('_intelliwidget_trim_excerpt') ) {
             $text = implode(' ', $words);
         }
         return $text;
+    }
+    function d($object) {
+        echo "<pre><textarea>";
+        print_r($object);
+        echo "</textarea></pre>\n\n";
     }
 }
 
