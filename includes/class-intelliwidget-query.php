@@ -189,8 +189,9 @@ LEFT OUTER JOIN (
     GROUP BY post_id, meta_value
 ) pm1 ON pm1.post_id = p1.ID
             ";
-            if ($instance['skip_expired'])
+            if ($instance['skip_expired']):
                 $clauses[] = "(  pm1.meta_value IS NULL  OR CAST( pm1.meta_value AS CHAR ) > '" . $time_adj . "' )";
+            endif;
         endif;
         // use future events only
         // note postmeta intelliwidget_event_date date format 
@@ -211,7 +212,7 @@ LEFT OUTER JOIN (
             case 'event_date':
                 $orderby = 'pm2.meta_value ' . $order;
                 break;
-            case 'random':
+            case 'rand':
                 $orderby = 'RAND()';
                 break;
             case 'menu_order':
@@ -232,7 +233,6 @@ LEFT OUTER JOIN (
         $querystr = $select . implode(' ', $joins) . ' WHERE ' . implode("\n AND ", $clauses) . $orderby . $limit;
 
         $this->posts      = $wpdb->get_results($querystr, OBJECT);
-        
         $this->post_count = count($this->posts);
     }
 
