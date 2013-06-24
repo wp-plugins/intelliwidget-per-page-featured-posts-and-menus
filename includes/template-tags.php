@@ -40,12 +40,12 @@ if ( !function_exists('get_the_intelliwidget_image') ) {
     function get_the_intelliwidget_image() {
         global $this_instance, $post;
         if ($this_instance['image_size'] != 'none' && has_intelliwidget_image() ) :
-            return '<a title="' . get_the_intelliwidget_title() . '" href="' . get_the_intelliwidget_url() . '">'
+            return '<a title="' . strip_tags(get_the_intelliwidget_title()) . '" href="' . get_the_intelliwidget_url() . '">'
                 . get_the_post_thumbnail(
                     $post->ID, 
                     $this_instance['image_size'], 
                     array(
-                        'title' => get_the_intelliwidget_title(), 
+                        'title' => strip_tags(get_the_intelliwidget_title()), 
                         'class' =>'intelliwidget-image-'. $this_instance['image_size'],
                     )
                 )
@@ -150,10 +150,14 @@ if ( !function_exists('get_the_intelliwidget_link') ) {
         if (empty( $link_text )):
             $link_text = get_the_intelliwidget_title($post_id);
         endif;
+        $title_text = strip_tags($link_text);
+        if (empty( $title_text )):
+            $title_text = get_the_intelliwidget_title($post_id);
+        endif;
         $url     = get_the_intelliwidget_url($post_id, $category_id);
         $classes = empty($post->link_classes) ? '' :  ' class="' . $post->link_classes . '"';
         $target  = empty($post->link_target) ? '' : ' target="' . $post->link_target . '"';
-        $content = '<a title="' . $link_text . '" href="' . $url . '"' . $classes . $target . '>' . $link_text .  '</a>';
+        $content = '<a title="' . $title_text . '" href="' . $url . '"' . $classes . $target . '>' . $link_text .  '</a>';
         return $content;
     }
 }
@@ -260,8 +264,10 @@ if ( !function_exists('_intelliwidget_trim_excerpt') ) {
      */
     function _intelliwidget_trim_excerpt($text, $length = 15) {
         $text = strip_shortcodes($text);
-        $text = strip_tags($text);
+        $text = preg_replace('@<(style|script).*?>.*?</(style|script)>@si', '', $text);
+        $text = apply_filters('the_content', $text);
         $text = str_replace(']]>', ']]&gt;', $text);
+        $text= strip_tags($text);
         $words = preg_split("#\s+#s", $text, $length + 1);
         if ( count($words) > $length ) {
             array_pop($words);

@@ -12,7 +12,7 @@ if ( !defined('ABSPATH')) exit;
  */
 class IntelliWidget_Widget extends WP_Widget {
 
-    var $version     = '1.2.3';
+    var $version     = '1.2.5';
 
     /**
      * Constructor

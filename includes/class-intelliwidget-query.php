@@ -97,7 +97,7 @@ class IntelliWidget_Query {
         global $wpdb;
         // filter = raw lets IW posts play nice with WP post functions for backward compatability
         $select = "
-SELECT 
+SELECT DISTINCT
     p1.ID,
     p1.post_content, 
     p1.post_excerpt, 
@@ -161,8 +161,9 @@ LEFT OUTER JOIN (
             "(p1.post_password = '' OR p1.post_password IS NULL)",
         );
         if ( $instance['category'] != -1 ):
-            $clauses[] = '( tx1.term_taxonomy_id IN (' . $instance['category'] . ') )';
-            $joins[] = "INNER JOIN {$wpdb->term_relationships} tx1 ON p1.ID = tx1.object_id"; 
+	        $clauses[] = '( tx2.term_id IN (' . $instance['category'] . ') )';
+            $joins[] = "INNER JOIN {$wpdb->term_relationships} tx1 ON p1.ID = tx1.object_id " . 
+                "INNER JOIN {$wpdb->term_taxonomy} tx2 ON tx2.term_taxonomy_id = tx1.term_taxonomy_id ";
         endif;
         //if (!empty($instance['page'])):
             $pages = is_array($instance['page']) ? implode(',', $instance['page']) : $instance['page'];
@@ -188,8 +189,9 @@ LEFT OUTER JOIN (
     GROUP BY post_id, meta_value
 ) pm1 ON pm1.post_id = p1.ID
             ";
-            if ($instance['skip_expired'])
+            if ($instance['skip_expired']):
                 $clauses[] = "(  pm1.meta_value IS NULL  OR CAST( pm1.meta_value AS CHAR ) > '" . $time_adj . "' )";
+            endif;
         endif;
         // use future events only
         // note postmeta intelliwidget_event_date date format 
@@ -210,7 +212,7 @@ LEFT OUTER JOIN (
             case 'event_date':
                 $orderby = 'pm2.meta_value ' . $order;
                 break;
-            case 'random':
+            case 'rand':
                 $orderby = 'RAND()';
                 break;
             case 'menu_order':
@@ -228,7 +230,7 @@ LEFT OUTER JOIN (
         $orderby = ' ORDER BY ' . $orderby;
         $items = intval($instance['items']);
         $limit = ' LIMIT 0, ' . (empty($items) ? '5' : $items);
-        $querystr = $select . implode(' ', $joins) . ' WHERE ' . implode(" AND ", $clauses) . $orderby . $limit;
+        $querystr = $select . implode(' ', $joins) . ' WHERE ' . implode("\n AND ", $clauses) . $orderby . $limit;
 
         $this->posts      = $wpdb->get_results($querystr, OBJECT);
         $this->post_count = count($this->posts);

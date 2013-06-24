@@ -3,8 +3,8 @@ Contributors: lilaeamedia
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=DE4W9KW7HQJNA
 Tags: featured posts, events, page menu, plugin, textwidget, widget, custom post types, custom sidebar
 Requires at least: 3.5
-Tested up to: 3.5.1
-Stable tag: 1.2.3
+Tested up to: 3.5.2
+Stable tag: 1.2.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -47,7 +47,7 @@ IntelliWidget is flexible and versatile. Please read the documentation to see mo
 
 1. Download the IntelliWidget plugin archive and unzip it.
 
-2. Upload the 'intelliwidget' directory to `/wp-content/plugins/` directory
+2. Upload the 'intelliwidget-per-page-featured-posts-and-menus' directory to `/wp-content/plugins/` directory
 
 3. Activate the plugin through the 'Plugins' menu in WordPress
 
@@ -71,8 +71,17 @@ Docs can be found at http://www.lilaeamedia.com/plugins/intelliwidget/
 
 == Changelog ==
 
+= 1.2.5 =
+* Fixed random sort order bug (thanks Joshua)
+* Strip tags from title attribute text on links
+* Fixed conditional in skip_expired query
+
+= 1.2.4 =
+* Fixed SQL bug that incorrectly joined taxonomies. (thanks AMoy)
+* Cleaned up _get_the_intelliwidget_excerpt to strip all but text.
+
 = 1.2.3 =
-* Fixed SQL bug that caused duplicate results in the post data. 
+* Fixed SQL bug that caused duplicate results in the post data. (thanks MNolte)
 * Cleaned up i18l functions and created new .pot file.
 
 = 1.2.2 =
@@ -117,9 +126,13 @@ Docs can be found at http://www.lilaeamedia.com/plugins/intelliwidget/
 
 == Upgrade Notice ==
 
+= 1.2.4 =
+
+This upgrade fixes an issue in the query class that incorrectly joined posts and taxonomy terms.
+
 = 1.2.3 =
 
-This upgrade fixes an issue in the query class that caused multiple rows to be returned for posts with duplicate thumbnail rows in the postmeta table. It also fixes a problem with the excerpts template showing debug output. We also added a Page Menu option, wrapper id field and cleaned up the i18l functions.
+This upgrade fixes an issue in the query class that caused multiple rows to be returned for posts with duplicate thumbnail rows in the postmeta table. It also fixes a problem with the excerpts template showing debug output.
 
 = 1.2.0 =
 
