@@ -4,7 +4,7 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_i
 Tags: featured posts, events, page menu, plugin, textwidget, widget, custom post types, custom sidebar
 Requires at least: 3.5
 Tested up to: 3.5.2
-Stable tag: 1.2.5
+Stable tag: 1.2.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -70,6 +70,10 @@ Docs can be found at http://www.lilaeamedia.com/plugins/intelliwidget/
 5. Example of the Custom Data Fields Panel.
 
 == Changelog ==
+
+= 1.2.6 =
+* Fixed bug in "skip current post" (thanks Markus)
+* Section Settings Specific Posts Menu now refreshes on save
 
 = 1.2.5 =
 * Fixed random sort order bug (thanks Joshua)

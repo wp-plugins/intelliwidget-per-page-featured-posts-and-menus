@@ -14,7 +14,7 @@ require_once( 'class-intelliwidget-query.php' );
 require_once( 'class-walker-intelliwidget.php' );
 class IntelliWidget {
 
-    var $version     = '1.2.5';
+    var $version     = '1.2.6';
     var $pluginName;
     var $pluginPath;
     var $pluginURL;
@@ -320,7 +320,15 @@ class IntelliWidget {
 
     function ajax_save_postdata() {
         if ($this->save_postdata() === false) die('fail');
-        die('success');
+        // get pages to refresh page menu
+        $post_type_key = current(preg_grep("/_post_types$/", array_keys($_POST)));
+        $page_key = str_replace('_post_types', '_page', $post_type_key);
+        $instance = array(
+            'page'      => $_POST[$page_key],
+            'post_types'=> $_POST[$post_type_key],
+        );
+        $response = $this->get_pages($instance);
+        die($response);
     }
     function ajax_save_cdfdata() {
         if ($this->save_cdfdata() === false) die('fail');
@@ -441,9 +449,11 @@ class IntelliWidget {
      * @return <string> 
      */
     function get_pages($instance = NULL) {
-        if ( !is_array($instance['page']) ) {
+        if ( empty($instance['page']) ):
+            $instance['page'] = array();
+        elseif (!is_array($instance['page'])):
             $instance['page'] = array($instance['page']);
-        }
+        endif;
         $pages = get_posts(
             array(
                 'post_type'      => $instance['post_types'], 
