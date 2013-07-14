@@ -190,7 +190,7 @@ iw_save_postdata = function (){
     jQuery(this).attr('disabled', 'disabled');;
     jQuery('.iw-copy-container,.iw-save-container,.iw-cdf-container').removeClass('success failure');
     // get id of button
-    var thisID   = jQuery(this).attr('id')
+    var thisID   = jQuery(this).attr('id'),
         // munge selector
         sel      = '#' + thisID,
         // parse id to get section number
@@ -226,12 +226,19 @@ iw_save_postdata = function (){
         postData,
         //on success function  
         function(response){
+            if ('fail' == response) {
+                // show red X
+                jQuery(sel).parent().addClass('failure');
+            } else {
+                // refresh posts menu
+                jQuery('#' + pre + '_page').html(response);
+                // show check mark
+                jQuery(sel).parent().addClass('success');
+            }
             // release button
             jQuery(sel).removeAttr('disabled');
             // hide spinner
             jQuery('#' + pre + '_spinner').hide();
-            // show check mark
-            jQuery(sel).parent().addClass('success');
             return false;  
         }
     );  
