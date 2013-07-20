@@ -254,7 +254,7 @@ class IntelliWidget {
          * the actual post record. The parameters passed by the 'save_post' action are for the revision, so 
          * we must use the post_ID passed in the form data, and skip the revision. 
          */
-        if (empty($_POST['iwpage']) || ( defined('DOING_AUTOSAVE') && DOING_AUTOSAVE ) || ( !empty($post) && $post->post_type == 'revision' )) return false;
+        if (empty($_POST['iwpage']) || ( defined('DOING_AUTOSAVE') && DOING_AUTOSAVE ) || ( !empty($post) && 'revision' == $post->post_type )) return false;
         
         $post_ID   = intval($_POST['post_ID']);
         // security checkpoint
@@ -319,7 +319,7 @@ class IntelliWidget {
     }
 
     function ajax_save_postdata() {
-        if ($this->save_postdata() === false) die('fail');
+        if (false === $this->save_postdata()) die('fail');
         // get pages to refresh page menu
         $post_type_key = current(preg_grep("/_post_types$/", array_keys($_POST)));
         $page_key = str_replace('_post_types', '_page', $post_type_key);
@@ -331,7 +331,7 @@ class IntelliWidget {
         die($response);
     }
     function ajax_save_cdfdata() {
-        if ($this->save_cdfdata() === false) die('fail');
+        if (false === $this->save_cdfdata()) die('fail');
         die('success');
     }
     function save_cdfdata() {
@@ -380,7 +380,7 @@ class IntelliWidget {
         $nonce = $_POST['_wpnonce'];
         $pagesection = $this->add_meta_box($post_ID, $nonce, 
             $this->get_box_map($post_ID));
-        if ($pagesection === false) die('fail');
+        if (false === $pagesection) die('fail');
         $intelliwidget_data = $this->defaults();
         $widgets_array = wp_get_sidebars_widgets();
 
@@ -409,7 +409,7 @@ class IntelliWidget {
             die('fail');
         $post_ID   = intval($_POST['post_ID']);
         if (!current_user_can('edit_post', $post_ID) || !wp_verify_nonce($_POST['iwpage'],'iwpage_' . $post_ID)) die('fail');
-        if ($this->save_copy_page($_POST['post_ID']) === false) die('fail');
+        if (false === $this->save_copy_page($_POST['post_ID'])) die('fail');
         die('success');
     }
     
@@ -517,17 +517,17 @@ class IntelliWidget {
      * @return <string>                The full path to the template file.
      */
     function get_template($template = NULL, $ext = '.php', $type = 'path') {
-        if ( $template == NULL ) {
+        if ( NULL == $template ) {
             return false;
         }
         $themeFile = get_stylesheet_directory() . '/intelliwidget/' . $template . $ext;
         if ( file_exists($themeFile) ) {
-            if ( $type == 'url' ) {
+            if ( 'url' == $type ) {
                 return get_bloginfo('template_url') . '/intelliwidget/' . $template . $ext;
             } else {
                 $file = get_stylesheet_directory() . '/intelliwidget/' . $template . $ext;
             }
-        } elseif ( $type == 'url' ) {
+        } elseif ( 'url' == $type ) {
             return $this->templatesURL . $template . $ext;
         } else {
             $file = $this->templatesPath . $template . $ext;
@@ -615,7 +615,7 @@ class IntelliWidget {
      * @param <array> $instance
      * @return void
      */
-    function build_widget($args, $instance) {
+    function build_widget($args, $instance, $post_ID = null) {
         global $this_instance;
         $instance = $this_instance = $this->defaults($instance);
         if (!is_array($instance['page'])) $instance['page'] = array($instance['page']);
@@ -656,17 +656,17 @@ class IntelliWidget {
         }
         // handle custom text
         $custom_text = apply_filters( 'widget_text', $instance['custom_text'], $instance );
-        if (($instance['text_position'] == 'above' || $instance['text_position'] == 'only')):
+        if (('above' == $instance['text_position'] || 'only' == $instance['text_position'] )):
             echo '<div class="textwidget">' . ( !empty( $instance['filter'] ) ? 
                 wpautop( $custom_text ) : $custom_text ) . '</div>';
         endif;
-        if ($instance['text_position'] == 'only'):
+        if ('only' == $instance['text_position']):
             echo $after_widget;
             return;
         endif;
         // if this is a nav menu, use default WP menu output
         if (!empty($instance['nav_menu'])):
-            if ($instance['nav_menu'] == '-1'):
+            if ('-1' == $instance['nav_menu'] ):
                 wp_page_menu( array( 'show_home' => true ));
             else:
                 wp_nav_menu( array( 'fallback_cb' => '', 'menu' => $nav_menu, 'menu_class' => 'iw-menu'));
@@ -677,7 +677,7 @@ class IntelliWidget {
                 include ($template);
             endif;
         endif;
-        if ($instance['text_position'] == 'below'):
+        if ('below' == $instance['text_position']):
             echo "<div class=\"textwidget\">\n" . ( !empty( $instance['filter'] ) ? 
                 wpautop( $custom_text ) : $custom_text ) . "\n</div>\n";
         endif;
@@ -713,7 +713,7 @@ class IntelliWidget {
         // buffer standard output
         ob_start();
         // generate widget from arguments
-        $this->build_widget($args, $atts);
+        $this->build_widget($args, $atts, $post->ID);
         // retrieve widget content from buffer
         $content = ob_get_contents();
         ob_end_clean();

@@ -48,7 +48,7 @@ class IntelliWidget_Widget extends WP_Widget {
             // if this page is using another page's settings and they exist for this widget, use them
             if (($other_page_id = get_post_meta($post->ID, '_intelliwidget_widget_page_id', true))) :
                 if ($page_data = $this->get_page_data($other_page_id, $args['widget_id'])):
-                    $intelliwidget->build_widget($args, $page_data);
+                    $intelliwidget->build_widget($args, $page_data, $post->ID);
                     // done -- restore original post object and return
                     $post = $old_post;
                     return;
@@ -56,7 +56,7 @@ class IntelliWidget_Widget extends WP_Widget {
             endif;
             // if there are page-specific settings for this widget, use them
             if ($page_data = $this->get_page_data($post->ID, $args['widget_id'])):
-                $intelliwidget->build_widget($args, $page_data);
+                $intelliwidget->build_widget($args, $page_data, $post->ID);
                 // done -- restore original post object and return
                 $post = $old_post;
                 return;
@@ -69,7 +69,7 @@ class IntelliWidget_Widget extends WP_Widget {
             return;
         endif;
         // if we get here, there are no page settings and no hide setting, so use the widget settings
-        $intelliwidget->build_widget($args, $instance);
+        $intelliwidget->build_widget($args, $instance, $post->ID);
         // done -- restore original post object and return
         $post = $old_post;
     }
