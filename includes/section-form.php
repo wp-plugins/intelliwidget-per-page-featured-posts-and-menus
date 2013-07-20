@@ -10,9 +10,15 @@ if ( !defined('ABSPATH')) exit;
  * @copyright 2013
  * @access public
  */
-global $_wp_additional_image_sizes;
+global $_wp_additional_image_sizes, $wp_registered_sidebars;
 ?>
 
+<p>
+    <label>
+        <input name="<?php echo 'intelliwidget_' . $pagesection . '_nocopy'; ?>" id="<?php echo 'intelliwidget_' . $pagesection . '_nocopy'; ?>" type="checkbox" <?php checked($intelliwidget_data['nocopy']); ?> />
+        <?php _e('Override Copied Settings', 'intelliwidget'); ?>
+    </label>
+</p>
 <p>
     <label for="<?php echo 'intelliwidget_' . $pagesection . '_replace_widget'; ?>">
         <?php _e( 'Replaces', 'intelliwidget'); ?>: </label>
@@ -26,7 +32,7 @@ global $_wp_additional_image_sizes;
               foreach ($sidebar_widgets as $sidebar_widget_id):
                  if (false !== strpos($sidebar_widget_id, 'intelliwidget') ):
   ?>
-        <option value="<?php echo $sidebar_widget_id; ?>"<?php selected( $intelliwidget_data['replace_widget'], $sidebar_widget_id ); ?>> <?php echo $sidebar_id . ' - ' . $count; ?> </option>
+        <option value="<?php echo $sidebar_widget_id; ?>"<?php selected( $intelliwidget_data['replace_widget'], $sidebar_widget_id ); ?>> <?php echo $wp_registered_sidebars[$sidebar_id]['name'] . ' [' . $count . ']'; ?> </option>
         <?php $count++; endif; endforeach; endif; endforeach?>
     </select>
 </p>

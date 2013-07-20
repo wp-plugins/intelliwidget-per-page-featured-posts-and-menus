@@ -288,7 +288,7 @@ class IntelliWidget {
         // additional processing for each box data segment
         foreach (array_keys($post_data) as $box_id):
             // special handling for checkboxes:
-            foreach(array('skip_expired', 'skip_post', 'link_title', 'hide_if_empty', 'filter', 'future_only', 'active_only') as $cb):
+            foreach(array('skip_expired', 'skip_post', 'link_title', 'hide_if_empty', 'filter', 'future_only', 'active_only', 'nocopy') as $cb):
                 $post_data[$box_id][$cb] = isset($_POST[$prefix . $box_id . '_' . $cb]);
             endforeach;
             $post_data[$box_id]['post_types'] = empty($_POST[$prefix . $box_id . '_post_types']) ? 
@@ -588,6 +588,7 @@ class IntelliWidget {
             'filter'         => 0,
             'future_only'    => 0,
             'active_only'    => 0,
+            'nocopy'         => 0,
         );
         // standard WP function for merging argument lists
         $merged = wp_parse_args($instance, $defaults);
