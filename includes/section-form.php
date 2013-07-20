@@ -21,10 +21,10 @@ global $_wp_additional_image_sizes;
         <?php _e('No Widget Selected', 'intelliwidget');?>
         </option>
         <?php foreach($widgets_array as $sidebar_id => $sidebar_widgets): 
-             if (strpos($sidebar_id, 'wp_inactive') === false):
+             if (false === strpos($sidebar_id, 'wp_inactive') ):
             $count = 1;
               foreach ($sidebar_widgets as $sidebar_widget_id):
-                 if (strpos($sidebar_widget_id, 'intelliwidget') !== false):
+                 if (false !== strpos($sidebar_widget_id, 'intelliwidget') ):
   ?>
         <option value="<?php echo $sidebar_widget_id; ?>"<?php selected( $intelliwidget_data['replace_widget'], $sidebar_widget_id ); ?>> <?php echo $sidebar_id . ' - ' . $count; ?> </option>
         <?php $count++; endif; endforeach; endif; endforeach?>

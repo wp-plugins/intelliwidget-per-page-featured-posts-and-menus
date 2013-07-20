@@ -82,7 +82,7 @@ class IntelliWidget_Query {
 		global $post;
 		$this->in_the_loop = true;
 
-		if ( $this->current_post == -1 ){ // loop has just started
+		if ( -1 == $this->current_post ){ // loop has just started
             // stub for future functionality
         }
         
@@ -94,7 +94,7 @@ class IntelliWidget_Query {
      */
     function iw_query($instance = null) {
         if (empty($instance)) return;
-        global $wpdb;
+        global $wpdb, $post;
         // filter = raw lets IW posts play nice with WP post functions for backward compatability
         $select = "
 SELECT DISTINCT
@@ -160,7 +160,7 @@ LEFT OUTER JOIN (
             "(p1.post_status = 'publish')",
             "(p1.post_password = '' OR p1.post_password IS NULL)",
         );
-        if ( $instance['category'] != -1 ):
+        if (-1 != $instance['category']):
 	        $clauses[] = '( tx2.term_id IN (' . $instance['category'] . ') )';
             $joins[] = "INNER JOIN {$wpdb->term_relationships} tx1 ON p1.ID = tx1.object_id " . 
                 "INNER JOIN {$wpdb->term_taxonomy} tx2 ON tx2.term_taxonomy_id = tx1.term_taxonomy_id ";
@@ -231,7 +231,6 @@ LEFT OUTER JOIN (
         $items = intval($instance['items']);
         $limit = ' LIMIT 0, ' . (empty($items) ? '5' : $items);
         $querystr = $select . implode(' ', $joins) . ' WHERE ' . implode("\n AND ", $clauses) . $orderby . $limit;
-
         $this->posts      = $wpdb->get_results($querystr, OBJECT);
         $this->post_count = count($this->posts);
     }

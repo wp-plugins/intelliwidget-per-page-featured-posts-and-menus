@@ -104,7 +104,7 @@ jQuery(document).ready(function($) {
             attemptedDate.getMinutes() != mn ) {
             // date object returned invalid
             // if validating, display error and return invalid
-            if (validate == true) {
+            if (true == validate ) {
                 $(div).addClass('form-invalid');
                 $('.iw-cdfsave').attr('disabled', 'disabled');
                 return false;
@@ -190,7 +190,7 @@ iw_save_postdata = function (){
     jQuery(this).attr('disabled', 'disabled');;
     jQuery('.iw-copy-container,.iw-save-container,.iw-cdf-container').removeClass('success failure');
     // get id of button
-    var thisID   = jQuery(this).attr('id')
+    var thisID   = jQuery(this).attr('id'),
         // munge selector
         sel      = '#' + thisID,
         // parse id to get section number
@@ -226,12 +226,19 @@ iw_save_postdata = function (){
         postData,
         //on success function  
         function(response){
+            if ('fail' == response) {
+                // show red X
+                jQuery(sel).parent().addClass('failure');
+            } else {
+                // refresh posts menu
+                jQuery('#' + pre + '_page').html(response);
+                // show check mark
+                jQuery(sel).parent().addClass('success');
+            }
             // release button
             jQuery(sel).removeAttr('disabled');
             // hide spinner
             jQuery('#' + pre + '_spinner').hide();
-            // show check mark
-            jQuery(sel).parent().addClass('success');
             return false;  
         }
     );  
@@ -314,7 +321,7 @@ iw_add_meta_box = function (e){
         function(response){
             jQuery(sel).removeClass('disabled');
             jQuery('#intelliwidget_spinner').hide();
-            if (response == 'fail') {
+            if ('fail' == response) {
                 jQuery('.iw-copy-container').addClass('failure');
             } else {
                 jQuery('#side-sortables').append(response);
@@ -378,7 +385,7 @@ iw_delete_meta_box = function (e){
         function(response){
             jQuery(sel).removeClass('disabled');
             jQuery('#intelliwidget_' + pre + '_spinner').hide();
-            if (response == 'success') {
+            if ('success' == response ) {
                 jQuery('#intelliwidget_section_meta_box_' + pre).slideUp('fast', function(){
                     jQuery('#intelliwidget_section_meta_box_' + pre).remove();
                 });
