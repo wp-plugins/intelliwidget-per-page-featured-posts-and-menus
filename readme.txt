@@ -136,23 +136,18 @@ Docs can be found at http://www.lilaeamedia.com/plugins/intelliwidget/
 == Upgrade Notice ==
 
 = 1.3.0 =
-
 New Features! We added the long-needed intelliwidget-current-menu-item style, a generic "events" template, and the ability to keep some page sections and copy the rest using "Override Copied Settings."
 
 = 1.2.4 =
-
 This upgrade fixes an issue in the query class that incorrectly joined posts and taxonomy terms.
 
 = 1.2.3 =
-
 This upgrade fixes an issue in the query class that caused multiple rows to be returned for posts with duplicate thumbnail rows in the postmeta table. It also fixes a problem with the excerpts template showing debug output.
 
 = 1.2.0 =
-
 IntelliWidget now uses its own query class instead of WP_Query so it can get postmeta data in a single database call. Event Date and Expire Date fields have been added which replace using "future" post status for upcoming events. PLEASE READ http://www.lilaeamedia.com/plugins/intelliwidget/ and report any issues on the WP Forum.
 
 = 1.1.0 =
-
 Ajax submits and collapsible form areas greatly improve useability
 
 == Getting Started ==
