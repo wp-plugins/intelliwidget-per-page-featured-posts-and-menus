@@ -98,7 +98,7 @@ input.intelliwidget-input, select.intelliwidget-input {
     <input type="hidden" class="intelliwidget-input" id="intelliwidget_event_date" name="intelliwidget_event_date" value="<?php echo $fields['intelliwidget_event_date'] ?>" />
     <div id="intelliwidget_event_date_div" class="intelliwidget-timestamp-div hide-if-js"><?php intelliwidget_timestamp('intelliwidget_event_date', $fields['intelliwidget_event_date']); ?></div></p>
 <p>    <label for="intelliwidget_expire_date"><?php _e('Expire Date', 'intelliwidget');?>:
-    <a href="#edit_timestamp" id="intelliwidget_expire_date-edit" class="intelliwidget-edit-timestamp hide-if-no-js"><?php _e('Edit') ?></a>
+    <a href="#edit_timestamp" id="intelliwidget_expire_date-edit" class="intelliwidget-edit-timestamp hide-if-no-js"><?php _e('Edit', 'intelliwidget') ?></a>
 <span id="intelliwidget_expire_date_timestamp" class="intelliwidget-timestamp">
     <?php echo $fields['intelliwidget_expire_date']; ?></span></label>
     <input type="hidden" class="intelliwidget-input" id="intelliwidget_expire_date" name="intelliwidget_expire_date" value="<?php echo $fields['intelliwidget_expire_date'] ?>" />
@@ -170,7 +170,7 @@ function intelliwidget_timestamp($field = 'intelliwidget_event_date', $post_date
 
     echo '<div class="timestamp-wrap">';
     /* translators: 1: month input, 2: day input, 3: year input, 4: hour input, 5: minute input */
-    printf(__('%1$s%2$s, %3$s @ %4$s : %5$s'), $month, $day, $year, $hour, $minute);
+    printf(__('%1$s%2$s, %3$s @ %4$s : %5$s', 'intelliwidget'), $month, $day, $year, $hour, $minute);
 
     echo '</div><input type="hidden" id="'.$field.'_ss" name="'.$field.'_ss" value="' . $ss . '" />';
 
@@ -183,9 +183,9 @@ function intelliwidget_timestamp($field = 'intelliwidget_event_date', $post_date
 ?>
 
 <p>
-<a href="#edit_timestamp" id="<?php echo $field; ?>-save" class="intelliwidget-save-timestamp hide-if-no-js button"><?php _e('OK'); ?></a>
-<a href="#edit_timestamp" id="<?php echo $field; ?>-clear" class="intelliwidget-clear-timestamp hide-if-no-js button"><?php _e('Clear'); ?></a>
-<a href="#edit_timestamp" id="<?php echo $field; ?>-cancel" class="intelliwidget-cancel-timestamp hide-if-no-js"><?php _e('Cancel'); ?></a>
+<a href="#edit_timestamp" id="<?php echo $field; ?>-save" class="intelliwidget-save-timestamp hide-if-no-js button"><?php _e('OK', 'intelliwidget'); ?></a>
+<a href="#edit_timestamp" id="<?php echo $field; ?>-clear" class="intelliwidget-clear-timestamp hide-if-no-js button"><?php _e('Clear', 'intelliwidget'); ?></a>
+<a href="#edit_timestamp" id="<?php echo $field; ?>-cancel" class="intelliwidget-cancel-timestamp hide-if-no-js"><?php _e('Cancel', 'intelliwidget'); ?></a>
 </p>
 <?php
 }

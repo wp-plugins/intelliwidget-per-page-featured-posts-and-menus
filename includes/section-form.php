@@ -101,7 +101,7 @@ global $_wp_additional_image_sizes, $wp_registered_sidebars;
     <div class="inside">
         <p>
             <label for="<?php echo 'intelliwidget_' . $pagesection . '_nav_menu'; ?>">
-                <?php _e('WP Nav Menu'); ?>
+                <?php _e('WP Nav Menu', 'intelliwidget'); ?>
             </label>
             <select id="<?php echo 'intelliwidget_' . $pagesection . '_nav_menu'; ?>" name="<?php echo 'intelliwidget_' . $pagesection . '_nav_menu'; ?>">
                 <option value="" <?php selected( $intelliwidget_data['nav_menu'], '' ); ?>>

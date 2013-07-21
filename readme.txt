@@ -4,7 +4,7 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_i
 Tags: featured posts, events, page menu, plugin, textwidget, widget, custom post types, custom sidebar
 Requires at least: 3.5
 Tested up to: 3.5.2
-Stable tag: 1.2.6
+Stable tag: 1.3.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -14,7 +14,7 @@ Display featured posts, custom menus, html content and more within a single dyna
 
 Why use IntelliWidget as your Featured Post plugin?
 
-* Quick Setup
+* Powerful and extensible, does the work of multiple plugins
 * No new sidebars necessary–uses the sidebars you already have
 * Displays custom page settings if they exist, main widget if they don’t
 * Supports Custom Post Types and Custom Nav Menus
@@ -70,6 +70,11 @@ Docs can be found at http://www.lilaeamedia.com/plugins/intelliwidget/
 5. Example of the Custom Data Fields Panel.
 
 == Changelog ==
+
+= 1.3.0 =
+* Added intelliwidget-current-menu-item style for items linked to current page
+* Added "Override copied settings" feature. You can now keep some or all of the settings sections from a page and copy the rest
+* Added "events" template and corresponding styles to intelliwidget.css
 
 = 1.2.6 =
 * Fixed bug in "skip current post" (thanks Markus)
@@ -129,6 +134,10 @@ Docs can be found at http://www.lilaeamedia.com/plugins/intelliwidget/
 
 
 == Upgrade Notice ==
+
+= 1.3.0 =
+
+New Features! We added the long-needed intelliwidget-current-menu-item style, a generic "events" template, and the ability to keep some page sections and copy the rest using "Override Copied Settings."
 
 = 1.2.4 =
 

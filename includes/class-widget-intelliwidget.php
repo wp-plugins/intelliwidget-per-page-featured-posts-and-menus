@@ -12,7 +12,7 @@ if ( !defined('ABSPATH')) exit;
  */
 class IntelliWidget_Widget extends WP_Widget {
 
-    var $version     = '1.2.6';
+    var $version     = '1.3.0';
 
     /**
      * Constructor
@@ -47,9 +47,10 @@ class IntelliWidget_Widget extends WP_Widget {
         if (is_object($post)):            
             // if there are page-specific settings for this widget, use them
             $page_data = $this->get_page_data($post->ID, $args['widget_id']);
-            // if this page is using another page's settings and they exist for this widget, use them
-            if ($other_page_id = get_post_meta($post->ID, '_intelliwidget_widget_page_id', true)) :
-                if (empty($page_data['nocopy'])):
+            // check for no-copy override
+            if (empty($page_data['nocopy'])):
+                // if this page is using another page's settings and they exist for this widget, use them
+                if ($other_page_id = get_post_meta($post->ID, '_intelliwidget_widget_page_id', true)) :
                     $page_data = $this->get_page_data($other_page_id, $args['widget_id']);
                 endif;
             endif;
