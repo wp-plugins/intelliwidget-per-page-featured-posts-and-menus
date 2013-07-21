@@ -45,7 +45,7 @@ global $_wp_additional_image_sizes;
     <div class="iw-collapsible" id="<?php echo $this->get_field_id('specificposts'); ?>" title="<?php _e('Click to toggle', 'intelliwidget'); ?>">
         <div class="handlediv" title="<?php _e('Click to toggle', 'intelliwidget'); ?>"></div>
         <h4 style="margin:0;padding:8px">
-            <?php _e('Specific Post(s)', 'intelliwidget'); ?>
+            <?php _e('Specific Posts', 'intelliwidget'); ?>
         </h4>
     </div>
     <div id="<?php echo $this->get_field_id('specificposts'); ?>-inside" style="display:none;padding:8px" class="closed">
@@ -98,7 +98,7 @@ name="<?php echo $this->get_field_name('custom_text'); ?>">
     <div id="<?php echo $this->get_field_id('advancedsettings'); ?>-inside" style="display:none;padding:8px" class="closed">
         <p>
             <label for="<?php echo $this->get_field_id('nav_menu'); ?>">
-                <?php _e('WP Nav Menu'); ?>: </label>
+                <?php _e('WP Nav Menu', 'intelliwidget'); ?>: </label>
             <select id="<?php echo $this->get_field_id('nav_menu'); ?>" name="<?php echo $this->get_field_name('nav_menu'); ?>">
                 <option value="" <?php selected($instance['nav_menu'], ""); ?>>
                 <?php _e('None', 'intelliwidget'); ?>
