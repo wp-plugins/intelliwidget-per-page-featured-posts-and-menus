@@ -14,7 +14,7 @@ require_once( 'class-intelliwidget-query.php' );
 require_once( 'class-walker-intelliwidget.php' );
 class IntelliWidget {
 
-    var $version     = '1.3.0';
+    var $version     = '1.3.1';
     var $pluginName;
     var $pluginPath;
     var $pluginURL;
