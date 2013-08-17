@@ -12,7 +12,7 @@ if ( !defined('ABSPATH')) exit;
  */
 class IntelliWidget_Widget extends WP_Widget {
 
-    var $version     = '1.3.1';
+    var $version     = '1.3.2';
 
     /**
      * Constructor
@@ -44,32 +44,33 @@ class IntelliWidget_Widget extends WP_Widget {
         global $post, $intelliwidget;
         // save global post object for later
         $old_post = $post;
-        if (is_object($post)):            
+        $post_id = is_object($post) ? $post->ID : null;
+        if ($post_id):            
             // if there are page-specific settings for this widget, use them
-            $page_data = $this->get_page_data($post->ID, $args['widget_id']);
+            $page_data = $this->get_page_data($post_id, $args['widget_id']);
             // check for no-copy override
             if (empty($page_data['nocopy'])):
                 // if this page is using another page's settings and they exist for this widget, use them
-                if ($other_page_id = get_post_meta($post->ID, '_intelliwidget_widget_page_id', true)) :
+                if ($other_page_id = get_post_meta($post_id, '_intelliwidget_widget_page_id', true)) :
                     $page_data = $this->get_page_data($other_page_id, $args['widget_id']);
                 endif;
             endif;
             if (!empty($page_data)):
-                $intelliwidget->build_widget($args, $page_data, $post->ID);
+                $intelliwidget->build_widget($args, $page_data, $post_id);
                 // done -- restore original post object and return
                 $post = $old_post;
                 return;
             endif;
-        endif;
-        // no page-specific settings, should we hide?
-        if ($instance['hide_if_empty']):
-            // done -- restore original post object and return
-            $post = $old_post;
-            return;
-        endif;
-        // if we get here, there are no page settings and no hide setting, so use the primary widget settings
-        $intelliwidget->build_widget($args, $instance, $post->ID);
+            // no page-specific settings, should we hide?
+            if ($instance['hide_if_empty']):
+                // done -- restore original post object and return
+                $post = $old_post;
+                return;
+            endif;
+            // if we get here, there are no page settings and no hide setting, so use the primary widget settings
+            $intelliwidget->build_widget($args, $instance, $post_id);
         // done -- restore original post object and return
+        endif;
         $post = $old_post;
     }
     

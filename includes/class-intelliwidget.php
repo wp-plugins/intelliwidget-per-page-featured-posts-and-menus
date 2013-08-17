@@ -14,7 +14,7 @@ require_once( 'class-intelliwidget-query.php' );
 require_once( 'class-walker-intelliwidget.php' );
 class IntelliWidget {
 
-    var $version     = '1.3.1';
+    var $version     = '1.3.2';
     var $pluginName;
     var $pluginPath;
     var $pluginURL;
@@ -714,7 +714,7 @@ class IntelliWidget {
         // buffer standard output
         ob_start();
         // generate widget from arguments
-        $this->build_widget($args, $atts, $post->ID);
+        $this->build_widget($args, $atts, is_object($post) ? $post->ID : null);
         // retrieve widget content from buffer
         $content = ob_get_contents();
         ob_end_clean();
