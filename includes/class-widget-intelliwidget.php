@@ -91,11 +91,7 @@ class IntelliWidget_Widget extends WP_Widget {
             if (array_key_exists($widget_id, $widget_map)):
                 $box_id = $widget_map[$widget_id];
                 // are there settings for this widget?
-                if ($page_data = unserialize(get_post_meta($post_id, '_intelliwidget_data_' . $box_id, true))):
-                    if (!empty($page_data['custom_text'])):
-                        // base64 encoding saves us from markup serialization heartburn
-                        $page_data['custom_text'] = stripslashes(base64_decode($page_data['custom_text']));
-                    endif;
+                if ($page_data = $intelliwidget->get_page_data($post_id, $box_id)):
                     return $page_data;
                 endif;
             endif;
