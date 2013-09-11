@@ -723,7 +723,7 @@ class IntelliWidget {
         $args = array(
             'before_title'  => '',
             'after_title'   => '',
-            'before_widget' => empty($atts['nav_menu'])?'<div class="">':'',
+            'before_widget' => empty($atts['nav_menu'])?'<div class="widget_intelliwidget">':'',
             'after_widget'  => empty($atts['nav_menu'])?'</div>':'',
         );
         // buffer standard output
