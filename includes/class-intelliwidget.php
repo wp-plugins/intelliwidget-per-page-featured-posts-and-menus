@@ -14,7 +14,7 @@ require_once( 'class-intelliwidget-query.php' );
 require_once( 'class-walker-intelliwidget.php' );
 class IntelliWidget {
 
-    var $version     = '1.3.3';
+    var $version     = '1.3.4';
     var $pluginName;
     var $pluginPath;
     var $pluginURL;
@@ -667,7 +667,7 @@ class IntelliWidget {
         // if this is a nav menu, use default WP menu output
         if (!empty($instance['nav_menu'])):
             if ('-1' == $instance['nav_menu'] ):
-                wp_page_menu( array( 'show_home' => true ));
+                wp_page_menu( array( 'show_home' => true, 'menu_class' => 'iw-menu' . (empty($instance['classes'])?'':' ' . $instance['classes']) ));
             else:
                 wp_nav_menu( array( 'fallback_cb' => '', 'menu' => $nav_menu, 'menu_class' => 'iw-menu' . (empty($instance['classes'])?'':' ' . $instance['classes'])));
             endif;
@@ -723,7 +723,7 @@ class IntelliWidget {
         $args = array(
             'before_title'  => '',
             'after_title'   => '',
-            'before_widget' => empty($atts['nav_menu'])?'<div class="">':'',
+            'before_widget' => empty($atts['nav_menu'])?'<div class="widget_intelliwidget">':'',
             'after_widget'  => empty($atts['nav_menu'])?'</div>':'',
         );
         // buffer standard output
