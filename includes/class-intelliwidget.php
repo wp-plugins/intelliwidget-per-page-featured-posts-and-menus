@@ -14,7 +14,7 @@ require_once( 'class-intelliwidget-query.php' );
 require_once( 'class-walker-intelliwidget.php' );
 class IntelliWidget {
 
-    var $version     = '1.3.2';
+    var $version     = '1.3.3';
     var $pluginName;
     var $pluginPath;
     var $pluginURL;
@@ -462,7 +462,6 @@ class IntelliWidget {
                 'orderby'        => 'menu_order,title',
             )
         );
-
     	$output = '';
 	    if ( ! empty($pages) ) {
             $args = array($pages, 0, $instance);
@@ -670,7 +669,7 @@ class IntelliWidget {
             if ('-1' == $instance['nav_menu'] ):
                 wp_page_menu( array( 'show_home' => true ));
             else:
-                wp_nav_menu( array( 'fallback_cb' => '', 'menu' => $nav_menu, 'menu_class' => 'iw-menu'));
+                wp_nav_menu( array( 'fallback_cb' => '', 'menu' => $nav_menu, 'menu_class' => 'iw-menu' . (empty($instance['classes'])?'':' ' . $instance['classes'])));
             endif;
         // otherwise load IW template
         else:
@@ -683,6 +682,17 @@ class IntelliWidget {
                 wpautop( $custom_text ) : $custom_text ) . "\n</div>\n";
         endif;
         echo $after_widget;
+    }
+    
+    function get_page_data($post_id, $box_id) {
+        // are there settings for this widget?
+        if ($page_data = unserialize(get_post_meta($post_id, '_intelliwidget_data_' . $box_id, true))):
+            if (!empty($page_data['custom_text'])):
+                // base64 encoding saves us from markup serialization heartburn
+                $page_data['custom_text'] = stripslashes(base64_decode($page_data['custom_text']));
+            endif;
+            return $page_data;
+        endif;
     }
     
     /**
@@ -698,18 +708,23 @@ class IntelliWidget {
     function intelliwidget_shortcode($atts) {
         global $post;
         $old_post = $post;
-        if (!empty($atts['pages'])) $atts['pages'] = preg_split("/, */", $atts['pages']);
-        if (!empty($atts['post_types'])) $atts['post_types'] = preg_split("/, */", $atts['post_types']);
-        if (!empty($atts['custom_text'])) unset($atts['custom_text']);
-        if (!empty($atts['text_position'])) unset($atts['text_position']);
-        if (!empty($atts['title'])) $atts['title'] = strip_tags($atts['title']);
-        if (!empty($atts['link_text'])) $atts['link_text'] = strip_tags($atts['link_text']);
+        // section parameter lets us use page-specific IntelliWidgets in shortcode without all the params
+        if (is_object($post) && !empty($atts['section'])):
+            $atts = $this->get_page_data($post->ID, intval($atts['section']));
+        else:
+            if (!empty($atts['pages'])) $atts['pages'] = preg_split("/, */", $atts['pages']);
+            if (!empty($atts['post_types'])) $atts['post_types'] = preg_split("/, */", $atts['post_types']);
+            if (!empty($atts['custom_text'])) unset($atts['custom_text']);
+            if (!empty($atts['text_position'])) unset($atts['text_position']);
+            if (!empty($atts['title'])) $atts['title'] = strip_tags($atts['title']);
+            if (!empty($atts['link_text'])) $atts['link_text'] = strip_tags($atts['link_text']);
+        endif;
         $atts = $this->defaults($atts);
         $args = array(
             'before_title'  => '',
             'after_title'   => '',
-            'before_widget' => '<div class="">',
-            'after_widget'  => '</div>',
+            'before_widget' => empty($atts['nav_menu'])?'<div class="">':'',
+            'after_widget'  => empty($atts['nav_menu'])?'</div>':'',
         );
         // buffer standard output
         ob_start();
