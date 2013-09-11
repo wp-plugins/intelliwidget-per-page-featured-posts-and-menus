@@ -12,7 +12,7 @@ if ( !defined('ABSPATH')) exit;
  */
 class IntelliWidget_Widget extends WP_Widget {
 
-    var $version     = '1.3.3';
+    var $version     = '1.3.4';
 
     /**
      * Constructor
@@ -83,6 +83,7 @@ class IntelliWidget_Widget extends WP_Widget {
      * @return <array> if exists or false if empty
      */
     function get_page_data($post_id, $widget_id) {
+        global $intelliwidget;
         // the box map stores meta box => widget id relations in page meta data
         $box_map = unserialize(get_post_meta($post_id, '_intelliwidget_map', true));
         if (is_array($box_map)):
