@@ -4,7 +4,7 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_i
 Tags: featured posts, events, page menu, plugin, textwidget, widget, custom post types, custom sidebar
 Requires at least: 3.5
 Tested up to: 3.6
-Stable tag: 1.3.2
+Stable tag: 1.3.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -70,6 +70,9 @@ Docs can be found at http://www.lilaeamedia.com/plugins/intelliwidget/
 5. Example of the Custom Data Fields Panel.
 
 == Changelog ==
+
+= 1.3.3 =
+* Added Page Content option to shortcode. Now you can specify an IntelliWidget Section to get the parameters instead of passing them as args.
 
 = 1.3.2 =
 * Test if $post is object before attempted to get ID attribute to prevent error notice.
