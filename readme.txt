@@ -3,7 +3,7 @@ Contributors: lilaeamedia
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=DE4W9KW7HQJNA
 Tags: featured posts, events, page menu, plugin, textwidget, widget, custom post types, custom sidebar
 Requires at least: 3.5
-Tested up to: 3.6
+Tested up to: 3.6.1
 Stable tag: 1.3.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -146,6 +146,9 @@ Docs can be found at http://www.lilaeamedia.com/plugins/intelliwidget/
 
 
 == Upgrade Notice ==
+
+= 1.3.4 =
+Fixed incorrect global (fatal error) in release 1.3.3. This release adds the ability to use on-page IW Sections as the settings for shortcodes.
 
 = 1.3.0 =
 New Features! We added the long-needed intelliwidget-current-menu-item style, a generic "events" template, and the ability to keep some page sections and copy the rest using "Override Copied Settings."
