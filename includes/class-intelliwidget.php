@@ -693,6 +693,7 @@ class IntelliWidget {
             endif;
             return $page_data;
         endif;
+        return false;
     }
     
     /**
@@ -710,8 +711,10 @@ class IntelliWidget {
         $old_post = $post;
         // section parameter lets us use page-specific IntelliWidgets in shortcode without all the params
         if (is_object($post) && !empty($atts['section'])):
-            $atts = $this->get_page_data($post->ID, intval($atts['section']));
-        else:
+//            if (!($atts = $this->get_page_data($post->ID, intval($atts['section'])))): return; endif;
+             $atts = $this->get_page_data($post->ID, intval($atts['section']));
+             if (empty($atts)): return; endif;
+       else:
             if (!empty($atts['pages'])) $atts['pages'] = preg_split("/, */", $atts['pages']);
             if (!empty($atts['post_types'])) $atts['post_types'] = preg_split("/, */", $atts['post_types']);
             if (!empty($atts['custom_text'])) unset($atts['custom_text']);
