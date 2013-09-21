@@ -14,7 +14,7 @@ require_once( 'class-intelliwidget-query.php' );
 require_once( 'class-walker-intelliwidget.php' );
 class IntelliWidget {
 
-    var $version     = '1.3.4';
+    var $version     = '1.3.5';
     var $pluginName;
     var $pluginPath;
     var $pluginURL;
@@ -39,7 +39,7 @@ class IntelliWidget {
         /* get url to this directory 
          * Thanks to Spokesrider for finding this bug! 
          */
-        $this->pluginURL     = plugin_dir_url($file) . '/';
+        $this->pluginURL     = plugin_dir_url($file);// . '/';
         $this->templatesPath = $this->pluginPath . 'templates/';
         $this->templatesURL  = $this->pluginURL . 'templates/';        
 
@@ -150,7 +150,7 @@ class IntelliWidget {
                     'intelliwidget_section_meta_box_' . $box_id,
                     __( 'IntelliWidget Section ', 'intelliwidget') . $count,
                     array( &$this, 'section_meta_box_form' ),
-                    'page',
+                    $post->post_type,
                     'side',
                     'low',
                     array('pagesection' => $box_id)
@@ -166,14 +166,16 @@ class IntelliWidget {
      */
     function main_meta_box() {
         global $post;
-        add_meta_box( 
-            'intelliwidget_main_meta_box',
-            __( 'IntelliWidget', 'intelliwidget'),
-            array( &$this, 'main_meta_box_form' ),
-            'page',
-            'side',
-            'low'
-        );
+        foreach ($this->get_eligible_post_types(true) as $type):
+            add_meta_box( 
+                'intelliwidget_main_meta_box',
+                __( 'IntelliWidget', 'intelliwidget'),
+                array( &$this, 'main_meta_box_form' ),
+                $type,
+                'side',
+                'low'
+            );
+        endforeach;
     }
     
     /**
@@ -594,16 +596,19 @@ class IntelliWidget {
         return $merged;
     }
     
-    function get_eligible_post_types() {
+    function get_eligible_post_types($queryable = false) {
         $eligible = array();
         if ( function_exists('get_post_types') ):
-            $types = get_post_types(array('public' => true));
+            $args = array('public' => true);
+            if ($queryable) $args['publicly_queryable'] = true;
+            $types = get_post_types($args);
         else:
             $types = array('post', 'page');
         endif;
         foreach($types as $type):
-            if (post_type_supports($type, 'custom-fields'))
+            if (post_type_supports($type, 'custom-fields')):
                 $eligible[] = $type;
+            endif;
         endforeach;
         return $eligible;
     }
