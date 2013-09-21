@@ -19,9 +19,9 @@ if ( !defined('ABSPATH')) exit;
         <?php _e('Use settings from', 'intelliwidget'); ?>: </label>
     <select style="width:100%" name="<?php echo 'intelliwidget_widget_page_id'; ?>" id="<?php echo 'intelliwidget_widget_page_id'; ?>">
         <option value="">
-        <?php _e('This Page', 'intelliwidget'); ?>
+        <?php printf(__('This %s', 'intelliwidget'), ucfirst($post->post_type)); ?>
         </option>
-        <?php echo $this->get_pages(array('post_types' => array('page'), 'page' => array($widget_page_id))); ?>
+        <?php echo $this->get_pages(array('post_types' => array($post->post_type), 'page' => array($widget_page_id))); ?>
     </select>
 </p>
 <div class="iw-copy-container">

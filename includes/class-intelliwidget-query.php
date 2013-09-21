@@ -229,7 +229,7 @@ LEFT OUTER JOIN (
         endswitch;
         $orderby = ' ORDER BY ' . $orderby;
         $items = intval($instance['items']);
-        $limit = ' LIMIT 0, ' . (empty($items) ? '5' : $items);
+        $limit = empty($items) ? '' : ' LIMIT 0, ' . $items;
         $querystr = $select . implode(' ', $joins) . ' WHERE ' . implode("\n AND ", $clauses) . $orderby . $limit;
         $this->posts      = $wpdb->get_results($querystr, OBJECT);
         $this->post_count = count($this->posts);
