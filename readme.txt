@@ -75,8 +75,15 @@ timezone under Settings > General in the WordPress admin.
 
 Custom Post Types must support custom fields (post meta data) for IntelliWidget to recognize them. 
 Change the 'supports' parameter in the register_post_type function to include 'custom-fields', e.g.,
-
-    'supports' => array( 'title', 'editor', 'excerpt', 'thumbnail', 'author', 'custom-fields', 'revisions' ),
+    'supports' => array( 
+      'title', 
+      'editor', 
+      'excerpt', 
+      'thumbnail', 
+      'author', 
+      'custom-fields', 
+      'revisions', 
+    ),
 
 == Screenshots ==
 
