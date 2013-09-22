@@ -66,7 +66,7 @@ Docs can be found at http://www.lilaeamedia.com/plugins/intelliwidget/
 By default, IntelliWidget does not display the featured image. To enable the featured image,
 choose an image size under Advanced Settings > Image Size in the IntelliWidget settings.
 
-= Why is are the posts showing and hiding several hours before or after the time I entered? =
+= Why are posts showing and hiding several hours before or after the time I entered? =
 
 Dates are calculated using the WordPress current_time() function. Make sure you have set the correct
 timezone under Settings > General in the WordPress admin.
