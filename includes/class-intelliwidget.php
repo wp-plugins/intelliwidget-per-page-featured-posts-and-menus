@@ -14,7 +14,7 @@ require_once( 'class-intelliwidget-query.php' );
 require_once( 'class-walker-intelliwidget.php' );
 class IntelliWidget {
 
-    var $version     = '1.3.5';
+    var $version     = '1.3.6';
     var $pluginName;
     var $pluginPath;
     var $pluginURL;
@@ -166,7 +166,7 @@ class IntelliWidget {
      */
     function main_meta_box() {
         global $post;
-        foreach ($this->get_eligible_post_types(true) as $type):
+        foreach ($this->get_eligible_post_types() as $type):
             add_meta_box( 
                 'intelliwidget_main_meta_box',
                 __( 'IntelliWidget', 'intelliwidget'),
@@ -596,11 +596,10 @@ class IntelliWidget {
         return $merged;
     }
     
-    function get_eligible_post_types($queryable = false) {
+    function get_eligible_post_types() {
         $eligible = array();
         if ( function_exists('get_post_types') ):
             $args = array('public' => true);
-            if ($queryable) $args['publicly_queryable'] = true;
             $types = get_post_types($args);
         else:
             $types = array('post', 'page');
