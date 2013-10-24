@@ -290,7 +290,7 @@ class IntelliWidget {
         // additional processing for each box data segment
         foreach (array_keys($post_data) as $box_id):
             // special handling for checkboxes:
-            foreach(array('skip_expired', 'skip_post', 'link_title', 'hide_if_empty', 'filter', 'future_only', 'active_only', 'nocopy') as $cb):
+            foreach(array('skip_expired', 'skip_post', 'link_title', 'hide_if_empty', 'filter', 'future_only', 'active_only', 'nocopy', 'nocache') as $cb):
                 $post_data[$box_id][$cb] = isset($_POST[$prefix . $box_id . '_' . $cb]);
             endforeach;
             $post_data[$box_id]['post_types'] = empty($_POST[$prefix . $box_id . '_post_types']) ? 
@@ -590,6 +590,7 @@ class IntelliWidget {
             'future_only'    => 0,
             'active_only'    => 0,
             'nocopy'         => 0,
+            'nocache'        => 0,
         );
         // standard WP function for merging argument lists
         $merged = wp_parse_args($instance, $defaults);
@@ -620,72 +621,82 @@ class IntelliWidget {
      * @return void
      */
     function build_widget($args, $instance, $post_ID = null) {
-        global $this_instance;
-        $instance = $this_instance = $this->defaults($instance);
-        if (!is_array($instance['page'])) $instance['page'] = array($instance['page']);
-        if (!is_array($instance['post_types'])) $instance['post_types'] = array($instance['post_types']);
         extract($args, EXTR_SKIP);
-        /* if this is a nav menu get menu object and skip query */
-        $nav_menu = false;
-        if (! empty( $instance['nav_menu'] )) :
-            $nav_menu =  wp_get_nav_menu_object( $instance['nav_menu'] );
+        $transient_id = $widget_id . (empty($post_ID)?'':'_' . $post_ID);
+        if (empty($instance['nocache']) && ($iw_content = get_transient($transient_id))):
+            $iw_content = stripslashes($iw_content);
         else:
-            $selected = new IntelliWidget_Query($instance);
-        endif;
-        
-        // use widget CSS if present
-        $classes = array();
-        if (!empty($instance['classes'])) :
-            $classes = preg_split("/[, ;]+/", $instance['classes']);
-        endif;
-        if (!empty($instance['container_id'])):
-            $before_widget = preg_replace('/id=".+?"/', 'id="' . $instance['container_id'] . '"', $before_widget);
-        endif;
-        if (!empty($classes)):
-            $before_widget = preg_replace('/class="/', 'class="' . implode(" ", $classes) . ' ', $before_widget);
-        endif;
-        // use before widget argument
-        echo $before_widget;
-        // handle title
-        $title = apply_filters( 'widget_title', empty( $instance['title'] ) ? '' : $instance['title'], $instance );
-        if ( !empty( $title ) ) {
-            echo $before_title;
-            if ( $instance['link_title'] && $selected->post_count) {
-                // @params $post_ID, $text, $category_ID
-                the_intelliwidget_link($selected->posts[0]->ID, $title, $instance['category']);
-            } else {
-                echo $title;
-            }
-            echo $after_title;
-        }
-        // handle custom text
-        $custom_text = apply_filters( 'widget_text', $instance['custom_text'], $instance );
-        if (('above' == $instance['text_position'] || 'only' == $instance['text_position'] )):
-            echo '<div class="textwidget">' . ( !empty( $instance['filter'] ) ? 
-                wpautop( $custom_text ) : $custom_text ) . '</div>';
-        endif;
-        if ('only' == $instance['text_position']):
-            echo $after_widget;
-            return;
-        endif;
-        // if this is a nav menu, use default WP menu output
-        if (!empty($instance['nav_menu'])):
-            if ('-1' == $instance['nav_menu'] ):
-                wp_page_menu( array( 'show_home' => true, 'menu_class' => 'iw-menu' . (empty($instance['classes'])?'':' ' . $instance['classes']) ));
+            ob_start();
+            global $this_instance;
+            $instance = $this_instance = $this->defaults($instance);
+            if (!is_array($instance['page'])) $instance['page'] = array($instance['page']);
+            if (!is_array($instance['post_types'])) $instance['post_types'] = array($instance['post_types']);
+            /* if this is a nav menu get menu object and skip query */
+            $nav_menu = false;
+            if (! empty( $instance['nav_menu'] )) :
+                $nav_menu =  wp_get_nav_menu_object( $instance['nav_menu'] );
             else:
-                wp_nav_menu( array( 'fallback_cb' => '', 'menu' => $nav_menu, 'menu_class' => 'iw-menu' . (empty($instance['classes'])?'':' ' . $instance['classes'])));
+                $selected = new IntelliWidget_Query($instance);
             endif;
-        // otherwise load IW template
-        else:
-            if ($template = $this->get_template($instance['template'])):
-                include ($template);
+        
+            // use widget CSS if present
+            $classes = array();
+            if (!empty($instance['classes'])) :
+                $classes = preg_split("/[, ;]+/", $instance['classes']);
             endif;
+            if (!empty($instance['container_id'])):
+                $before_widget = preg_replace('/id=".+?"/', 'id="' . $instance['container_id'] . '"', $before_widget);
+            endif;
+            if (!empty($classes)):
+                $before_widget = preg_replace('/class="/', 'class="' . implode(" ", $classes) . ' ', $before_widget);
+            endif;
+            // use before widget argument
+            echo $before_widget;
+            // handle title
+            $title = apply_filters( 'widget_title', empty( $instance['title'] ) ? '' : $instance['title'], $instance );
+            if ( !empty( $title ) ) {
+                echo $before_title;
+                if ( $instance['link_title'] && $selected->post_count) {
+                    // @params $post_ID, $text, $category_ID
+                    the_intelliwidget_link($selected->posts[0]->ID, $title, $instance['category']);
+                } else {
+                    echo $title;
+                }
+                echo $after_title;
+            }
+            // handle custom text
+            $custom_text = apply_filters( 'widget_text', $instance['custom_text'], $instance );
+            if (('above' == $instance['text_position'] || 'only' == $instance['text_position'] )):
+                echo '<div class="textwidget">' . ( !empty( $instance['filter'] ) ? 
+                    wpautop( $custom_text ) : $custom_text ) . '</div>';
+            endif;
+            if ('only' != $instance['text_position']):
+                // if this is a nav menu, use default WP menu output
+                if (!empty($instance['nav_menu'])):
+                    if ('-1' == $instance['nav_menu'] ):
+                        wp_page_menu( array( 'show_home' => true, 'menu_class' => 'iw-menu' . (empty($instance['classes'])?'':' ' . $instance['classes']) ));
+                    else:
+                        wp_nav_menu( array( 'fallback_cb' => '', 'menu' => $nav_menu, 'menu_class' => 'iw-menu' . (empty($instance['classes'])?'':' ' . $instance['classes'])));
+                    endif;
+                // otherwise load IW template
+                else:
+                    if ($template = $this->get_template($instance['template'])):
+                        include ($template);
+                    endif;
+                endif;
+                if ('below' == $instance['text_position']):
+                    echo "<div class=\"textwidget\">\n" . ( !empty( $instance['filter'] ) ? 
+                    wpautop( $custom_text ) : $custom_text ) . "\n</div>\n";
+                endif;
+            endif;
+            echo $after_widget;
+            $iw_content = ob_get_contents();
+            ob_end_clean();
+            
+            set_transient($transient_id, addslashes($iw_content), 3600); // 1 hour cache
         endif;
-        if ('below' == $instance['text_position']):
-            echo "<div class=\"textwidget\">\n" . ( !empty( $instance['filter'] ) ? 
-                wpautop( $custom_text ) : $custom_text ) . "\n</div>\n";
-        endif;
-        echo $after_widget;
+        echo $iw_content;
+            
     }
     
     function get_page_data($post_id, $box_id) {
@@ -711,14 +722,18 @@ class IntelliWidget {
      */
 
     function intelliwidget_shortcode($atts) {
-        global $post;
+        global $post, $shortcode_count;
         $old_post = $post;
+        $post_id = (is_object($post) ? $post->ID : null);
         // section parameter lets us use page-specific IntelliWidgets in shortcode without all the params
-        if (is_object($post) && !empty($atts['section'])):
-//            if (!($atts = $this->get_page_data($post->ID, intval($atts['section'])))): return; endif;
-             $atts = $this->get_page_data($post->ID, intval($atts['section']));
+        if ($post_id && !empty($atts['section'])):
+             $box_id = intval($atts['section']);
+             $atts = $this->get_page_data($post->ID, $box_id);
              if (empty($atts)): return; endif;
-       else:
+        else:
+            if (!$shortcode_count) $shortcode_count = 0;
+            $shortcode_count++;
+            $box_id = $shortcode_count;
             if (!empty($atts['pages'])) $atts['pages'] = preg_split("/, */", $atts['pages']);
             if (!empty($atts['post_types'])) $atts['post_types'] = preg_split("/, */", $atts['post_types']);
             if (!empty($atts['custom_text'])) unset($atts['custom_text']);
@@ -728,6 +743,7 @@ class IntelliWidget {
         endif;
         $atts = $this->defaults($atts);
         $args = array(
+            'widget_id'     => 'intelliwidget_shortcode_' . (empty($post_id) ? '' : $post_id . '_') . $box_id ,
             'before_title'  => '',
             'after_title'   => '',
             'before_widget' => empty($atts['nav_menu'])?'<div class="widget_intelliwidget">':'',
@@ -736,7 +752,7 @@ class IntelliWidget {
         // buffer standard output
         ob_start();
         // generate widget from arguments
-        $this->build_widget($args, $atts, is_object($post) ? $post->ID : null);
+        $this->build_widget($args, $atts, $post_id);
         // retrieve widget content from buffer
         $content = ob_get_contents();
         ob_end_clean();

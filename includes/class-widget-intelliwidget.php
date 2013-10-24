@@ -116,7 +116,7 @@ class IntelliWidget_Widget extends WP_Widget {
             $instance['custom_text'] = stripslashes( wp_filter_post_kses( addslashes($new_instance['custom_text']) ) ); 
         endif;
         // special handling for checkboxes: //'replace_widget', 
-        foreach(array('skip_expired', 'skip_post', 'link_title', 'hide_if_empty', 'filter', 'future_only', 'active_only') as $cb):
+        foreach(array('skip_expired', 'skip_post', 'link_title', 'hide_if_empty', 'filter', 'future_only', 'active_only', 'nocache') as $cb):
             $instance[$cb] = isset($new_instance[$cb]);
         endforeach;
         return $instance;

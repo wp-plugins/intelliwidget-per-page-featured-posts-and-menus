@@ -19,6 +19,10 @@ global $_wp_additional_image_sizes;
         <input name="<?php echo $this->get_field_name('hide_if_empty'); ?>" id="<?php echo $this->get_field_id('hide_if_empty'); ?>" type="checkbox" <?php checked($instance['hide_if_empty']); ?> />
         <?php _e('Hide if no Page Data is available', 'intelliwidget'); ?>
     </label>
+    <label>
+        <input name="<?php echo $this->get_field_name('nocache'); ?>" id="<?php echo $this->get_field_id('nocache'); ?>" type="checkbox" <?php checked($instance['nocache']); ?> />
+        <?php _e('Disable cache', 'intelliwidget'); ?>
+    </label>
 </p>
 <p>
     <label for="<?php echo $this->get_field_id('title'); ?>"> <?php echo __('Widget', 'intelliwidget') . ' ' . __('Title', 'intelliwidget') . ' ' . __('(Leave blank to omit)', 'intelliwidget'); ?>: </label>
