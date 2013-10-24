@@ -3,8 +3,8 @@ Contributors: lilaeamedia
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=DE4W9KW7HQJNA
 Tags: featured posts, events, page menu, plugin, textwidget, widget, custom post types, custom sidebar
 Requires at least: 3.5
-Tested up to: 3.6.1
-Stable tag: 1.3.5
+Tested up to: 3.7
+Stable tag: 1.3.7
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -96,6 +96,15 @@ Change the 'supports' parameter in the register_post_type function to include 'c
 
 == Changelog ==
 
+= 1.3.7 =
+* Fixed case where IntelliWidgets are orphaned after theme change. 
+* Updated to support WP 3.7
+* Tweaked img class to set height:auto
+* Added new "album" template
+
+= 1.3.6 =
+* Update to metabox for pages
+
 = 1.3.5 =
 * Added metaboxes (settings panels) for all eligible post types, not just pages.
 * Fixed "Show All" in the query class (it was showing the default 5 instead of "all")
@@ -175,6 +184,12 @@ Change the 'supports' parameter in the register_post_type function to include 'c
 
 
 == Upgrade Notice ==
+
+= 1.3.7 =
+This release fixes some minor issues and adds support up to WP 3.7
+
+= 1.3.6 =
+This release adds post-specific IntelliWidgets to all post types, not just 'pages.'
 
 = 1.3.4 =
 Fixed incorrect global (fatal error) in release 1.3.3. This release adds the ability to use on-page IW Sections as the settings for shortcodes.
