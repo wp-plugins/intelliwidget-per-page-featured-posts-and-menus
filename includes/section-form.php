@@ -29,8 +29,9 @@ global $_wp_additional_image_sizes, $wp_registered_sidebars;
         <option value="content"<?php selected( $intelliwidget_data['replace_widget'], 'content' ); ?>>
         <?php _e('Use in Page Content', 'intelliwidget');?>
         </option>
-        <?php foreach($widgets_array as $sidebar_id => $sidebar_widgets): 
-             if (false === strpos($sidebar_id, 'wp_inactive') ):
+        <?php 
+        foreach($widgets_array as $sidebar_id => $sidebar_widgets): 
+             if (false === strpos($sidebar_id, 'wp_inactive') && false === strpos($sidebar_id, 'orphaned')):
             $count = 1;
               foreach ($sidebar_widgets as $sidebar_widget_id):
                  if (false !== strpos($sidebar_widget_id, 'intelliwidget') ):

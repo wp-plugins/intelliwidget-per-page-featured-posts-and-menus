@@ -73,6 +73,7 @@
 .widget_intelliwidget img.intelliwidget-image-thumbnail, img.intelliwidget-image-thumbnail.wp-post-image {
     margin: 0;
     width: 100%;
+    height:auto;
 }
 
 .widget_intelliwidget .intelliwidget-more-link a {
