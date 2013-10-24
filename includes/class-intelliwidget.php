@@ -14,7 +14,7 @@ require_once( 'class-intelliwidget-query.php' );
 require_once( 'class-walker-intelliwidget.php' );
 class IntelliWidget {
 
-    var $version     = '1.3.2';
+    var $version     = '1.3.6';
     var $pluginName;
     var $pluginPath;
     var $pluginURL;
@@ -39,7 +39,7 @@ class IntelliWidget {
         /* get url to this directory 
          * Thanks to Spokesrider for finding this bug! 
          */
-        $this->pluginURL     = plugin_dir_url($file) . '/';
+        $this->pluginURL     = plugin_dir_url($file);// . '/';
         $this->templatesPath = $this->pluginPath . 'templates/';
         $this->templatesURL  = $this->pluginURL . 'templates/';        
 
@@ -150,7 +150,7 @@ class IntelliWidget {
                     'intelliwidget_section_meta_box_' . $box_id,
                     __( 'IntelliWidget Section ', 'intelliwidget') . $count,
                     array( &$this, 'section_meta_box_form' ),
-                    'page',
+                    $post->post_type,
                     'side',
                     'low',
                     array('pagesection' => $box_id)
@@ -166,14 +166,16 @@ class IntelliWidget {
      */
     function main_meta_box() {
         global $post;
-        add_meta_box( 
-            'intelliwidget_main_meta_box',
-            __( 'IntelliWidget', 'intelliwidget'),
-            array( &$this, 'main_meta_box_form' ),
-            'page',
-            'side',
-            'low'
-        );
+        foreach ($this->get_eligible_post_types() as $type):
+            add_meta_box( 
+                'intelliwidget_main_meta_box',
+                __( 'IntelliWidget', 'intelliwidget'),
+                array( &$this, 'main_meta_box_form' ),
+                $type,
+                'side',
+                'low'
+            );
+        endforeach;
     }
     
     /**
@@ -597,13 +599,15 @@ class IntelliWidget {
     function get_eligible_post_types() {
         $eligible = array();
         if ( function_exists('get_post_types') ):
-            $types = get_post_types(array('public' => true));
+            $args = array('public' => true);
+            $types = get_post_types($args);
         else:
             $types = array('post', 'page');
         endif;
         foreach($types as $type):
-            if (post_type_supports($type, 'custom-fields'))
+            if (post_type_supports($type, 'custom-fields')):
                 $eligible[] = $type;
+            endif;
         endforeach;
         return $eligible;
     }
@@ -667,7 +671,7 @@ class IntelliWidget {
         // if this is a nav menu, use default WP menu output
         if (!empty($instance['nav_menu'])):
             if ('-1' == $instance['nav_menu'] ):
-                wp_page_menu( array( 'show_home' => true ));
+                wp_page_menu( array( 'show_home' => true, 'menu_class' => 'iw-menu' . (empty($instance['classes'])?'':' ' . $instance['classes']) ));
             else:
                 wp_nav_menu( array( 'fallback_cb' => '', 'menu' => $nav_menu, 'menu_class' => 'iw-menu' . (empty($instance['classes'])?'':' ' . $instance['classes'])));
             endif;
@@ -693,6 +697,7 @@ class IntelliWidget {
             endif;
             return $page_data;
         endif;
+        return false;
     }
     
     /**
@@ -710,8 +715,10 @@ class IntelliWidget {
         $old_post = $post;
         // section parameter lets us use page-specific IntelliWidgets in shortcode without all the params
         if (is_object($post) && !empty($atts['section'])):
-            $atts = $this->get_page_data($post->ID, intval($atts['section']));
-        else:
+//            if (!($atts = $this->get_page_data($post->ID, intval($atts['section'])))): return; endif;
+             $atts = $this->get_page_data($post->ID, intval($atts['section']));
+             if (empty($atts)): return; endif;
+       else:
             if (!empty($atts['pages'])) $atts['pages'] = preg_split("/, */", $atts['pages']);
             if (!empty($atts['post_types'])) $atts['post_types'] = preg_split("/, */", $atts['post_types']);
             if (!empty($atts['custom_text'])) unset($atts['custom_text']);
@@ -723,7 +730,7 @@ class IntelliWidget {
         $args = array(
             'before_title'  => '',
             'after_title'   => '',
-            'before_widget' => empty($atts['nav_menu'])?'<div class="">':'',
+            'before_widget' => empty($atts['nav_menu'])?'<div class="widget_intelliwidget">':'',
             'after_widget'  => empty($atts['nav_menu'])?'</div>':'',
         );
         // buffer standard output

@@ -3,8 +3,8 @@ Contributors: lilaeamedia
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=DE4W9KW7HQJNA
 Tags: featured posts, events, page menu, plugin, textwidget, widget, custom post types, custom sidebar
 Requires at least: 3.5
-Tested up to: 3.6
-Stable tag: 1.3.2
+Tested up to: 3.6.1
+Stable tag: 1.3.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -53,13 +53,38 @@ IntelliWidget is flexible and versatile. Please read the documentation to see mo
 
 == Frequently Asked Questions ==
 
-= How do I get started? =
+= Is there a quick tutorial? =
 
 See the "Getting Started" section.
 
-= Where can I find documentation? =
+= Where can I find full documentation? =
 
 Docs can be found at http://www.lilaeamedia.com/plugins/intelliwidget/
+
+= Why isn't IntelliWidget displaying the featured image? =
+
+By default, IntelliWidget does not display the featured image. To enable the featured image,
+choose an image size under Advanced Settings > Image Size in the IntelliWidget settings.
+
+= Why are posts showing and hiding several hours before or after the time I entered? =
+
+Dates are calculated using the WordPress current_time() function. Make sure you have set the correct
+timezone under Settings > General in the WordPress admin.
+
+= Why isn't my Custom Post Type appearing as an option? =
+
+Custom Post Types must support custom fields (post meta data) for IntelliWidget to recognize them. 
+Change the 'supports' parameter in the register_post_type function to include 'custom-fields', e.g.,
+
+    'supports' => array( 
+      'title', 
+      'editor', 
+      'excerpt', 
+      'thumbnail', 
+      'author', 
+      'custom-fields', 
+      'revisions', 
+    ),
 
 == Screenshots ==
 
@@ -70,6 +95,19 @@ Docs can be found at http://www.lilaeamedia.com/plugins/intelliwidget/
 5. Example of the Custom Data Fields Panel.
 
 == Changelog ==
+
+= 1.3.6 =
+* Update to metabox for pages
+
+= 1.3.5 =
+* Added metaboxes (settings panels) for all eligible post types, not just pages.
+* Fixed "Show All" in the query class (it was showing the default 5 instead of "all")
+
+= 1.3.4 =
+* Fixed missing global scope on intelliwidget object. Added "widget_intelliwidget" class to shortcode widget wrappers.
+
+= 1.3.3 =
+* Added Page Content option to shortcode. Now you can specify an IntelliWidget Section to get the parameters instead of passing them as args.
 
 = 1.3.2 =
 * Test if $post is object before attempted to get ID attribute to prevent error notice.
@@ -140,6 +178,12 @@ Docs can be found at http://www.lilaeamedia.com/plugins/intelliwidget/
 
 
 == Upgrade Notice ==
+
+= 1.3.6 =
+This release adds post-specific IntelliWidgets to all post types, not just 'pages.'
+
+= 1.3.4 =
+Fixed incorrect global (fatal error) in release 1.3.3. This release adds the ability to use on-page IW Sections as the settings for shortcodes.
 
 = 1.3.0 =
 New Features! We added the long-needed intelliwidget-current-menu-item style, a generic "events" template, and the ability to keep some page sections and copy the rest using "Override Copied Settings."
