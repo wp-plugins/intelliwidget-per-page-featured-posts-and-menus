@@ -13,9 +13,6 @@ if ( !defined('ABSPATH')) exit;
  * @access public
  */
 ?>
-<style type="text/css">
-.intelliwidget-album-container { text-align: center; }
-</style>
 <?php
 if ( $selected->have_posts() ) : while ($selected->have_posts()) : $selected->the_post();
 ?>

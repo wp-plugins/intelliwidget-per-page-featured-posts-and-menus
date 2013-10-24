@@ -4,7 +4,7 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_i
 Tags: featured posts, events, page menu, plugin, textwidget, widget, custom post types, custom sidebar
 Requires at least: 3.5
 Tested up to: 3.7
-Stable tag: 1.3.7
+Stable tag: 1.3.8
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -96,7 +96,7 @@ Change the 'supports' parameter in the register_post_type function to include 'c
 
 == Changelog ==
 
-= 1.3.7 =
+= 1.3.8 =
 * Fixed case where IntelliWidgets are orphaned after theme change. 
 * Updated to support WP 3.7
 * Tweaked img class to set height:auto
@@ -185,7 +185,7 @@ Change the 'supports' parameter in the register_post_type function to include 'c
 
 == Upgrade Notice ==
 
-= 1.3.7 =
+= 1.3.8 =
 This release fixes some minor issues and adds support up to WP 3.7
 
 = 1.3.6 =
