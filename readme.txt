@@ -3,8 +3,8 @@ Contributors: lilaeamedia
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=DE4W9KW7HQJNA
 Tags: featured posts, events, page menu, plugin, textwidget, widget, custom post types, custom sidebar
 Requires at least: 3.5
-Tested up to: 3.7
-Stable tag: 1.3.8
+Tested up to: 3.8
+Stable tag: 1.3.9
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -96,11 +96,16 @@ Change the 'supports' parameter in the register_post_type function to include 'c
 
 == Changelog ==
 
+= 1.3.9 =
+* Fixed input field names intelliwidget_link_classes and intelliwidget_link_target so that they save correctly
+* Modified query class to retreive expire_date for all queries
+* Added new "multi-date" template to display start and end dates for multi-date events
+
 = 1.3.8 =
 * Fixed case where IntelliWidgets are orphaned after theme change. 
 * Updated to support WP 3.7
 * Tweaked img class to set height:auto
-* Added new "album" template
+* Added new "albums" template
 
 = 1.3.6 =
 * Update to metabox for pages

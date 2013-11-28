@@ -1,4 +1,4 @@
-/**
+/*!
  * intelliwidget.js - Javascript for the Admin.
  *
  * @package IntelliWidget
@@ -146,7 +146,7 @@ jQuery(document).ready(function($) {
  */
 var iw_save_cdfdata = function(){
     // disable the button until ajax returns
-    jQuery(this).attr('disabled', 'disabled');
+    jQuery(this).prop('disabled', true);
     // clear previous success/fail icons
     jQuery('.iw-copy-container,.iw-save-container,.iw-cdf-container').removeClass('success failure');
     // unbind button from click event
@@ -172,7 +172,7 @@ var iw_save_cdfdata = function(){
         //on success function  
         function(response){
             // release button
-            jQuery('#iw_cdfsave').removeAttr('disabled');
+            jQuery('#iw_cdfsave').prop('disabled', false);
             // hide spinner
             jQuery('#intelliwidget_cpt_spinner').hide();
             // show check mark
@@ -187,7 +187,7 @@ var iw_save_cdfdata = function(){
  */
 iw_save_postdata = function (){ 
     // disable the button until ajax returns
-    jQuery(this).attr('disabled', 'disabled');;
+    jQuery(this).prop('disabled', true);;
     jQuery('.iw-copy-container,.iw-save-container,.iw-cdf-container').removeClass('success failure');
     // get id of button
     var thisID   = jQuery(this).attr('id'),
@@ -236,7 +236,7 @@ iw_save_postdata = function (){
                 jQuery(sel).parent().addClass('success');
             }
             // release button
-            jQuery(sel).removeAttr('disabled');
+            jQuery(sel).prop('disabled', false);
             // hide spinner
             jQuery('#' + pre + '_spinner').hide();
             return false;  
@@ -250,7 +250,7 @@ iw_save_postdata = function (){
  */
 iw_copy_page = function (){ 
     // disable the button until ajax returns
-    jQuery(this).attr('disabled', 'disabled');
+    jQuery(this).prop('disabled', true);
     // clear previous success/fail icons
     jQuery('.iw-copy-container,.iw-save-container,.iw-cdf-container').removeClass('success failure');
     // unbind button from click event
@@ -276,7 +276,7 @@ iw_copy_page = function (){
         //on success function  
         function(response){
             // release button
-            jQuery('#iw_copy').removeAttr('disabled');
+            jQuery('#iw_copy').prop('disabled', false);
             // hide spinner
             jQuery('#intelliwidget_spinner').hide();
             // show check mark

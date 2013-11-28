@@ -78,8 +78,8 @@ input.intelliwidget-input, select.intelliwidget-input {
         $keys = array(
             'intelliwidget_event_date',
             'intelliwidget_expire_date',
-            'intelliwidget_classes',
-            'intelliwidget_target',
+            'intelliwidget_link_classes',
+            'intelliwidget_link_target',
             'intelliwidget_alt_title',
             'intelliwidget_external_url',
         );
@@ -110,16 +110,16 @@ input.intelliwidget-input, select.intelliwidget-input {
 <p>    <label for="intelliwidget_external_url"><?php _e('External URL', 'intelliwidget');?>:</label>
     <input class="intelliwidget-input" type="text" id="intelliwidget_external_url" name="intelliwidget_external_url" value="<?php echo $fields['intelliwidget_external_url'] ?>" />
 </p>
-<p>    <label for="intelliwidget_classes"><?php _e('Link Classes', 'intelliwidget');?>:</label>
-    <input class="intelliwidget-input" type="text" id="intelliwidget_classes" name="intelliwidget_classes" value="<?php echo $fields['intelliwidget_classes'] ?>" />
+<p>    <label for="intelliwidget_link_classes"><?php _e('Link Classes', 'intelliwidget');?>:</label>
+    <input class="intelliwidget-input" type="text" id="intelliwidget_link_classes" name="intelliwidget_link_classes" value="<?php echo $fields['intelliwidget_link_classes'] ?>" />
 </p>
-<p>    <label for="intelliwidget_target"><?php _e('Link Target', 'intelliwidget');?>:</label>
-    <select class="intelliwidget-input" id="intelliwidget_target" name="intelliwidget_target">
-      <option value=""<?php selected( $fields['intelliwidget_target'], '' ); ?>>None</option>
-      <option value="_new"<?php selected( $fields['intelliwidget_target'], '_new' ); ?>>_new</option>
-      <option value="_blank"<?php selected( $fields['intelliwidget_target'], '_blank' ); ?>>_blank</option>
-      <option value="_self"<?php selected( $fields['intelliwidget_target'], '_self' ); ?>>_self</option>
-      <option value="_top"<?php selected( $fields['intelliwidget_target'], '_top' ); ?>>_top</option>
+<p>    <label for="intelliwidget_link_target"><?php _e('Link Target', 'intelliwidget');?>:</label>
+    <select class="intelliwidget-input" id="intelliwidget_link_target" name="intelliwidget_link_target">
+      <option value=""<?php selected( $fields['intelliwidget_link_target'], '' ); ?>>None</option>
+      <option value="_new"<?php selected( $fields['intelliwidget_link_target'], '_new' ); ?>>_new</option>
+      <option value="_blank"<?php selected( $fields['intelliwidget_link_target'], '_blank' ); ?>>_blank</option>
+      <option value="_self"<?php selected( $fields['intelliwidget_link_target'], '_self' ); ?>>_self</option>
+      <option value="_top"<?php selected( $fields['intelliwidget_link_target'], '_top' ); ?>>_top</option>
     </select>
 </p>
 <div class="iw-cdf-container">

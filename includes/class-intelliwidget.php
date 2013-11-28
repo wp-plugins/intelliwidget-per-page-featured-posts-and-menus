@@ -14,7 +14,7 @@ require_once( 'class-intelliwidget-query.php' );
 require_once( 'class-walker-intelliwidget.php' );
 class IntelliWidget {
 
-    var $version     = '1.3.8';
+    var $version     = '1.3.9';
     var $pluginName;
     var $pluginPath;
     var $pluginURL;
@@ -338,7 +338,6 @@ class IntelliWidget {
     }
     function save_cdfdata() {
         if (empty($_POST['iwpage']) ) return false;
-        
         $post_ID   = intval($_POST['post_ID']);
         // security checkpoint
         if ( empty($post_ID) || !current_user_can('edit_post', $post_ID) || !wp_verify_nonce($_POST['iwpage'],'iwpage_' . $post_ID) ) return false;

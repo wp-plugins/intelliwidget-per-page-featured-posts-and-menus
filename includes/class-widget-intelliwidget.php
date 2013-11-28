@@ -12,7 +12,7 @@ if ( !defined('ABSPATH')) exit;
  */
 class IntelliWidget_Widget extends WP_Widget {
 
-    var $version     = '1.3.8';
+    var $version     = '1.3.9';
 
     /**
      * Constructor
@@ -29,8 +29,7 @@ class IntelliWidget_Widget extends WP_Widget {
      */
     function wp_print_styles() {
         global $intelliwidget;
-        wp_register_style('intelliwidget', $intelliwidget->get_template('intelliwidget', '.css', 'url'));
-        wp_enqueue_style('intelliwidget');
+        wp_enqueue_style('intelliwidget', $intelliwidget->get_template('intelliwidget', '.css', 'url'));
     }
     
     /**
@@ -116,7 +115,7 @@ class IntelliWidget_Widget extends WP_Widget {
             $instance['custom_text'] = stripslashes( wp_filter_post_kses( addslashes($new_instance['custom_text']) ) ); 
         endif;
         // special handling for checkboxes: //'replace_widget', 
-        foreach(array('skip_expired', 'skip_post', 'link_title', 'hide_if_empty', 'filter', 'future_only', 'active_only') as $cb):
+        foreach(array('skip_expired', 'skip_post', 'link_title', 'hide_if_empty', 'filter', 'future_only', 'active_only', 'nocopy') as $cb):
             $instance[$cb] = isset($new_instance[$cb]);
         endforeach;
         return $instance;
