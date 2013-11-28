@@ -254,6 +254,35 @@ if ( !function_exists('the_intelliwidget_date') ) {
     }
 }
 
+if ( !function_exists('get_the_intelliwidget_exp_date') ) {
+    /**
+     * Get the event date for the post if it exists, otherwise return the post date.
+     *
+     * @global <object> $post
+     * @param <string> $format
+     * @return <string>
+     */
+    function get_the_intelliwidget_exp_date($format = 'j') {
+        global $post;
+        if (empty($post->expire_date) || 
+            (date('j', $post->post_date) == date('j', $post->expire_date) 
+                && date('m', $post->post_date) == date('m', $post->expire_date))):
+            return false;
+        else:
+            return date($format, strtotime($post->expire_date));
+        endif;
+    }
+}
+    /**
+     * Display the event date if it exists otherwise display post date.
+     */
+
+if ( !function_exists('the_intelliwidget_exp_date') ) {
+    function the_intelliwidget_exp_date($format = 'j') {
+        if ($exp = get_the_intelliwidget_exp_date($format)) echo $exp;
+    }
+}
+
 if ( !function_exists('_intelliwidget_trim_excerpt') ) {
     /**
      * Trim the content to a set number of words.

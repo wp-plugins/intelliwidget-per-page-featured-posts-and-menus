@@ -105,6 +105,7 @@ SELECT DISTINCT
     COALESCE(NULLIF(pm2.meta_value, ''), p1.post_date) AS post_date,
     p1.post_author,
     'raw' AS filter,
+    pm1.meta_value AS expire_date, 
     pm2.meta_value AS event_date, 
     pm3.meta_value AS link_classes,
     pm4.meta_value AS alt_title,
@@ -117,6 +118,13 @@ SELECT DISTINCT
 LEFT OUTER JOIN (
     SELECT post_id, meta_value
     FROM {$wpdb->postmeta}
+    WHERE meta_key = 'intelliwidget_expire_date'
+    GROUP BY post_id, meta_value
+) pm1 ON pm1.post_id = p1.ID
+            ", "
+LEFT OUTER JOIN (
+    SELECT post_id, meta_value
+    FROM {$wpdb->postmeta}
     WHERE meta_key = 'intelliwidget_event_date'
     GROUP BY post_id, meta_value
 ) pm2 ON pm2.post_id = p1.ID
@@ -124,7 +132,7 @@ LEFT OUTER JOIN (
 LEFT OUTER JOIN (
     SELECT post_id, meta_value
     FROM {$wpdb->postmeta}
-    WHERE meta_key = 'intelliwidget_classes'
+    WHERE meta_key = 'intelliwidget_link_classes'
     GROUP BY post_id, meta_value
 ) pm3 ON pm3.post_id = p1.ID
             ", "
@@ -138,7 +146,7 @@ LEFT OUTER JOIN (
 LEFT OUTER JOIN (
     SELECT post_id, meta_value
     FROM {$wpdb->postmeta}
-    WHERE meta_key = 'intelliwidget_target'
+    WHERE meta_key = 'intelliwidget_link_target'
     GROUP BY post_id, meta_value
 ) pm5 ON pm5.post_id = p1.ID
             ", "
@@ -180,18 +188,8 @@ LEFT OUTER JOIN (
         $time_adj = gmdate('Y-m-d H:i', current_time('timestamp') );
 
         // skip expired posts
-        if ($instance['skip_expired'] || $instance['future_only']):
-            $joins[] = "
-LEFT OUTER JOIN (
-    SELECT post_id, meta_value
-    FROM {$wpdb->postmeta}
-    WHERE meta_key = 'intelliwidget_expire_date'
-    GROUP BY post_id, meta_value
-) pm1 ON pm1.post_id = p1.ID
-            ";
-            if ($instance['skip_expired']):
-                $clauses[] = "(  pm1.meta_value IS NULL  OR CAST( pm1.meta_value AS CHAR ) > '" . $time_adj . "' )";
-            endif;
+        if ($instance['skip_expired']):
+            $clauses[] = "(  pm1.meta_value IS NULL  OR CAST( pm1.meta_value AS CHAR ) > '" . $time_adj . "' )";
         endif;
         // use future events only
         // note postmeta intelliwidget_event_date date format 
