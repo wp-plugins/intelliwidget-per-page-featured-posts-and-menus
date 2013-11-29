@@ -63,8 +63,8 @@ if ( !function_exists('has_intelliwidget_image') ) {
      * @return <boolean>
      */
     function has_intelliwidget_image() {
-        global $post;
-        return !empty($post->thumbnail_id);
+        global $this_instance, $post;
+        return !($this_instance['image_size'] == 'none' || empty($post->thumbnail_id));
     }
 }
 
@@ -265,8 +265,8 @@ if ( !function_exists('get_the_intelliwidget_exp_date') ) {
     function get_the_intelliwidget_exp_date($format = 'j') {
         global $post;
         if (empty($post->expire_date) || 
-            (date('j', $post->post_date) == date('j', $post->expire_date) 
-                && date('m', $post->post_date) == date('m', $post->expire_date))):
+            (date('j', strtotime($post->event_date)) == date('j', strtotime($post->expire_date)) 
+                && date('m', strtotime($post->event_date)) == date('m', strtotime($post->expire_date)))):
             return false;
         else:
             return date($format, strtotime($post->expire_date));
