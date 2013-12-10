@@ -77,6 +77,32 @@ if ( !function_exists('the_intelliwidget_image') ) {
     }
 }
 
+if ( !function_exists('get_the_intelliwidget_author') ) {
+    /**
+     * Return meta data from the post author
+     *
+     * @param <string> $meta - field to retrieve
+     * @global <object> $post
+     * @return <string>
+     */
+    function get_the_intelliwidget_author_meta($meta) {
+        global $post;
+        if ($value = get_the_author_meta($meta, $post->post_author)) return $value;
+        return false;
+    }
+}
+if ( !function_exists('the_intelliwidget_author_meta') ) {
+    /**
+     * Display meta data from the post author
+     *
+     * @param <integer> $meta - field to retrieve
+     * @return void
+     */
+    function the_intelliwidget_author_meta($meta = 'display_name') {
+        if ($value = get_the_intelliwidget_author_meta($meta)) echo $value;
+    }
+}
+
 if ( !function_exists('get_the_intelliwidget_excerpt') ) {
     /**
      * Return the excerpt to display with the current post.
@@ -86,11 +112,11 @@ if ( !function_exists('get_the_intelliwidget_excerpt') ) {
      * @return <string>
      */
     function get_the_intelliwidget_excerpt() {
-        global $this_instance, $post;
+        global $intelliwidget, $this_instance, $post;
         // use excerpt text if it exists otherwise parse the main content
         $excerpt = empty($post->post_excerpt) ?
             get_the_intelliwidget_content() : $post->post_excerpt;
-        return _intelliwidget_trim_excerpt($excerpt, $this_instance['length']);
+        return $intelliwidget->trim_excerpt($excerpt, $this_instance);
     }
 }
 
@@ -280,30 +306,6 @@ if ( !function_exists('get_the_intelliwidget_exp_date') ) {
 if ( !function_exists('the_intelliwidget_exp_date') ) {
     function the_intelliwidget_exp_date($format = 'j') {
         if ($exp = get_the_intelliwidget_exp_date($format)) echo $exp;
-    }
-}
-
-if ( !function_exists('_intelliwidget_trim_excerpt') ) {
-    /**
-     * Trim the content to a set number of words.
-     *
-     * @param <string> $text
-     * @param <integer> $length
-     * @return <string>
-     */
-    function _intelliwidget_trim_excerpt($text, $length = 15) {
-        $text = strip_shortcodes($text);
-        $text = preg_replace('@<(style|script).*?>.*?</(style|script)>@si', '', $text);
-        $text = apply_filters('the_content', $text);
-        $text = str_replace(']]>', ']]&gt;', $text);
-        $text= strip_tags($text);
-        $words = preg_split("#\s+#s", $text, $length + 1);
-        if ( count($words) > $length ) {
-            array_pop($words);
-            array_push($words, '...');
-            $text = implode(' ', $words);
-        }
-        return $text;
     }
 }
 
