@@ -14,7 +14,7 @@ require_once( 'class-intelliwidget-query.php' );
 require_once( 'class-walker-intelliwidget.php' );
 class IntelliWidget {
 
-    var $version     = '1.3.9';
+    var $version     = '1.4.0';
     var $pluginName;
     var $pluginPath;
     var $pluginURL;
@@ -94,7 +94,7 @@ class IntelliWidget {
      * Stub for printing the scripts needed for the admin.
      */
     function admin_scripts() {
-        wp_enqueue_script('intelliwidget-js', $this->pluginURL . 'js/intelliwidget.js', array('jquery'), '1.2.0', false);
+        wp_enqueue_script('intelliwidget-js', $this->pluginURL . 'js/intelliwidget.min.js', array('jquery'), '1.2.0', false);
         wp_localize_script( 'intelliwidget-js', 'IWAjax', array(
             'ajaxurl' => admin_url( 'admin-ajax.php' )
         ));
@@ -475,64 +475,74 @@ class IntelliWidget {
 
     
     /**
-     * Return a list of template files in the theme folder and plugin folder.
+     * Return a list of template files in the theme folder(s) and plugin folder.
      * Templates actually render the output to the widget based on instance settings
      *
      * @return <array>
      */
     function get_widget_templates() {
-        $templates = array();
-        // check theme folder if intelliwidget folder exists and grab custom templates
-        if ( $handle = @opendir(get_stylesheet_directory() . '/intelliwidget') ) {
-            while (false !== ($file = readdir($handle))) {
-                if ( ! preg_match("/^\./", $file) && preg_match('/\.php$/', $file) ) {
-                    $file = str_replace('.php', '', $file);
-                    $name = str_replace('-', ' ', $file);
-                    $templates[$file] = ucfirst($name) . "<br>";
-                }
-            }
-            closedir($handle);
-        }
-        // grab pre-configured plugin templates
-        if ( $handle = opendir($this->pluginPath . '/templates') ) {
-            while (false !== ($file = readdir($handle))) {
-                if ( ! preg_match("/^\./", $file) && preg_match('/\.php$/', $file) ) {
-                    $file = str_replace('.php', '', $file);
-                    $name = str_replace('-', ' ', $file);
-                    $templates[$file] = ucfirst($name) . "<br>";
-                }
-            }
-            closedir($handle);
-        }
+        $templates  = array();
+        $paths      = array();
+        $parentPath = get_template_directory() . '/intelliwidget';
+        $themePath  = get_stylesheet_directory() . '/intelliwidget';
+        $paths[] = $this->templatesPath;
+        $paths[] = $parentPath;
+        if ($parentPath != $themePath) $paths[] = $themePath;
+        foreach ($paths as $path):
+            if (file_exists($path) && ($handle = opendir($path)) ):
+                while (false !== ($file = readdir($handle))):
+                    if ( ! preg_match("/^\./", $file) && preg_match('/\.php$/', $file) ):
+                        $file = str_replace('.php', '', $file);
+                        $name = str_replace('-', ' ', $file);
+                        $templates[$file] = ucfirst($name) . "<br>";
+                    endif;
+                endwhile;
+                closedir($handle);
+            endif;
+        endforeach;
         asort($templates);
         return $templates;
+    }
+    
+    /**
+     * Load either IW stylesheet or override stylesheet.
+     *
+     * @param <string> $override    The name of the template.
+     * @param <string> $ext         The template file extension
+     * @param <string> $type        Retrieve from path or url
+     * @return <string>             The url to the stylesheet file or false if none exist.
+     */
+
+    function get_stylesheet($override = false) {
+        if ($override):
+            $file   = '/intelliwidget/intelliwidget.css';
+            if (file_exists(get_stylesheet_directory() . $file)):
+                return get_stylesheet_directory_uri() . $file;
+            elseif (file_exists(get_template_directory() . $file)):
+                return get_template_directory_uri() . $file;
+            else:
+                return false;
+            endif;
+        else:
+            return $this->templatesURL . 'intelliwidget.css';
+        endif;
+        return false;
     }
     
     /**
      * Retrieve a template file from either the theme or the plugin directory.
      *
      * @param <string> $template    The name of the template.
-     * @param <string> $ext            The template file extension
-     * @param <string> $type        Retrieve from path or url
-     * @return <string>                The full path to the template file.
+     * @return <string>             The full path to the template file.
      */
-    function get_template($template = NULL, $ext = '.php', $type = 'path') {
-        if ( NULL == $template ) {
-            return false;
-        }
-        $themeFile = get_stylesheet_directory() . '/intelliwidget/' . $template . $ext;
-        if ( file_exists($themeFile) ) {
-            if ( 'url' == $type ) {
-                return get_bloginfo('template_url') . '/intelliwidget/' . $template . $ext;
-            } else {
-                $file = get_stylesheet_directory() . '/intelliwidget/' . $template . $ext;
-            }
-        } elseif ( 'url' == $type ) {
-            return $this->templatesURL . $template . $ext;
-        } else {
-            $file = $this->templatesPath . $template . $ext;
-        }
-        if (file_exists($file)) return $file;
+    function get_template($template = NULL) {
+        if ( NULL == $template ) return false;
+        $themeFile  = get_stylesheet_directory() . '/intelliwidget/' . $template . '.php';
+        $parentFile = get_template_directory() . '/intelliwidget/' . $template . '.php';
+        $pluginFile = $this->templatesPath . $template . '.php';
+        if ( file_exists($themeFile) )  return $themeFile;
+        if ( file_exists($parentFile) ) return $parentFile;
+        if ( file_exists($pluginFile) ) return $pluginFile;
         return false;
     }
 
@@ -569,6 +579,7 @@ class IntelliWidget {
             'items'          => 5,
             'length'         => 15,
             'link_text'      => __('Read More', 'intelliwidget'),
+            'allowed_tags'   => '',
             'post_types'     => array('page', 'post'),
             'sortby'         => 'title',
             'sortorder'      => 'ASC',
@@ -676,6 +687,13 @@ class IntelliWidget {
             endif;
         // otherwise load IW template
         else:
+            $this_instance['allowed_tags_norm'] = '';
+            if (isset($this_instance['allowed_tags'])):
+                $tags = explode(',', $this_instance['allowed_tags']);
+                foreach ( $tags as $tag ):
+                    $this_instance['allowed_tags_norm'].= '<' . trim($tag) . '>';
+                endforeach;          
+            endif;
             if ($template = $this->get_template($instance['template'])):
                 include ($template);
             endif;
@@ -743,7 +761,69 @@ class IntelliWidget {
         // return widget content
         return $content;
     }
-       
+    /**
+     * Trim the content to a set number of words.
+     *
+     * @param <string> $text
+     * @param <integer> $length
+     * @return <string>
+     */
+    function trim_excerpt($text, $this_instance) {
+        $length = intval($this_instance['length']);
+        $tags   = $this_instance['allowed_tags_norm'];
+        $text   = strip_shortcodes($text);
+        $text   = preg_replace( '@<(script|style)[^>]*?>.*?</\\1>@si', '', $text );
+        $text   = apply_filters('the_content', $text);
+        //$text   = str_replace(']]>', ']]&gt;', $text);
+        $text   = strip_tags($text, $tags);
+        if (empty($tags)):
+            $words  = preg_split('/[\r\n\t ]+/', $text, $length + 1);
+            if ( count($words) > $length ):
+                array_pop($words);
+                array_push($words, '...');
+                $text = implode(' ', $words);
+            endif;
+        else:
+            $text = $this->get_words_html($text, $length);
+        endif; 
+        return $text;
+    }
+
+    function get_words_html($text, $length) {
+        $opentags   = array();
+        $excerpt    = '';
+        $text       = preg_replace('/<(br|hr)[ \/]*>/', "<$1/>", $text);
+        preg_match_all('/(<[^>]+?>)?([^<]*)/', $text, $elements);
+        if (!empty($elements[2])):
+            $count = 0;
+            foreach($elements[2] as $string):
+                $html = array_shift($elements[1]);
+                if (preg_match('/<(\w+)[^\/]*>/', $html, $matches)):
+                    $opentags[] = $matches[1];
+                elseif (preg_match('/<\/(\w+)/', $html, $matches)):
+                    $close = array_pop($opentags);
+                endif;
+                $excerpt .= $html;
+                $words = preg_split('/[\r\n\t ]+/', $string);
+                foreach ($words as $word):
+                    if (empty($word)) continue;
+                    $count++;
+                    if ($count <= $length):
+                        $excerpt .= $word . ' ';
+                    else:
+                        $excerpt .= '...';
+                        break;
+                    endif;
+                endforeach;
+                if ($count > $length) break;
+            endforeach;
+            while (count($opentags)):
+                $close = array_pop($opentags);
+                $excerpt .= '</' . $close . '>';
+            endwhile;
+        endif;
+        return $excerpt;
+    }
     /**
      * Stub for plugin activation
      */

@@ -12,7 +12,7 @@ if ( !defined('ABSPATH')) exit;
  */
 class IntelliWidget_Widget extends WP_Widget {
 
-    var $version     = '1.3.9';
+    var $version     = '1.4.0';
 
     /**
      * Constructor
@@ -29,7 +29,10 @@ class IntelliWidget_Widget extends WP_Widget {
      */
     function wp_print_styles() {
         global $intelliwidget;
-        wp_enqueue_style('intelliwidget', $intelliwidget->get_template('intelliwidget', '.css', 'url'));
+        wp_enqueue_style('intelliwidget', $intelliwidget->get_stylesheet(false));
+        if ($override = $intelliwidget->get_stylesheet(true)):
+            wp_enqueue_style('intelliwidget-custom', $override);
+        endif;
     }
     
     /**

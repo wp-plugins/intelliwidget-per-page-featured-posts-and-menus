@@ -4,7 +4,7 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_i
 Tags: featured posts, events, page menu, plugin, textwidget, widget, custom post types, custom sidebar
 Requires at least: 3.5
 Tested up to: 3.8
-Stable tag: 1.3.9
+Stable tag: 1.4.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -61,6 +61,17 @@ See the "Getting Started" section.
 
 Docs can be found at http://www.lilaeamedia.com/plugins/intelliwidget/
 
+= Where do I put custom templates/stylesheets? =
+
+Here are the steps:
+
+1. Add a directory in your theme named "intelliwidget".
+2. Create a copy of "intelliwidget.css" (located in the "templates" directory of the plugin) and drop it into this directory.
+3. Adjust the styles as necessary.
+4. Review the documentation for more information:
+    * Templates: http://www.lilaeamedia.com/plugins/intelliwidget/#templates
+    * Stylesheet: http://www.lilaeamedia.com/plugins/intelliwidget/#stylesheet
+
 = Why isn't IntelliWidget displaying the featured image? =
 
 By default, IntelliWidget does not display the featured image. To enable the featured image,
@@ -95,6 +106,13 @@ Change the 'supports' parameter in the register_post_type function to include 'c
 5. Example of the Custom Data Fields Panel.
 
 == Changelog ==
+
+= 1.4.0 =
+* Secured SQL in query class via prepare()
+* Added allowed_tags parameter to advanced widget options so that html attributes can be preserved in excerpts
+* Now loading custom stylesheet as well as and default stylesheet so that only override and new styles need to be added
+* Added get_the_intelliwidget_author_meta function to template tags to retrieve author info
+* Reorganized get_template to check child theme, then parent theme, then plugin templates directory for files
 
 = 1.3.9 =
 * Fixed input field names intelliwidget_link_classes and intelliwidget_link_target so that they save correctly
@@ -189,6 +207,9 @@ Change the 'supports' parameter in the register_post_type function to include 'c
 
 
 == Upgrade Notice ==
+
+= 1.4.0 =
+Added a number of enhancements and refactored some logic flow for better performance. See changelog for details.
 
 = 1.3.8 =
 This release fixes some minor issues and adds support up to WP 3.7

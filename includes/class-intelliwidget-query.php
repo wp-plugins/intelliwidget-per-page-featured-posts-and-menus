@@ -168,23 +168,43 @@ LEFT OUTER JOIN (
             "(p1.post_status = 'publish')",
             "(p1.post_password = '' OR p1.post_password IS NULL)",
         );
+        // categories
+        $prepargs = array();
         if (-1 != $instance['category']):
-	        $clauses[] = '( tx2.term_id IN (' . $instance['category'] . ') )';
+	        $clauses[] = '( tx2.term_id IN (%s) )';
             $joins[] = "INNER JOIN {$wpdb->term_relationships} tx1 ON p1.ID = tx1.object_id " . 
                 "INNER JOIN {$wpdb->term_taxonomy} tx2 ON tx2.term_taxonomy_id = tx1.term_taxonomy_id ";
+            $prepargs[] = $instance['category'];
         endif;
-        //if (!empty($instance['page'])):
-            $pages = is_array($instance['page']) ? implode(',', $instance['page']) : $instance['page'];
+        
+        // specific posts
+        $pages = is_array($instance['page']) ? $instance['page'] : array($instance['page']);
+        $placeholders = array();
         if (!empty($pages)):
-            $clauses[] = '(p1.ID IN (' . $pages . ') )'; 
+            foreach($pages as $page):
+                $placeholders[] = '%d';
+                $prepargs[] = $page;
+            endforeach;
+            $clauses[] = '(p1.ID IN ('. implode(',', $placeholders) . ') )';
         endif;
         /* Remove current page from list of pages if set */
         if ( $instance['skip_post'] && !empty($post)):
-            $clauses[] = "(p1.ID != '" . $post->ID . "' )";
+            $clauses[] = "(p1.ID != %d )";
+            $prepargs[] = $post->ID;
         endif;
-        $post_types = empty($instance['post_types']) ? "'post'" : "'" . implode("','", $instance['post_types']) . "'";
-        $clauses[] = '(p1.post_type IN (' . $post_types . ') )';
-
+        
+        // post types
+        $post_types = empty($instance['post_types']) ? array('post') : 
+            (is_array($instance['post_types']) ? $instance['post_types'] : array($instance['post_types']));
+        $placeholders = array();
+        foreach($post_types as $type):
+            $placeholders[] = '%s';
+            $prepargs[] = $type;
+        endforeach;
+        $clauses[] = '(p1.post_type IN ('. implode(',', $placeholders) . ') )';
+        
+        // time-based clauses //
+        
         $time_adj = gmdate('Y-m-d H:i', current_time('timestamp') );
 
         // skip expired posts
@@ -227,9 +247,14 @@ LEFT OUTER JOIN (
         endswitch;
         $orderby = ' ORDER BY ' . $orderby;
         $items = intval($instance['items']);
-        $limit = empty($items) ? '' : ' LIMIT 0, ' . $items;
-        $querystr = $select . implode(' ', $joins) . ' WHERE ' . implode("\n AND ", $clauses) . $orderby . $limit;
-        $this->posts      = $wpdb->get_results($querystr, OBJECT);
+        $limit = '';
+        if (!empty($items)): 
+            $limit = ' LIMIT 0, %d';
+            $prepargs[] = $items;
+        endif;
+        $query = $select . implode(' ', $joins) . ' WHERE ' . implode("\n AND ", $clauses) . $orderby . $limit;
+        //echo $query . "\n" . print_r($prepargs, true) . "\n";
+        $this->posts      = $wpdb->get_results($wpdb->prepare($query, $prepargs), OBJECT);
         $this->post_count = count($this->posts);
     }
 

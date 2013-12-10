@@ -95,6 +95,13 @@ global $_wp_additional_image_sizes, $wp_registered_sidebars;
         </select>
         <textarea class="widefat" rows="3" cols="20" id="<?php echo 'intelliwidget_' . $pagesection . '_custom_text'; ?>" name="<?php echo 'intelliwidget_' . $pagesection . '_custom_text'; ?>">
 <?php echo esc_textarea($intelliwidget_data['custom_text']); ?></textarea>
+        <p>
+            <label for="<?php echo 'intelliwidget_' . $pagesection . '_filter'; ?>">
+                <input id="<?php echo 'intelliwidget_' . $pagesection . '_filter'; ?>" name="<?php echo 'intelliwidget_' . $pagesection . '_filter'; ?>" type="checkbox" <?php checked($intelliwidget_data['filter'] ? 1 : 0); ?> />
+                &nbsp;
+                <?php _e('Auto-format Custom Text', 'intelliwidget'); ?>
+            </label>
+        </p>
     </div>
 </div>
 <div id="iw-advancedsettings" class="postbox closed">
@@ -157,35 +164,13 @@ global $_wp_additional_image_sizes, $wp_registered_sidebars;
         </p>
         <p>
             <label for="<?php echo 'intelliwidget_' . $pagesection . '_items'; ?>">
-                <?php _e('Posts per section', 'intelliwidget'); ?>: </label>
-            <select name="<?php echo 'intelliwidget_' . $pagesection . '_items'; ?>" id="<?php echo 'intelliwidget_' . $pagesection . '_items'; ?>">
-                <option value="all" <?php selected($intelliwidget_data['items'], 'all'); ?>>
-                <?php _e('Show All', 'intelliwidget'); ?>
-                </option>
-                <?php for ( $ictr = 1; $ictr <= 10; ++$ictr ) : ?>
-                <option value="<?php echo $ictr; ?>" <?php selected($intelliwidget_data['items'], $ictr); ?>><?php echo $ictr; ?></option>
-                <?php endfor; ?>
-            </select>
+                <?php _e('Max posts', 'intelliwidget'); ?>: </label>
+            <input id="<?php echo 'intelliwidget_' . $pagesection . '_items'; ?>" name="<?php echo 'intelliwidget_' . $pagesection . '_items'; ?>" size="3" type="text" value="<?php echo esc_attr($intelliwidget_data['items']); ?>" />
         </p>
         <p>
             <label for="<?php echo 'intelliwidget_' . $pagesection . '_length'; ?>">
-                <?php _e('Words per post', 'intelliwidget'); ?>: </label>
+                <?php _e('Max words per post', 'intelliwidget'); ?>: </label>
             <input id="<?php echo 'intelliwidget_' . $pagesection . '_length'; ?>" name="<?php echo 'intelliwidget_' . $pagesection . '_length'; ?>" size="3" type="text" value="<?php echo esc_attr($intelliwidget_data['length']); ?>" />
-        </p>
-        <p>
-            <label for="<?php echo 'intelliwidget_' . $pagesection . '_link_text'; ?>">
-                <?php _e('Link Text', 'intelliwidget'); ?>: </label>
-            <input name="<?php echo 'intelliwidget_' . $pagesection . '_link_text'; ?>" id="<?php echo 'intelliwidget_' . $pagesection . '_link_text'; ?>" type="text" value="<?php echo esc_attr($intelliwidget_data['link_text']); ?>" />
-        </p>
-        <p>
-            <label for="<?php echo 'intelliwidget_' . $pagesection . '_container_id'; ?>">
-                <?php _e('ID', 'intelliwidget'); ?>: </label>
-            <input name="<?php echo 'intelliwidget_' . $pagesection . '_container_id'; ?>" id="<?php echo 'intelliwidget_' . $pagesection . '_container_id'; ?>" type="text" value="<?php echo esc_attr($intelliwidget_data['container_id']); ?>" />
-        </p>
-        <p>
-            <label for="<?php echo 'intelliwidget_' . $pagesection . '_classes'; ?>">
-                <?php _e('Classes', 'intelliwidget'); ?>: </label>
-            <input name="<?php echo 'intelliwidget_' . $pagesection . '_classes'; ?>" id="<?php echo 'intelliwidget_' . $pagesection . '_classes'; ?>" type="text" value="<?php echo esc_attr($intelliwidget_data['classes']); ?>" />
         </p>
         <p>
             <label for="<?php echo 'intelliwidget_' . $pagesection . '_skip_post'; ?>">
@@ -216,11 +201,24 @@ global $_wp_additional_image_sizes, $wp_registered_sidebars;
             </label>
         </p>
         <p>
-            <label for="<?php echo 'intelliwidget_' . $pagesection . '_filter'; ?>">
-                <input id="<?php echo 'intelliwidget_' . $pagesection . '_filter'; ?>" name="<?php echo 'intelliwidget_' . $pagesection . '_filter'; ?>" type="checkbox" <?php checked($intelliwidget_data['filter'] ? 1 : 0); ?> />
-                &nbsp;
-                <?php _e('Auto-format Custom Text', 'intelliwidget'); ?>
-            </label>
+            <label for="<?php echo 'intelliwidget_' . $pagesection . '_allowed_tags'; ?>">
+                <?php _e('Allowed Tags', 'intelliwidget'); ?>: </label>
+            <input name="<?php echo 'intelliwidget_' . $pagesection . '_allowed_tags'; ?>" id="<?php echo 'intelliwidget_' . $pagesection . '_allowed_tags'; ?>" type="text" value="<?php echo esc_attr($intelliwidget_data['allowed_tags']); ?>" />
+        </p>
+        <p>
+            <label for="<?php echo 'intelliwidget_' . $pagesection . '_link_text'; ?>">
+                <?php _e('Link Text', 'intelliwidget'); ?>: </label>
+            <input name="<?php echo 'intelliwidget_' . $pagesection . '_link_text'; ?>" id="<?php echo 'intelliwidget_' . $pagesection . '_link_text'; ?>" type="text" value="<?php echo esc_attr($intelliwidget_data['link_text']); ?>" />
+        </p>
+        <p>
+            <label for="<?php echo 'intelliwidget_' . $pagesection . '_container_id'; ?>">
+                <?php _e('ID', 'intelliwidget'); ?>: </label>
+            <input name="<?php echo 'intelliwidget_' . $pagesection . '_container_id'; ?>" id="<?php echo 'intelliwidget_' . $pagesection . '_container_id'; ?>" type="text" value="<?php echo esc_attr($intelliwidget_data['container_id']); ?>" />
+        </p>
+        <p>
+            <label for="<?php echo 'intelliwidget_' . $pagesection . '_classes'; ?>">
+                <?php _e('Classes', 'intelliwidget'); ?>: </label>
+            <input name="<?php echo 'intelliwidget_' . $pagesection . '_classes'; ?>" id="<?php echo 'intelliwidget_' . $pagesection . '_classes'; ?>" type="text" value="<?php echo esc_attr($intelliwidget_data['classes']); ?>" />
         </p>
         <p>
             <label for="<?php echo 'intelliwidget_' . $pagesection . '_imagealign'; ?>">
