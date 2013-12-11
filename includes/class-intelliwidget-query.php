@@ -177,8 +177,8 @@ LEFT OUTER JOIN (
         endif;
         
         // specific posts
-        if (!empty($instance['pages'])):
-            $clauses[] = '(p1.ID IN ('. $this->prep_array($instance['pages'], $prepargs, 'd') . ') )';
+        if (!empty($instance['page'])):
+            $clauses[] = '(p1.ID IN ('. $this->prep_array($instance['page'], $prepargs, 'd') . ') )';
         endif;
         /* Remove current page from list of pages if set */
         if ( $instance['skip_post'] && !empty($post)):
