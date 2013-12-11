@@ -86,6 +86,13 @@ global $_wp_additional_image_sizes;
 name="<?php echo $this->get_field_name('custom_text'); ?>">
 <?php echo esc_textarea($instance['custom_text']); ?></textarea>
         </p>
+        <p>
+            <label>
+                <input id="<?php echo $this->get_field_id('filter'); ?>" name="<?php echo $this->get_field_name('filter'); ?>" type="checkbox" <?php checked(isset($instance['filter']) ? $instance['filter'] : 0); ?> />
+                &nbsp;
+                <?php _e('Auto-format Custom Text', 'intelliwidget'); ?>
+            </label>
+        </p>
     </div>
 </div>
 <div class="postbox">
@@ -148,19 +155,12 @@ name="<?php echo $this->get_field_name('custom_text'); ?>">
         </p>
         <p>
             <label for="<?php echo $this->get_field_id('items'); ?>">
-                <?php _e('Posts per section', 'intelliwidget'); ?>: </label>
-            <select name="<?php echo $this->get_field_name('items'); ?>" id="<?php echo $this->get_field_id('items'); ?>">
-                <option value="all" <?php selected($instance['items'], 'all'); ?>>
-                <?php _e('Show All', 'intelliwidget'); ?>
-                </option>
-                <?php for ( $ictr = 1; $ictr <= 10; ++$ictr ) : ?>
-                <option value="<?php echo $ictr; ?>" <?php selected($instance['items'], $ictr); ?>><?php echo $ictr; ?></option>
-                <?php endfor; ?>
-            </select>
+                <?php _e('Max posts', 'intelliwidget'); ?>: </label>
+            <input id="<?php echo $this->get_field_id('items'); ?>" name="<?php echo $this->get_field_name('items'); ?>" size="3" type="text" value="<?php echo esc_attr($instance['items']); ?>" />
         </p>
         <p>
             <label for="<?php echo $this->get_field_id('length'); ?>">
-                <?php _e('Words per post', 'intelliwidget'); ?>: </label>
+                <?php _e('Max words per post', 'intelliwidget'); ?>: </label>
             <input id="<?php echo $this->get_field_id('length'); ?>" name="<?php echo $this->get_field_name('length'); ?>" size="3" type="text" value="<?php echo esc_attr($instance['length']); ?>" />
         </p>
         <p>
@@ -192,11 +192,9 @@ name="<?php echo $this->get_field_name('custom_text'); ?>">
             </label>
         </p>
         <p>
-            <label>
-                <input id="<?php echo $this->get_field_id('filter'); ?>" name="<?php echo $this->get_field_name('filter'); ?>" type="checkbox" <?php checked(isset($instance['filter']) ? $instance['filter'] : 0); ?> />
-                &nbsp;
-                <?php _e('Auto-format Custom Text', 'intelliwidget'); ?>
-            </label>
+            <label for="<?php echo $this->get_field_id('allowed_tags'); ?>">
+                <?php _e('Allowed Tags', 'intelliwidget'); ?>: </label>
+            <input name="<?php echo $this->get_field_name('allowed_tags'); ?>" id="<?php echo $this->get_field_id('allowed_tags'); ?>" type="text" value="<?php echo esc_attr($instance['allowed_tags']); ?>" />
         </p>
         <p>
             <label for="<?php echo $this->get_field_id('link_text'); ?>">
