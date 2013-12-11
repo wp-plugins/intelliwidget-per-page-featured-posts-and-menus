@@ -14,7 +14,7 @@ require_once( 'class-intelliwidget-query.php' );
 require_once( 'class-walker-intelliwidget.php' );
 class IntelliWidget {
 
-    var $version     = '1.4.0';
+    var $version     = '1.4.1';
     var $pluginName;
     var $pluginPath;
     var $pluginURL;
@@ -736,8 +736,8 @@ class IntelliWidget {
              $atts = $this->get_page_data($post->ID, intval($atts['section']));
              if (empty($atts)): return; endif;
        else:
-            if (!empty($atts['pages'])) $atts['pages'] = preg_split("/, */", $atts['pages']);
-            if (!empty($atts['post_types'])) $atts['post_types'] = preg_split("/, */", $atts['post_types']);
+            //if (!empty($atts['pages'])) $atts['pages'] = preg_split("/, */", $atts['pages']);
+            //if (!empty($atts['post_types'])) $atts['post_types'] = preg_split("/, */", $atts['post_types']);
             if (!empty($atts['custom_text'])) unset($atts['custom_text']);
             if (!empty($atts['text_position'])) unset($atts['text_position']);
             if (!empty($atts['title'])) $atts['title'] = strip_tags($atts['title']);

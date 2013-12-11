@@ -171,21 +171,14 @@ LEFT OUTER JOIN (
         // categories
         $prepargs = array();
         if (-1 != $instance['category']):
-	        $clauses[] = '( tx2.term_id IN (%s) )';
+            $clauses[] = '( tx2.term_id IN ('. $this->prep_array($instance['category'], $prepargs, 'd') . ') )';
             $joins[] = "INNER JOIN {$wpdb->term_relationships} tx1 ON p1.ID = tx1.object_id " . 
                 "INNER JOIN {$wpdb->term_taxonomy} tx2 ON tx2.term_taxonomy_id = tx1.term_taxonomy_id ";
-            $prepargs[] = $instance['category'];
         endif;
         
         // specific posts
-        $pages = is_array($instance['page']) ? $instance['page'] : array($instance['page']);
-        $placeholders = array();
-        if (!empty($pages)):
-            foreach($pages as $page):
-                $placeholders[] = '%d';
-                $prepargs[] = $page;
-            endforeach;
-            $clauses[] = '(p1.ID IN ('. implode(',', $placeholders) . ') )';
+        if (!empty($instance['pages'])):
+            $clauses[] = '(p1.ID IN ('. $this->prep_array($instance['pages'], $prepargs, 'd') . ') )';
         endif;
         /* Remove current page from list of pages if set */
         if ( $instance['skip_post'] && !empty($post)):
@@ -194,14 +187,7 @@ LEFT OUTER JOIN (
         endif;
         
         // post types
-        $post_types = empty($instance['post_types']) ? array('post') : 
-            (is_array($instance['post_types']) ? $instance['post_types'] : array($instance['post_types']));
-        $placeholders = array();
-        foreach($post_types as $type):
-            $placeholders[] = '%s';
-            $prepargs[] = $type;
-        endforeach;
-        $clauses[] = '(p1.post_type IN ('. implode(',', $placeholders) . ') )';
+        $clauses[] = '(p1.post_type IN ('. $this->prep_array($instance['post_types'], $prepargs) . ') )';
         
         // time-based clauses //
         
@@ -258,5 +244,13 @@ LEFT OUTER JOIN (
         $this->post_count = count($this->posts);
     }
 
-    
+    function prep_array($value, &$args, $type = 's') {
+        $values = is_array($value) ? $value : explode(',', $value);
+        $placeholders = array();
+        foreach($values as $val):
+            $placeholders[] = ('d' == $type ? '%d' : '%s');
+            $args[] = trim($val);
+        endforeach;
+        return implode(',', $placeholders);
+    }
 }

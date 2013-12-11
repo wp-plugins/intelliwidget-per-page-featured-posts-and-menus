@@ -4,7 +4,7 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_i
 Tags: featured posts, events, page menu, plugin, textwidget, widget, custom post types, custom sidebar
 Requires at least: 3.5
 Tested up to: 3.8
-Stable tag: 1.4.0
+Stable tag: 1.4.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -106,6 +106,9 @@ Change the 'supports' parameter in the register_post_type function to include 'c
 5. Example of the Custom Data Fields Panel.
 
 == Changelog ==
+
+= 1.4.1 -
+* Fixed bug in sql class that broke shortcodes in 1.4.0 (thanks cfuller)
 
 = 1.4.0 =
 * Secured SQL in query class via prepare()
