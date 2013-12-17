@@ -1,4 +1,408 @@
 /*!
  * intelliwidget.js - Javascript for the Admin.
+ *
+ * @package IntelliWidget
+ * @subpackage js
+ * @author Lilaea Media
+ * @copyright 2013
+ * @access public
+ *
  */
-;jQuery(document).ready(function(a){a("body").on("click",".iw-collapsible",function(){id=a(this).attr("id");sel="#"+id+"-inside";a(sel).stop().slideToggle()});a("body").on("click",".iw-save",iw_save_postdata);a("body").on("click",".iw-cdfsave",iw_save_cdfdata);a("body").on("click",".iw-copy",iw_copy_page);a("body").on("click",".iw-add",iw_add_meta_box);a("body").on("click",".iw-delete",iw_delete_meta_box);b("intelliwidget_event_date",false);b("intelliwidget_expire_date",false);a("body").on("click","a.intelliwidget-edit-timestamp",function(){var c=a(this).attr("id").split("-",1);if(a("#"+c+"_div").is(":hidden")){a("#"+c+"_div").slideDown("fast");a("#"+c+"_mm").focus();a(this).hide()}return false});a("body").on("click",".intelliwidget-clear-timestamp",function(){var c=a(this).attr("id").split("-",1);a("#"+c+"_div").slideUp("fast");a("#"+c+"_mm").val(a("#"+c+"_cur_mm").val());a("#"+c+"_jj").val(a("#"+c+"_cur_jj").val());a("#"+c+"_aa").val(a("#"+c+"_cur_aa").val());a("#"+c+"_hh").val(a("#"+c+"_cur_hh").val());a("#"+c+"_mn").val(a("#"+c+"_cur_mn").val());a("#"+c+"_timestamp").html("");a("#"+c).val("");a("a#"+c+"-edit").show();b(c,false);return false});a("body").on("click",".intelliwidget-cancel-timestamp",function(){var c=a(this).attr("id").split("-",1);a("#"+c+"_div").slideUp("fast");a("#"+c+"_mm").val(a("#"+c+"_hidden_mm").val());a("#"+c+"_jj").val(a("#"+c+"_hidden_jj").val());a("#"+c+"_aa").val(a("#"+c+"_hidden_aa").val());a("#"+c+"_hh").val(a("#"+c+"_hidden_hh").val());a("#"+c+"_mn").val(a("#"+c+"_hidden_mn").val());a("a#"+c+"-edit").show();b(c,false);return false});a("body").on("click",".intelliwidget-save-timestamp",function(){var c=a(this).attr("id").split("-",1);if(b(c,true)){a("#"+c+"_div").slideUp("fast");a("a#"+c+"-edit").show()}return false});function b(l,k){var i,d="#"+l+"_div",j=(!k&&!a("#"+l).val()),c=a("#"+l+"_aa").val(),g=("00"+a("#"+l+"_mm").val()).slice(-2),h=("00"+a("#"+l+"_jj").val()).slice(-2),f=("00"+a("#"+l+"_hh").val()).slice(-2),e=("00"+a("#"+l+"_mn").val()).slice(-2);if(!a(d).length){return true}i=new Date(c,g-1,h,f,e);if(i.getFullYear()!=c||(1+i.getMonth())!=g||i.getDate()!=h||i.getMinutes()!=e){if(true==k){a(d).addClass("form-invalid");a(".iw-cdfsave").attr("disabled","disabled");return false}j=true}a(d).removeClass("form-invalid");a(".iw-cdfsave").removeAttr("disabled");if(j){a("#"+l+"_timestamp").html("");a("#"+l).val("")}else{a("#"+l+"_timestamp").html("<b>"+a('option[value="'+a("#"+l+"_mm").val()+'"]',"#"+l+"_mm").text()+" "+h+", "+c+" @ "+f+":"+e+"</b> ");a("#"+l).val(c+"-"+a("#"+l+"_mm").val()+"-"+h+" "+f+":"+e)}return true}});var iw_save_cdfdata=function(){jQuery(this).prop("disabled",true);jQuery(".iw-copy-container,.iw-save-container,.iw-cdf-container").removeClass("success failure");jQuery("body").off("click","#iw_cdfsave",iw_save_cdfdata);jQuery("#intelliwidget_cpt_spinner").show();var a={};jQuery("input[name=post_ID],input[name=iwpage],.intelliwidget-input").each(function(b,c){fieldID=jQuery(this).attr("id");a[fieldID]=jQuery(this).val()});a.action="iw_cdfsave";jQuery.post(IWAjax.ajaxurl,a,function(b){jQuery("#iw_cdfsave").prop("disabled",false);jQuery("#intelliwidget_cpt_spinner").hide();jQuery(".iw-cdf-container").addClass("success");return false});return false},iw_save_postdata=function(){jQuery(this).prop("disabled",true);jQuery(".iw-copy-container,.iw-save-container,.iw-cdf-container").removeClass("success failure");var d=jQuery(this).attr("id"),b="#"+d,c="intelliwidget_"+d.split("_")[1],a={};jQuery("#"+c+"_spinner").show();jQuery("body").off("click",b,iw_save_postdata);a[c+"_post_types"]=[];jQuery("input[name=post_ID],input[name=iwpage],input[type=text][id^="+c+"],input[type=checkbox][id^="+c+"]:checked,select[id^="+c+"],textarea[id^="+c+"]").each(function(e,f){fieldID=jQuery(this).attr("id");if(fieldID.indexOf("_post_types")>0){a[fieldID].push(jQuery(this).val())}else{a[fieldID]=jQuery(this).val()}});a.action="iw_save";jQuery.post(IWAjax.ajaxurl,a,function(e){if("fail"==e){jQuery(b).parent().addClass("failure")}else{jQuery("#"+c+"_page").html(e);jQuery(b).parent().addClass("success")}jQuery(b).prop("disabled",false);jQuery("#"+c+"_spinner").hide();return false});return false},iw_copy_page=function(){jQuery(this).prop("disabled",true);jQuery(".iw-copy-container,.iw-save-container,.iw-cdf-container").removeClass("success failure");jQuery("body").off("click","#iw_copy",iw_copy_page);jQuery("#intelliwidget_spinner").show();var a={};jQuery("input[name=post_ID],input[name=iwpage],select[id=intelliwidget_widget_page_id]").each(function(b,c){fieldID=jQuery(this).attr("id");a[fieldID]=jQuery(this).val()});a.action="iw_copy";jQuery.post(IWAjax.ajaxurl,a,function(b){jQuery("#iw_copy").prop("disabled",false);jQuery("#intelliwidget_spinner").hide();jQuery(".iw-copy-container").addClass("success");return false});return false},iw_add_meta_box=function(d){d.stopPropagation();if(jQuery(this).hasClass("disabled")){return false}jQuery(this).addClass("disabled");jQuery(".iw-copy-container,.iw-save-container,.iw-cdf-container").removeClass("success failure");var f=jQuery(this).attr("id"),c="#"+f,b=jQuery(this).attr("href"),a=iw_url_to_array(b);jQuery("#intelliwidget_spinner").show();a.action="iw_add";jQuery.post(IWAjax.ajaxurl,a,function(e){jQuery(c).removeClass("disabled");jQuery("#intelliwidget_spinner").hide();if("fail"==e){jQuery(".iw-copy-container").addClass("failure")}else{jQuery("#side-sortables").append(e);jQuery("body").on("click",".iw_new_box h3, .iw_new_box .handlediv, .iw_new_box .postbox h3, .iw_new_box .postbox .handlediv",function(){var g=jQuery(this).parent(".postbox"),h=g.attr("id");g.toggleClass("closed");if(h){if(!g.hasClass("closed")&&jQuery.isFunction(postboxes.pbshow)){postboxes.pbshow(h)}else{if(g.hasClass("closed")&&jQuery.isFunction(postboxes.pbhide)){postboxes.pbhide(h)}}}});jQuery("body").on(".iw_new_box h3 a, .iw_new_box .postbox h3 a","click",function(g){g.stopPropagation()});jQuery(".iw-copy-container").addClass("success")}return false});return false},iw_delete_meta_box=function(f){f.stopPropagation();if(jQuery(this).hasClass("disabled")){return false}jQuery(this).addClass("disabled");jQuery(".iw-copy-container,.iw-save-container,.iw-cdf-container").removeClass("success failure");var g=jQuery(this).attr("id"),c="#"+g,b=jQuery(this).attr("href"),a=iw_url_to_array(b),d=a.iwdelete;jQuery("#intelliwidget_"+d+"_spinner").show();a.action="iw_delete";jQuery.post(IWAjax.ajaxurl,a,function(e){jQuery(c).removeClass("disabled");jQuery("#intelliwidget_"+d+"_spinner").hide();if("success"==e){jQuery("#intelliwidget_section_meta_box_"+d).slideUp("fast",function(){jQuery("#intelliwidget_section_meta_box_"+d).remove()})}return false});return false};function iw_url_to_array(a){var e,b,c={},d=a.substring(a.indexOf("?")+1).split("&");for(b=0;b<d.length;b++){e=d[b].split("=");c[decodeURIComponent(e[0])]=decodeURIComponent(e[1])}return c};
+
+jQuery(document).ready(function($) {
+    // add collapsibles to widgets admin
+    $('body').on('click', '.iw-collapsible', function() {
+        id = $(this).attr('id');
+        sel = '#' + id + '-inside';
+        $(sel).stop().slideToggle();
+    });
+    // bind click events to edit page meta box buttons
+    $('body').on('click', '.iw-save', iw_save_postdata);    
+    $('body').on('click', '.iw-cdfsave', iw_save_cdfdata);    
+    $('body').on('click', '.iw-copy', iw_copy_page);    
+    $('body').on('click', '.iw-add', iw_add_meta_box);    
+    $('body').on('click', '.iw-delete', iw_delete_meta_box);    
+    // bind toggle events to new content - using native wp postboxes class
+    $('body').on('click', '.iw_new_box h3, .iw_new_box .handlediv, .iw_new_box .postbox h3, .iw_new_box .postbox .handlediv', function() {
+        var p = $(this).parent('.postbox'), id = p.attr('id');
+        p.toggleClass('closed');
+        if ( id ) {
+            if ( !p.hasClass('closed') && $.isFunction(postboxes.pbshow) )
+                postboxes.pbshow(id);
+            else if ( p.hasClass('closed') && $.isFunction(postboxes.pbhide) )
+                postboxes.pbhide(id);
+        }
+    });
+    // prevent link action on h3 
+    $('body').on('click', '.iw_new_box h3 a, .iw_new_box .postbox h3 a', function(e) {
+        e.stopPropagation();
+    });
+    /**
+     * manipulate IntelliWidget timestamp inputs
+     * Adapted from wp-admin/js/post.js in Wordpress Core
+     */
+     
+    // format visible timestamp values
+    iwUpdateTimestampText('intelliwidget_event_date', false);
+    iwUpdateTimestampText('intelliwidget_expire_date', false);
+    
+    // bind edit links to reveal timestamp input form
+    $('body').on('click', 'a.intelliwidget-edit-timestamp', function() {
+        var field = $(this).attr('id').split('-', 1);
+        if ($('#'+field+'_div').is(":hidden")) {
+            $('#'+field+'_div').slideDown('fast');
+            $('#'+field+'_mm').focus();
+            $(this).hide();
+        }
+        return false;
+    });
+    // bind click to clear timestamp (resets form to current date/time and clears date fields)
+    $('body').on('click', '.intelliwidget-clear-timestamp', function() {
+        var field = $(this).attr('id').split('-', 1);
+        $('#'+field+'_div').slideUp('fast');
+        $('#'+field+'_mm').val($('#'+field+'_cur_mm').val());
+        $('#'+field+'_jj').val($('#'+field+'_cur_jj').val());
+        $('#'+field+'_aa').val($('#'+field+'_cur_aa').val());
+        $('#'+field+'_hh').val($('#'+field+'_cur_hh').val());
+        $('#'+field+'_mn').val($('#'+field+'_cur_mn').val());
+        $('#'+field+'_timestamp').html('');
+        $('#'+field).val('');
+        $('a#'+field+'-edit').show();
+        iwUpdateTimestampText(field, false);
+        return false;
+    });
+    // bind cancel button to reset values (or empty string if orig field is empty) 
+    $('body').on('click', '.intelliwidget-cancel-timestamp', function() {
+        var field = $(this).attr('id').split('-', 1);
+        $('#'+field+'_div').slideUp('fast');
+        $('#'+field+'_mm').val($('#'+field+'_hidden_mm').val());
+        $('#'+field+'_jj').val($('#'+field+'_hidden_jj').val());
+        $('#'+field+'_aa').val($('#'+field+'_hidden_aa').val());
+        $('#'+field+'_hh').val($('#'+field+'_hidden_hh').val());
+        $('#'+field+'_mn').val($('#'+field+'_hidden_mn').val());
+        $('a#'+field+'-edit').show();
+        iwUpdateTimestampText(field, false);
+        return false;
+    });
+
+    // bind 'Ok' button to update timestamp to inputs
+    $('body').on('click', '.intelliwidget-save-timestamp', function () { 
+        var field = $(this).attr('id').split('-', 1);
+        if ( iwUpdateTimestampText(field, true) ) {
+            $('#'+field+'_div').slideUp('fast');
+            $('a#'+field+'-edit').show();
+        }
+        return false;
+    });
+    // set visible timestamp and timestamp hidden inputs to form inputs 
+    // only validates form if validate param is true
+    // this allows values to be reset/cleared
+    function iwUpdateTimestampText(field, validate) {
+
+        // retrieve values from form
+        var attemptedDate, 
+            div         = '#' + field + '_div', 
+            clearForm   = (!validate && !$('#'+field).val()),  
+            aa          = $('#'+field+'_aa').val(),
+            mm          = ('00'+$('#'+field+'_mm').val()).slice(-2), 
+            jj          = ('00'+$('#'+field+'_jj').val()).slice(-2), 
+            hh          = ('00'+$('#'+field+'_hh').val()).slice(-2), 
+            mn          = ('00'+$('#'+field+'_mn').val()).slice(-2);
+        if (! $(div).length) return true;
+        // construct date object
+        attemptedDate = new Date( aa, mm - 1, jj, hh, mn );
+        // validate inputs by comparing to date object
+        if ( attemptedDate.getFullYear() != aa || 
+            (1 + attemptedDate.getMonth()) != mm || 
+            attemptedDate.getDate() != jj ||
+            attemptedDate.getMinutes() != mn ) {
+            // date object returned invalid
+            // if validating, display error and return invalid
+            if (true == validate ) {
+                $(div).addClass('form-invalid');
+                $('.iw-cdfsave').attr('disabled', 'disabled');
+                return false;
+            }
+            // otherwise clear form (value is/was null)  
+            clearForm = true;
+        }
+        // date validated or ignored, reset invalid class
+        $(div).removeClass('form-invalid');
+        $('.iw-cdfsave').removeAttr('disabled');
+        if (clearForm) {
+            // replace date fields with empty string
+            $('#'+field+'_timestamp').html('');
+            $('#'+field).val('');
+        } else {
+            // format displayed date string from form values
+            $('#'+field+'_timestamp').html(
+                '<b>' +
+                $('option[value="' + $('#'+field+'_mm').val() + '"]', '#'+field+'_mm').text() + ' ' +
+                jj + ', ' +
+                aa + ' @ ' +
+                hh + ':' +
+                mn + '</b> '
+            );
+            // format date field from form values
+            $('#'+field).val(
+                aa + '-' +
+                $('#'+field+'_mm').val() + '-' +
+                jj + ' ' +
+                hh + ':' +
+                mn                    
+            );
+        }
+        return true;
+    }
+});
+/**
+ * Ajax Save Custom Post Type Data
+ */
+var iw_save_cdfdata = function(){
+    // disable the button until ajax returns
+    jQuery(this).prop('disabled', true);
+    // clear previous success/fail icons
+    jQuery('.iw-copy-container,.iw-save-container,.iw-cdf-container').removeClass('success failure');
+    // unbind button from click event
+    jQuery('body').off('click', '#iw_cdfsave', iw_save_cdfdata);
+    // show spinner
+    jQuery('#intelliwidget_cpt_spinner').show();
+    // build post data array
+    var postData = {};
+    // find inputs for this section
+    jQuery('input[name=post_ID],input[name=iwpage],.intelliwidget-input').each(function(index, element) {
+        // get field id
+        fieldID = jQuery(this).attr('id');
+        postData[fieldID] = jQuery(this).val();
+    });
+    // add wp ajax action to array
+    postData['action'] = 'iw_cdfsave';
+    // send to wp
+    jQuery.post(  
+        // get ajax url from localized object
+        IWAjax.ajaxurl,  
+        //Data  
+        postData,
+        //on success function  
+        function(response){
+            // release button
+            jQuery('#iw_cdfsave').prop('disabled', false);
+            // hide spinner
+            jQuery('#intelliwidget_cpt_spinner').hide();
+            // show check mark
+            jQuery('.iw-cdf-container').addClass('success');
+            return false;  
+        }
+    );  
+    return false;  
+},
+/**
+ * Ajax Save IntelliWidget Meta Box Data
+ */
+iw_save_postdata = function (){ 
+    // disable the button until ajax returns
+    jQuery(this).prop('disabled', true);;
+    jQuery('.iw-copy-container,.iw-save-container,.iw-cdf-container').removeClass('success failure');
+    // get id of button
+    var thisID   = jQuery(this).attr('id'),
+        // munge selector
+        sel      = '#' + thisID,
+        // parse id to get section number
+        pre      = 'intelliwidget_' + thisID.split('_')[1],
+        // build post data array
+        postData = {};
+    // show spinner
+    jQuery('#' + pre + '_spinner').show();
+    // unbind button from click event
+    jQuery('body').off('click', sel, iw_save_postdata);
+    // special handling for post types (array of checkboxes)
+    postData[ pre + '_post_types'] = [];
+    // find inputs for this section
+    jQuery('input[name=post_ID],input[name=iwpage],input[type=text][id^='+pre+'],input[type=checkbox][id^='+pre+']:checked,select[id^='+pre+'],textarea[id^='+pre+']').each(
+        function(index, element) {
+        // get field id
+        fieldID = jQuery(this).attr('id');
+        // special handling for post types
+        if (fieldID.indexOf('_post_types') > 0) {
+            postData[fieldID].push(jQuery(this).val());
+            // otherwise add to post data
+        } else {
+            postData[fieldID] = jQuery(this).val();
+        }
+    });
+    // add wp ajax action to array
+    postData['action'] = 'iw_save';
+    // send to wp
+    jQuery.post(  
+        // get ajax url from localized object
+        IWAjax.ajaxurl,  
+        //Data  
+        postData,
+        //on success function  
+        function(response){
+            if ('fail' == response) {
+                // show red X
+                jQuery(sel).parent().addClass('failure');
+            } else {
+                // refresh posts menu
+                jQuery('#' + pre + '_page').html(response);
+                // show check mark
+                jQuery(sel).parent().addClass('success');
+            }
+            // release button
+            jQuery(sel).prop('disabled', false);
+            // hide spinner
+            jQuery('#' + pre + '_spinner').hide();
+            return false;  
+        }
+    );  
+    return false;  
+},
+
+/**
+ * Ajax Save Copy Page Input
+ */
+iw_copy_page = function (){ 
+    // disable the button until ajax returns
+    jQuery(this).prop('disabled', true);
+    // clear previous success/fail icons
+    jQuery('.iw-copy-container,.iw-save-container,.iw-cdf-container').removeClass('success failure');
+    // unbind button from click event
+    jQuery('body').off('click', '#iw_copy', iw_copy_page);
+    // show spinner
+    jQuery('#intelliwidget_spinner').show();
+    // build post data array
+    var postData = {};
+    // find inputs for this section
+    jQuery('input[name=post_ID],input[name=iwpage],select[id=intelliwidget_widget_page_id]').each(function(index, element) {
+        // get field id
+        fieldID = jQuery(this).attr('id');
+        postData[fieldID] = jQuery(this).val();
+    });
+    // add wp ajax action to array
+    postData['action'] = 'iw_copy';
+    // send to wp
+    jQuery.post(  
+        // get ajax url from localized object
+        IWAjax.ajaxurl,  
+        //Data  
+        postData,
+        //on success function  
+        function(response){
+            // release button
+            jQuery('#iw_copy').prop('disabled', false);
+            // hide spinner
+            jQuery('#intelliwidget_spinner').hide();
+            // show check mark
+            jQuery('.iw-copy-container').addClass('success');
+            return false;  
+        }
+    );  
+    return false;  
+},
+
+/**
+ * Ajax Add new IntelliWidget Meta Box Section
+ */
+iw_add_meta_box = function (e){ 
+    // don't act like a link
+    e.stopPropagation();
+    // ignore click if we are in process
+    if (jQuery(this).hasClass('disabled')) return false;
+    // disable the button until ajax returns
+    jQuery(this).addClass('disabled');
+    // clear previous success/fail icons
+    jQuery('.iw-copy-container,.iw-save-container,.iw-cdf-container').removeClass('success failure');
+    // get id of button
+    var thisID   = jQuery(this).attr('id'),
+        // munge selector
+        sel      = '#' + thisID,
+        // get href from link
+        href     = jQuery(this).attr('href'),
+        // build post data array from query string
+        postData = iw_url_to_array(href);
+    // show spinner
+    jQuery('#intelliwidget_spinner').show();
+    // add wp ajax action to array
+    postData['action'] = 'iw_add';
+    // send to wp
+    jQuery.post(  
+        // get ajax url from localized object
+        IWAjax.ajaxurl,  
+        //Data  
+        postData,
+        //on success function  
+        function(response){
+            jQuery(sel).removeClass('disabled');
+            jQuery('#intelliwidget_spinner').hide();
+            if ('fail' == response) {
+                jQuery('.iw-copy-container').addClass('failure');
+            } else {
+                jQuery('#side-sortables').append(response);
+                // show check mark
+                jQuery('.iw-copy-container').addClass('success');
+            }
+            return false;  
+        }
+    );  
+    return false;  
+},
+
+/**
+ * Ajax Delete IntelliWidget Meta Box Section
+ */
+iw_delete_meta_box = function (e){ 
+    // don't act like a link
+    e.stopPropagation();
+    // ignore click if we are in process
+    if (jQuery(this).hasClass('disabled')) return false;
+    // disable the button until ajax returns
+    jQuery(this).addClass('disabled');
+    // clear previous success/fail icons
+    jQuery('.iw-copy-container,.iw-save-container,.iw-cdf-container').removeClass('success failure');
+    // get id of button
+    var thisID = jQuery(this).attr('id'),
+        // munge selector
+        sel      = '#' + thisID,
+        // get href from link
+        href     = jQuery(this).attr('href'),
+        // build post data array from query string
+        postData = iw_url_to_array(href),
+        // get box id 
+        pre      = postData['iwdelete'];
+    // show spinner
+    jQuery('#intelliwidget_' + pre + '_spinner').show();
+    // add wp ajax action to array
+    postData['action'] = 'iw_delete';
+    // send to wp
+    jQuery.post(  
+        // get ajax url from localized object
+        IWAjax.ajaxurl,  
+        //Data  
+        postData,
+        //on success function  
+        function(response){
+            jQuery(sel).removeClass('disabled');
+            jQuery('#intelliwidget_' + pre + '_spinner').hide();
+            if ('success' == response ) {
+                jQuery('#intelliwidget_section_meta_box_' + pre).slideUp('fast', function(){
+                    jQuery('#intelliwidget_section_meta_box_' + pre).remove();
+                });
+            }
+            return false;  
+        }
+    );  
+    return false;  
+}
+/**
+ * nice little url -> name:value pairs codex
+ */
+function iw_url_to_array(url) {
+    var pair, i, request = {},
+        pairs = url.substring(url.indexOf('?') + 1).split('&');
+    for (i = 0; i < pairs.length; i++) {
+        pair = pairs[i].split('=');
+        request[decodeURIComponent(pair[0])] = decodeURIComponent(pair[1]);
+    }
+    return request;
+}
