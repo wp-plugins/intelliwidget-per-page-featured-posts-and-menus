@@ -187,8 +187,10 @@ LEFT OUTER JOIN (
         endif;
         
         // post types
+        if (empty($instance['post_types'])):
+            $instance['post_types'] = 'none';
+        endif;
         $clauses[] = '(p1.post_type IN ('. $this->prep_array($instance['post_types'], $prepargs) . ') )';
-        
         // time-based clauses //
         
         $time_adj = gmdate('Y-m-d H:i', current_time('timestamp') );
@@ -239,7 +241,6 @@ LEFT OUTER JOIN (
             $prepargs[] = $items;
         endif;
         $query = $select . implode(' ', $joins) . ' WHERE ' . implode("\n AND ", $clauses) . $orderby . $limit;
-        //echo $query . "\n" . print_r($prepargs, true) . "\n";
         $this->posts      = $wpdb->get_results($wpdb->prepare($query, $prepargs), OBJECT);
         $this->post_count = count($this->posts);
     }

@@ -62,23 +62,23 @@ global $_wp_additional_image_sizes, $wp_registered_sidebars;
         <?php _e('Category', 'intelliwidget'); ?>:</label>
     <?php wp_dropdown_categories(array('name' => 'intelliwidget_' . $pagesection . '_category', 'id' => 'intelliwidget_' . $pagesection . '_category', 'show_option_none' => __('None', 'intelliwidget'), 'hide_empty' => false, 'selected' => $intelliwidget_data['category'] )); ?>
 </p>
-<div id="iw-specificposts" class="postbox closed">
+<div id="iw-specificposts-<?php echo $pagesection; ?>" class="postbox closed">
     <div class="handlediv" title="<?php _e('Click to toggle', 'intelliwidget'); ?>"></div>
-    <h3 class='hndle'><span>
+    <h3><span>
         <?php _e('Specific Posts', 'intelliwidget'); ?>
         </span></h3>
-    <div class="inside">
+    <div id="iw-specificposts-<?php echo $pagesection; ?>-inside" class="inside">
         <select class="widefat" name="<?php echo 'intelliwidget_' . $pagesection . '_page'; ?>[]" size="1" style="height:100px;" multiple="multiple" id="<?php echo 'intelliwidget_' . $pagesection . '_page'; ?>">
             <?php echo $this->get_pages($intelliwidget_data); ?>
         </select>
     </div>
 </div>
-<div id="iw-customtext" class="postbox closed">
+<div id="iw-customtext-<?php echo $pagesection; ?>" class="postbox closed">
     <div class="handlediv" title="<?php _e('Click to toggle', 'intelliwidget'); ?>"></div>
-    <h3 class='hndle'><span>
+    <h3><span>
         <?php _e('Custom Text/HTML', 'intelliwidget'); ?>
         </span></h3>
-    <div class="inside">
+    <div  id="iw-customtext-<?php echo $pagesection; ?>-inside" class="inside">
         <select name="<?php echo 'intelliwidget_' . $pagesection . '_text_position'; ?>" id="<?php echo 'intelliwidget_' . $pagesection . '_text_position'; ?>">
             <option value="">
             <?php _e('None', 'intelliwidget'); ?>
@@ -104,12 +104,12 @@ global $_wp_additional_image_sizes, $wp_registered_sidebars;
         </p>
     </div>
 </div>
-<div id="iw-advancedsettings" class="postbox closed">
+<div id="iw-advancedsettings-<?php echo $pagesection; ?>" class="postbox closed">
     <div class="handlediv" title="<?php _e('Click to toggle', 'intelliwidget'); ?>"></div>
-    <h3 class='hndle'><span>
+    <h3><span>
         <?php _e('Advanced Settings', 'intelliwidget'); ?>
         </span></h3>
-    <div class="inside">
+    <div  id="iw-advancedsettings-<?php echo $pagesection; ?>-inside" class="inside">
         <p>
             <label for="<?php echo 'intelliwidget_' . $pagesection . '_nav_menu'; ?>">
                 <?php _e('WP Nav Menu', 'intelliwidget'); ?>

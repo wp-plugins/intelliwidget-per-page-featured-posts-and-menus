@@ -14,7 +14,7 @@ require_once( 'class-intelliwidget-query.php' );
 require_once( 'class-walker-intelliwidget.php' );
 class IntelliWidget {
 
-    var $version     = '1.4.1';
+    var $version     = '1.4.2';
     var $pluginName;
     var $pluginPath;
     var $pluginURL;
@@ -632,8 +632,8 @@ class IntelliWidget {
     function build_widget($args, $instance, $post_ID = null) {
         global $this_instance;
         $instance = $this_instance = $this->defaults($instance);
-        if (!is_array($instance['page'])) $instance['page'] = array($instance['page']);
-        if (!is_array($instance['post_types'])) $instance['post_types'] = array($instance['post_types']);
+        //if (!is_array($instance['page'])) $instance['page'] = array($instance['page']);
+        //if (!is_array($instance['post_types'])) $instance['post_types'] = array($instance['post_types']);
         extract($args, EXTR_SKIP);
         /* if this is a nav menu get menu object and skip query */
         $nav_menu = false;
@@ -687,13 +687,6 @@ class IntelliWidget {
             endif;
         // otherwise load IW template
         else:
-            $this_instance['allowed_tags_norm'] = '';
-            if (isset($this_instance['allowed_tags'])):
-                $tags = explode(',', $this_instance['allowed_tags']);
-                foreach ( $tags as $tag ):
-                    $this_instance['allowed_tags_norm'].= '<' . trim($tag) . '>';
-                endforeach;          
-            endif;
             if ($template = $this->get_template($instance['template'])):
                 include ($template);
             endif;
@@ -770,13 +763,19 @@ class IntelliWidget {
      */
     function trim_excerpt($text, $this_instance) {
         $length = intval($this_instance['length']);
-        $tags   = $this_instance['allowed_tags_norm'];
+        $allowed_tags = '';
+        if (isset($this_instance['allowed_tags'])):
+            $tags = explode(',', $this_instance['allowed_tags']);
+            foreach ( $tags as $tag ):
+                $allowed_tags .= '<' . trim($tag) . '>';
+            endforeach;          
+        endif;
         $text   = strip_shortcodes($text);
         $text   = preg_replace( '@<(script|style)[^>]*?>.*?</\\1>@si', '', $text );
         $text   = apply_filters('the_content', $text);
         //$text   = str_replace(']]>', ']]&gt;', $text);
-        $text   = strip_tags($text, $tags);
-        if (empty($tags)):
+        $text   = strip_tags($text, $allowed_tags);
+        if (empty($allowed_tags)):
             $words  = preg_split('/[\r\n\t ]+/', $text, $length + 1);
             if ( count($words) > $length ):
                 array_pop($words);

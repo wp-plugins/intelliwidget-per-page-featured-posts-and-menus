@@ -22,7 +22,21 @@ jQuery(document).ready(function($) {
     $('body').on('click', '.iw-copy', iw_copy_page);    
     $('body').on('click', '.iw-add', iw_add_meta_box);    
     $('body').on('click', '.iw-delete', iw_delete_meta_box);    
-
+    // bind toggle events to new content - using native wp postboxes class
+    $('body').on('click', '.iw_new_box h3, .iw_new_box .handlediv, .iw_new_box .postbox h3, .iw_new_box .postbox .handlediv', function() {
+        var p = $(this).parent('.postbox'), id = p.attr('id');
+        p.toggleClass('closed');
+        if ( id ) {
+            if ( !p.hasClass('closed') && $.isFunction(postboxes.pbshow) )
+                postboxes.pbshow(id);
+            else if ( p.hasClass('closed') && $.isFunction(postboxes.pbhide) )
+                postboxes.pbhide(id);
+        }
+    });
+    // prevent link action on h3 
+    $('body').on('click', '.iw_new_box h3 a, .iw_new_box .postbox h3 a', function(e) {
+        e.stopPropagation();
+    });
     /**
      * manipulate IntelliWidget timestamp inputs
      * Adapted from wp-admin/js/post.js in Wordpress Core
@@ -325,21 +339,6 @@ iw_add_meta_box = function (e){
                 jQuery('.iw-copy-container').addClass('failure');
             } else {
                 jQuery('#side-sortables').append(response);
-                // bind toggle events to new content - using native wp postboxes class
-                jQuery('body').on('click', '.iw_new_box h3, .iw_new_box .handlediv, .iw_new_box .postbox h3, .iw_new_box .postbox .handlediv', function() {
-                    var p = jQuery(this).parent('.postbox'), id = p.attr('id');
-                    p.toggleClass('closed');
-                    if ( id ) {
-                        if ( !p.hasClass('closed') && jQuery.isFunction(postboxes.pbshow) )
-                            postboxes.pbshow(id);
-                        else if ( p.hasClass('closed') && jQuery.isFunction(postboxes.pbhide) )
-                            postboxes.pbhide(id);
-                    }
-                });
-                // prevent link action on h3 
-                jQuery('body').on('.iw_new_box h3 a, .iw_new_box .postbox h3 a', 'click', function(e) {
-                    e.stopPropagation();
-                });
                 // show check mark
                 jQuery('.iw-copy-container').addClass('success');
             }

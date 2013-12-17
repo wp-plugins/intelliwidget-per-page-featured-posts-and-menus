@@ -4,7 +4,7 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_i
 Tags: featured posts, events, page menu, plugin, textwidget, widget, custom post types, custom sidebar
 Requires at least: 3.5
 Tested up to: 3.8
-Stable tag: 1.4.1
+Stable tag: 1.4.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -107,7 +107,13 @@ Change the 'supports' parameter in the register_post_type function to include 'c
 
 == Changelog ==
 
-= 1.4.1 -
+= 1.4.2 =
+* Fixed the inner postboxes so they cannot be dragged outside of the IntelliWidget options panel.
+* Fixed the query class to account for empty post_type, category and specific post selections
+* Added the section id to the inner postbox handles
+* Moved the event delegation outside of the XHR response so that events are correctly bound to newly injected meta boxes
+
+= 1.4.1 =
 * Fixed bug in sql class that broke shortcodes in 1.4.0 (thanks cfuller)
 
 = 1.4.0 =
@@ -210,6 +216,9 @@ Change the 'supports' parameter in the register_post_type function to include 'c
 
 
 == Upgrade Notice ==
+
+= 1.4.2 =
+Fixed a number of UI bugs that were causing problems. See changelog.
 
 = 1.4.0 =
 Added a number of enhancements and refactored some logic flow for better performance. See changelog for details.
