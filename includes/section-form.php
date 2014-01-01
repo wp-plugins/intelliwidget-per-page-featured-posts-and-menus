@@ -267,9 +267,9 @@ global $_wp_additional_image_sizes, $wp_registered_sidebars;
             <?php _e('Post Types', 'intelliwidget'); ?>
             <br/>
             <?php foreach ( $this->get_eligible_post_types() as $type ) : ?>
-            <label>
-                <input id="<?php echo 'intelliwidget_' . $pagesection . '_post_types'; ?>" type="checkbox" name="<?php echo 'intelliwidget_' . $pagesection . '_post_types[]'; ?>" value="<?php echo $type; ?>" <?php checked(in_array($type, $intelliwidget_data['post_types']), 1); ?> />
-                &nbsp;<?php echo ucfirst($type); ?></label>
+            <label for="<?php echo 'intelliwidget_' . $pagesection . '_post_types_' . $type; ?>">
+                <input id="<?php echo 'intelliwidget_' . $pagesection . '_post_types_' . $type; ?>" type="checkbox" name="<?php echo 'intelliwidget_' . $pagesection . '_post_types[]'; ?>" value="<?php echo $type; ?>" <?php checked(in_array($type, $intelliwidget_data['post_types']), 1); ?> />
+            <?php echo ucfirst($type); ?></label>
             <?php endforeach; ?>
         </p>
     </div>
