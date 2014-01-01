@@ -4,7 +4,7 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_i
 Tags: featured posts, events, page menu, plugin, textwidget, widget, custom post types, custom sidebar
 Requires at least: 3.5
 Tested up to: 3.8
-Stable tag: 1.4.2
+Stable tag: 1.4.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -55,7 +55,7 @@ IntelliWidget is flexible and versatile. Please read the documentation to see mo
 
 = Is there a quick tutorial? =
 
-See the "Getting Started" section.
+See the "Getting Started" section or watch the Quick Start Tutorial at http://www.youtube.com/watch?v=XwESsBRK9hg
 
 = Where can I find full documentation? =
 
@@ -106,6 +106,12 @@ Change the 'supports' parameter in the register_post_type function to include 'c
 5. Example of the Custom Data Fields Panel.
 
 == Changelog ==
+
+= 1.4.3 =
+* Added kses filter for all text inputs
+* Modified id of post_types checkboxes to eliminate odd checking/unchecking behavior
+* Added esc_attr filter to title tags on links
+* Refactored prep_array function to flatten multi-dimensional arrays before passing values to trim()
 
 = 1.4.2 =
 * Fixed the inner postboxes so they cannot be dragged outside of the IntelliWidget options panel.
@@ -216,6 +222,9 @@ Change the 'supports' parameter in the register_post_type function to include 'c
 
 
 == Upgrade Notice ==
+
+= 1.4.3 =
+This release fixes some very obscure bugs that have been reported.
 
 = 1.4.2 =
 Fixed a number of UI bugs that were causing problems. See changelog.

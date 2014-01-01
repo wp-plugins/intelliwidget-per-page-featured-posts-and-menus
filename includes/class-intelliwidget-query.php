@@ -241,6 +241,7 @@ LEFT OUTER JOIN (
             $prepargs[] = $items;
         endif;
         $query = $select . implode(' ', $joins) . ' WHERE ' . implode("\n AND ", $clauses) . $orderby . $limit;
+        //echo 'query: ' . "\n" . $query . " \n";
         $this->posts      = $wpdb->get_results($wpdb->prepare($query, $prepargs), OBJECT);
         $this->post_count = count($this->posts);
     }
@@ -248,10 +249,10 @@ LEFT OUTER JOIN (
     function prep_array($value, &$args, $type = 's') {
         $values = is_array($value) ? $value : explode(',', $value);
         $placeholders = array();
-        foreach($values as $val):
-            $placeholders[] = ('d' == $type ? '%d' : '%s');
-            $args[] = trim($val);
-        endforeach;
+        array_walk_recursive($values, function($a) use (&$placeholders, &$args, $type) { 
+            $placeholders[] = ('s' == $type ? '%s' : '%d');
+            $args[] = trim($a);
+        });
         return implode(',', $placeholders);
     }
 }
