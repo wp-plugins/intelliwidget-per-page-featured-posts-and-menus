@@ -249,10 +249,23 @@ LEFT OUTER JOIN (
     function prep_array($value, &$args, $type = 's') {
         $values = is_array($value) ? $value : explode(',', $value);
         $placeholders = array();
-        array_walk_recursive($values, function($a) use (&$placeholders, &$args, $type) { 
+        foreach($values as $val):
+            $placeholders[] = ('d' == $type ? '%d' : '%s');
+            $args[] = trim($val);
+        endforeach;
+        
+/*
+        array_walk_recursive($values, array($this, 'trimming'),  use (&$placeholders, &$args, $type) { 
             $placeholders[] = ('s' == $type ? '%s' : '%d');
             $args[] = trim($a);
         });
+*/
         return implode(',', $placeholders);
+    }
+    function trimming($data) {
+        if ('array' === gettype($data))
+            return array_map('trimming', $data);
+        else
+        return trim($data);
     }
 }

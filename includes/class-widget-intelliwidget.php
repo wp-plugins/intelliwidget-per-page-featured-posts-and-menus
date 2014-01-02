@@ -12,7 +12,7 @@ if ( !defined('ABSPATH')) exit;
  */
 class IntelliWidget_Widget extends WP_Widget {
 
-    var $version     = '1.4.3';
+    var $version     = '1.4.4';
 
     /**
      * Constructor
@@ -114,7 +114,7 @@ class IntelliWidget_Widget extends WP_Widget {
         foreach(array('custom_text', 'title', 'link_text') as $field):
             // handle custom text
             if ( current_user_can('unfiltered_html') ):
-                $instance[$field] =  $new_instance['custom_text'];
+                $instance[$field] =  $new_instance[$field];
             else:
                 // raw html parser/cleaner-upper: see WP docs re: KSES
                 $instance[$field] = stripslashes( 
