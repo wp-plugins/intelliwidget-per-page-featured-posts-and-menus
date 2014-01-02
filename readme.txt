@@ -55,7 +55,9 @@ IntelliWidget is flexible and versatile. Please read the documentation to see mo
 
 = Is there a quick tutorial? =
 
-See the "Getting Started" section or watch the Quick Start Tutorial at http://www.youtube.com/watch?v=XwESsBRK9hg
+See the "Getting Started" section or watch the Quick Start Tutorial:
+
+http://www.youtube.com/watch?v=XwESsBRK9hg
 
 = Where can I find full documentation? =
 
