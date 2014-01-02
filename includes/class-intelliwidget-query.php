@@ -241,6 +241,7 @@ LEFT OUTER JOIN (
             $prepargs[] = $items;
         endif;
         $query = $select . implode(' ', $joins) . ' WHERE ' . implode("\n AND ", $clauses) . $orderby . $limit;
+        //echo 'query: ' . "\n" . $query . " \n";
         $this->posts      = $wpdb->get_results($wpdb->prepare($query, $prepargs), OBJECT);
         $this->post_count = count($this->posts);
     }
@@ -252,6 +253,19 @@ LEFT OUTER JOIN (
             $placeholders[] = ('d' == $type ? '%d' : '%s');
             $args[] = trim($val);
         endforeach;
+        
+/*
+        array_walk_recursive($values, array($this, 'trimming'),  use (&$placeholders, &$args, $type) { 
+            $placeholders[] = ('s' == $type ? '%s' : '%d');
+            $args[] = trim($a);
+        });
+*/
         return implode(',', $placeholders);
+    }
+    function trimming($data) {
+        if ('array' === gettype($data))
+            return array_map('trimming', $data);
+        else
+        return trim($data);
     }
 }

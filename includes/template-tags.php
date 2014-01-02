@@ -176,10 +176,7 @@ if ( !function_exists('get_the_intelliwidget_link') ) {
         if (empty( $link_text )):
             $link_text = get_the_intelliwidget_title($post_id);
         endif;
-        $title_text = strip_tags($link_text);
-        if (empty( $title_text )):
-            $title_text = get_the_intelliwidget_title($post_id);
-        endif;
+        $title_text = esc_attr(strip_tags($link_text));
         $url     = get_the_intelliwidget_url($post_id, $category_id);
         $classes = empty($post->link_classes) ? '' :  ' class="' . $post->link_classes . '"';
         $target  = empty($post->link_target) ? '' : ' target="' . $post->link_target . '"';
@@ -243,7 +240,8 @@ if ( !function_exists('get_the_intelliwidget_title') ) {
      */
     function get_the_intelliwidget_title() {
         global $post;
-        return empty($post->alt_title) ? $post->post_title : $post->alt_title;
+        $title = empty($post->alt_title) ? $post->post_title : $post->alt_title;
+        return $title; //esc_attr($title);
     }
 }
     /**

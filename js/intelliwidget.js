@@ -193,7 +193,16 @@ var iw_save_cdfdata = function(){
             jQuery('.iw-cdf-container').addClass('success');
             return false;  
         }
-    );  
+    ).fail(function(){
+            // release button
+            jQuery('#iw_cdfsave').prop('disabled', false);
+            // hide spinner
+            jQuery('#intelliwidget_cpt_spinner').hide();
+            // show red X
+            jQuery('.iw-cdf-container').addClass('failure');
+            return false;  
+    });  
+  
     return false;  
 },
 /**
@@ -222,11 +231,11 @@ iw_save_postdata = function (){
         function(index, element) {
         // get field id
         fieldID = jQuery(this).attr('id');
-        // special handling for post types
         if (fieldID.indexOf('_post_types') > 0) {
-            postData[fieldID].push(jQuery(this).val());
-            // otherwise add to post data
+            // special handling for post types
+            postData[pre + '_post_types'].push(jQuery(this).val());
         } else {
+            // otherwise add to post data
             postData[fieldID] = jQuery(this).val();
         }
     });
@@ -255,7 +264,15 @@ iw_save_postdata = function (){
             jQuery('#' + pre + '_spinner').hide();
             return false;  
         }
-    );  
+    ).fail(function(){
+            // release button
+            jQuery(sel).prop('disabled', false);
+            // hide spinner
+            jQuery('#' + pre + '_spinner').hide();
+            // show red X
+            jQuery(sel).parent().addClass('failure');
+            return false;  
+    });  
     return false;  
 },
 
@@ -297,7 +314,16 @@ iw_copy_page = function (){
             jQuery('.iw-copy-container').addClass('success');
             return false;  
         }
-    );  
+    ).fail(function(){
+            // release button
+            jQuery('#iw_copy').prop('disabled', false);
+            // hide spinner
+            jQuery('#intelliwidget_spinner').hide();
+            // show red X
+            jQuery('.iw-copy-container').addClass('failure');
+            return false;  
+    });  
+  
     return false;  
 },
 
@@ -344,7 +370,16 @@ iw_add_meta_box = function (e){
             }
             return false;  
         }
-    );  
+    ).fail(function(){
+            // release button
+            jQuery(sel).removeClass('disabled');
+            // hide spinner
+            jQuery('#intelliwidget_spinner').hide();
+            // show red X
+            jQuery('.iw-copy-container').addClass('failure');
+            return false;  
+    });  
+  
     return false;  
 },
 
@@ -391,7 +426,14 @@ iw_delete_meta_box = function (e){
             }
             return false;  
         }
-    );  
+    ).fail(function(){
+            // release button
+            jQuery(sel).removeClass('disabled');
+            // hide spinner
+            jQuery('#intelliwidget_' + pre + '_spinner').hide();
+            return false;  
+    });  
+  
     return false;  
 }
 /**
