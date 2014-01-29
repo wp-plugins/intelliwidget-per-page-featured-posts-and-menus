@@ -132,7 +132,7 @@ name="<?php echo $this->get_field_name('custom_text'); ?>">
                 <?php _e('Post Date', 'intelliwidget'); ?>
                 </option>
                 <option value="event_date"<?php selected( $instance['sortby'], 'event_date' ); ?>>
-                <?php _e('Event Date', 'intelliwidget'); ?>
+                <?php _e('Start Date', 'intelliwidget'); ?>
                 </option>
                 <option value="menu_order"<?php selected( $instance['sortby'], 'menu_order' ); ?>>
                 <?php _e('Menu Order', 'intelliwidget'); ?>
@@ -174,14 +174,14 @@ name="<?php echo $this->get_field_name('custom_text'); ?>">
             <label>
                 <input name="<?php echo $this->get_field_name('future_only'); ?>" id="<?php echo $this->get_field_id('future_only'); ?>" type="checkbox" <?php checked($instance['future_only'], 1); ?> />
                 &nbsp;
-                <?php _e('Only future events', 'intelliwidget'); ?>
+                <?php _e('Only future posts', 'intelliwidget'); ?>
             </label>
         </p>
         <p>
             <label>
                 <input name="<?php echo $this->get_field_name('active_only'); ?>" id="<?php echo $this->get_field_id('active_only'); ?>" type="checkbox" <?php checked($instance['active_only'], 1); ?> />
                 &nbsp;
-                <?php _e('Only active events', 'intelliwidget'); ?>
+                <?php _e('Exclude future posts', 'intelliwidget'); ?>
             </label>
         </p>
         <p>

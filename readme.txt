@@ -4,7 +4,7 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_i
 Tags: featured posts, events, page menu, plugin, textwidget, widget, custom post types, custom sidebar
 Requires at least: 3.5
 Tested up to: 3.8
-Stable tag: 1.4.4
+Stable tag: 1.4.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -108,6 +108,10 @@ Change the 'supports' parameter in the register_post_type function to include 'c
 5. Example of the Custom Data Fields Panel.
 
 == Changelog ==
+
+= 1.4.5 =
+* Optimized left joins to avoid max_join_size error
+* Simplified date range options and behavior - see Additional Notes.
 
 = 1.4.4 =
 * rolled back array_walk_recursive function in prep_array() due to incompatibility with 5.4
@@ -226,8 +230,10 @@ Change the 'supports' parameter in the register_post_type function to include 'c
 * Combined favorite functionality from different widgets into a single IntelliWidget.
 * Packaged for public consumption
 
-
 == Upgrade Notice ==
+
+= 1.4.5 =
+IMPORTANT: Definitions of "Future" and "Active" posts (events) have changed to simplify use. See Additional Notes.
 
 = 1.4.3 =
 This release fixes some very obscure bugs that have been reported.
@@ -283,6 +289,12 @@ Here is a very simple example of how to use an IntelliWidget titled "My First In
 8. The point of this exercise is to demonstrate that any page can override the default widget with it's own custom section.
 
 9. Lastly, you can select this page in the "Use Settings From..." menu from any other page to re-use these settings. This is useful if you have a sub-set of pages that need to re-use the same sidebar content. This feature alone can save hours of repetition wasted on many other "custom sidebar" plugins.
+
+IMPORTANT: As of 1.4.5 the definition of "Future" posts (formerly "events") has been modified to simplify use and to make the interface more intuitive. This may require adjustments to date-dependent IntelliWidgets and Post date fields.
+
+Checking "Only Future Posts" excludes posts with a Start Date < current date/time, regardless of Expire Date. (Formerly "Only Future Events.")
+Checking "Exclude Future Posts" hides posts with a Start Date > current date/time, regardless of Expire Date. (Formerly "Only Active Events.")  
+The "Exclude Expired Posts" behavior has not changed.
 
 == Documentation ==
 

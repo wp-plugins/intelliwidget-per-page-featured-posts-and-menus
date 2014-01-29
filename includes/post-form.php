@@ -91,7 +91,7 @@ input.intelliwidget-input, select.intelliwidget-input {
                 $fields[$key] = $custom_data[$key][0];
         endforeach;
 ?>
-<p>    <label for="intelliwidget_event_date"><?php _e('Event Date', 'intelliwidget');?>:
+<p>    <label for="intelliwidget_event_date"><?php _e('Start Date', 'intelliwidget');?>:
     <a href="#edit_timestamp" id="intelliwidget_event_date-edit" class="intelliwidget-edit-timestamp hide-if-no-js"><?php _e('Edit', 'intelliwidget') ?></a>
 <span id="intelliwidget_event_date_timestamp" class="intelliwidget-timestamp">
     <?php echo $fields['intelliwidget_event_date'] ?></span></label>

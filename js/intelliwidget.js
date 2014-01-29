@@ -65,6 +65,7 @@ jQuery(document).ready(function($) {
         $('#'+field+'_aa').val($('#'+field+'_cur_aa').val());
         $('#'+field+'_hh').val($('#'+field+'_cur_hh').val());
         $('#'+field+'_mn').val($('#'+field+'_cur_mn').val());
+        $('#'+field+'_og').prop('checked', false);
         $('#'+field+'_timestamp').html('');
         $('#'+field).val('');
         $('a#'+field+'-edit').show();
@@ -80,6 +81,7 @@ jQuery(document).ready(function($) {
         $('#'+field+'_aa').val($('#'+field+'_hidden_aa').val());
         $('#'+field+'_hh').val($('#'+field+'_hidden_hh').val());
         $('#'+field+'_mn').val($('#'+field+'_hidden_mn').val());
+        $('#'+field+'_og').prop('checked', $('#'+field+'_hidden_og').val() ? true : false);
         $('a#'+field+'-edit').show();
         iwUpdateTimestampText(field, false);
         return false;
@@ -107,7 +109,8 @@ jQuery(document).ready(function($) {
             mm          = ('00'+$('#'+field+'_mm').val()).slice(-2), 
             jj          = ('00'+$('#'+field+'_jj').val()).slice(-2), 
             hh          = ('00'+$('#'+field+'_hh').val()).slice(-2), 
-            mn          = ('00'+$('#'+field+'_mn').val()).slice(-2);
+            mn          = ('00'+$('#'+field+'_mn').val()).slice(-2),
+            og          = $('#'+field+'_og').val();
         if (! $(div).length) return true;
         // construct date object
         attemptedDate = new Date( aa, mm - 1, jj, hh, mn );
@@ -118,23 +121,31 @@ jQuery(document).ready(function($) {
             attemptedDate.getMinutes() != mn ) {
             // date object returned invalid
             // if validating, display error and return invalid
-            if (true == validate ) {
-                $(div).addClass('form-invalid');
-                $('.iw-cdfsave').attr('disabled', 'disabled');
-                return false;
-            }
-            // otherwise clear form (value is/was null)  
-            clearForm = true;
+                if (true == validate && !og) {
+                    $(div).addClass('form-invalid');
+                    $('.iw-cdfsave').attr('disabled', 'disabled');
+                    return false;
+                }
+                // otherwise clear form (value is/was null)  
+                clearForm = true;
         }
         // date validated or ignored, reset invalid class
         $(div).removeClass('form-invalid');
         $('.iw-cdfsave').removeAttr('disabled');
         if (clearForm) {
             // replace date fields with empty string
-            $('#'+field+'_timestamp').html('');
+            if (! og) $('#'+field+'_timestamp').html('');
             $('#'+field).val('');
         } else {
             // format displayed date string from form values
+            if ('intelliwidget_expire_date' == field) {
+                $('#intelliwidget_ongoing').val($('#'+field+'_og').is(':checked') ? 1 : 0);
+                if ($('#'+field+'_og').is(':checked')) {
+                    $('#'+field+'_timestamp').html($('#intelliwidget_ongoing_label').text());
+                    $('#'+field).val('');
+                    return true;
+                }
+            }
             $('#'+field+'_timestamp').html(
                 '<b>' +
                 $('option[value="' + $('#'+field+'_mm').val() + '"]', '#'+field+'_mm').text() + ' ' +

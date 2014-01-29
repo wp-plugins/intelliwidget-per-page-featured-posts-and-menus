@@ -14,7 +14,7 @@ require_once( 'class-intelliwidget-query.php' );
 require_once( 'class-walker-intelliwidget.php' );
 class IntelliWidget {
 
-    var $version     = '1.4.4';
+    var $version     = '1.4.5';
     var $pluginName;
     var $pluginPath;
     var $pluginURL;
@@ -94,7 +94,7 @@ class IntelliWidget {
      * Stub for printing the scripts needed for the admin.
      */
     function admin_scripts() {
-        wp_enqueue_script('intelliwidget-js', $this->pluginURL . 'js/intelliwidget.min.js', array('jquery'), '1.4.4', false);
+        wp_enqueue_script('intelliwidget-js', $this->pluginURL . 'js/intelliwidget.min.js', array('jquery'), '1.4.5', false);
         wp_localize_script( 'intelliwidget-js', 'IWAjax', array(
             'ajaxurl' => admin_url( 'admin-ajax.php' )
         ));
