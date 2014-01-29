@@ -14,7 +14,7 @@ require_once( 'class-intelliwidget-query.php' );
 require_once( 'class-walker-intelliwidget.php' );
 class IntelliWidget {
 
-    var $version     = '1.4.2';
+    var $version     = '1.4.5';
     var $pluginName;
     var $pluginPath;
     var $pluginURL;
@@ -94,7 +94,7 @@ class IntelliWidget {
      * Stub for printing the scripts needed for the admin.
      */
     function admin_scripts() {
-        wp_enqueue_script('intelliwidget-js', $this->pluginURL . 'js/intelliwidget.min.js', array('jquery'), '1.2.0', false);
+        wp_enqueue_script('intelliwidget-js', $this->pluginURL . 'js/intelliwidget.min.js', array('jquery'), '1.4.5', false);
         wp_localize_script( 'intelliwidget-js', 'IWAjax', array(
             'ajaxurl' => admin_url( 'admin-ajax.php' )
         ));
@@ -214,10 +214,10 @@ class IntelliWidget {
         $meta_name = '_intelliwidget_data_' . $pagesection;
         $intelliwidget_data = $this->defaults(unserialize(get_post_meta( $post->ID, $meta_name, true ) ));
         $intelliwidget_data['custom_text'] = stripslashes(base64_decode($intelliwidget_data['custom_text']));
-        if (!is_array($intelliwidget_data['page'])) 
-            $intelliwidget_data['page'] = array($intelliwidget_data['page']);
-        if (!is_array($intelliwidget_data['post_types'])) 
-            $intelliwidget_data['post_types'] = array($intelliwidget_data['post_types']);
+        //if (!is_array($intelliwidget_data['page'])) 
+        //    $intelliwidget_data['page'] = array($intelliwidget_data['page']);
+        //if (!is_array($intelliwidget_data['post_types'])) 
+        //    $intelliwidget_data['post_types'] = array($intelliwidget_data['post_types']);
         $widgets_array = wp_get_sidebars_widgets();
         $post_ID = $post->ID;
         include( $this->pluginPath . 'includes/section-form.php');
@@ -298,8 +298,10 @@ class IntelliWidget {
             // handle custom text
             if ( !current_user_can('unfiltered_html') ):
                 // raw html parser/cleaner-upper: see WP docs re: KSES
-                $post_data[$box_id]['custom_text'] = stripslashes( 
-                    wp_filter_post_kses( addslashes($post_data[$box_id]['custom_text']) ) ); 
+                foreach(array('custom_text', 'title', 'link_text') as $field):
+                    $post_data[$box_id][$field] = stripslashes( 
+                        wp_filter_post_kses( addslashes($post_data[$box_id][$field]) ) ); 
+                endforeach;
             endif;
             $post_data[$box_id]['custom_text'] = base64_encode($post_data[$box_id]['custom_text']);
             // update map
@@ -355,7 +357,12 @@ class IntelliWidget {
                 if (empty($_POST[$prefix.$cptfield])):
                     delete_post_meta($post_ID, $prefix.$cptfield);
                 else:
-                    update_post_meta($post_ID, $prefix.$cptfield, $_POST[$prefix.$cptfield]);
+                    $newdata = $_POST[$prefix.$cptfield];
+                    if ( !current_user_can('unfiltered_html') ):
+                        $newdata = stripslashes( 
+                        wp_filter_post_kses( addslashes($newdata) ) ); 
+                    endif;
+                    update_post_meta($post_ID, $prefix.$cptfield, $newdata);
                 endif;
             endif;
         endforeach;
@@ -453,7 +460,7 @@ class IntelliWidget {
         if ( empty($instance['page']) ):
             $instance['page'] = array();
         elseif (!is_array($instance['page'])):
-            $instance['page'] = array($instance['page']);
+            $instance['page'] = explode(',', $instance['page']);
         endif;
         $pages = get_posts(
             array(
@@ -728,7 +735,7 @@ class IntelliWidget {
 //            if (!($atts = $this->get_page_data($post->ID, intval($atts['section'])))): return; endif;
              $atts = $this->get_page_data($post->ID, intval($atts['section']));
              if (empty($atts)): return; endif;
-       else:
+        else:
             //if (!empty($atts['pages'])) $atts['pages'] = preg_split("/, */", $atts['pages']);
             //if (!empty($atts['post_types'])) $atts['post_types'] = preg_split("/, */", $atts['post_types']);
             if (!empty($atts['custom_text'])) unset($atts['custom_text']);

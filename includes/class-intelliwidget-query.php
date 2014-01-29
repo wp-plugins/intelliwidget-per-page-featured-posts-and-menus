@@ -112,58 +112,30 @@ SELECT DISTINCT
     pm5.meta_value AS link_target,
     pm6.meta_value AS external_url,
     pm7.meta_value AS thumbnail_id
- FROM {$wpdb->posts} p1
+FROM {$wpdb->posts} p1
 ";
     $joins = array("
-LEFT OUTER JOIN (
-    SELECT post_id, meta_value
-    FROM {$wpdb->postmeta}
-    WHERE meta_key = 'intelliwidget_expire_date'
-    GROUP BY post_id, meta_value
-) pm1 ON pm1.post_id = p1.ID
+LEFT JOIN {$wpdb->postmeta} pm1 ON pm1.post_id = p1.ID
+    AND pm1.meta_key = 'intelliwidget_expire_date'
             ", "
-LEFT OUTER JOIN (
-    SELECT post_id, meta_value
-    FROM {$wpdb->postmeta}
-    WHERE meta_key = 'intelliwidget_event_date'
-    GROUP BY post_id, meta_value
-) pm2 ON pm2.post_id = p1.ID
+LEFT JOIN {$wpdb->postmeta} pm2 ON pm2.post_id = p1.ID
+    AND pm2.meta_key = 'intelliwidget_event_date'
             ", "
-LEFT OUTER JOIN (
-    SELECT post_id, meta_value
-    FROM {$wpdb->postmeta}
-    WHERE meta_key = 'intelliwidget_link_classes'
-    GROUP BY post_id, meta_value
-) pm3 ON pm3.post_id = p1.ID
+LEFT JOIN {$wpdb->postmeta} pm3 ON pm3.post_id = p1.ID
+    AND pm3.meta_key = 'intelliwidget_link_classes'
             ", "
-LEFT OUTER JOIN (
-    SELECT post_id, meta_value
-    FROM {$wpdb->postmeta}
-    WHERE meta_key = 'intelliwidget_alt_title'
-    GROUP BY post_id, meta_value
-) pm4 ON pm4.post_id = p1.ID
+LEFT JOIN {$wpdb->postmeta} pm4 ON pm4.post_id = p1.ID
+    AND pm4.meta_key = 'intelliwidget_alt_title'
             ", "
-LEFT OUTER JOIN (
-    SELECT post_id, meta_value
-    FROM {$wpdb->postmeta}
-    WHERE meta_key = 'intelliwidget_link_target'
-    GROUP BY post_id, meta_value
-) pm5 ON pm5.post_id = p1.ID
+LEFT JOIN {$wpdb->postmeta} pm5 ON pm5.post_id = p1.ID
+    AND pm5.meta_key = 'intelliwidget_link_target'
             ", "
-LEFT OUTER JOIN (
-    SELECT post_id, meta_value
-    FROM {$wpdb->postmeta}
-    WHERE meta_key = 'intelliwidget_external_url'
-    GROUP BY post_id, meta_value
-) pm6 ON pm6.post_id = p1.ID
+LEFT JOIN {$wpdb->postmeta} pm6 ON pm6.post_id = p1.ID
+    AND pm6.meta_key = 'intelliwidget_external_url'
             ", "
-LEFT OUTER JOIN (
-    SELECT post_id, meta_value
-    FROM {$wpdb->postmeta}
-    WHERE meta_key = '_thumbnail_id'
-    GROUP BY post_id, meta_value
-) pm7 ON pm7.post_id = p1.ID
-");
+LEFT JOIN {$wpdb->postmeta} pm7 ON pm7.post_id = p1.ID
+    AND pm7.meta_key = '_thumbnail_id'
+            ");
         $clauses = array(
             "(p1.post_status = 'publish')",
             "(p1.post_password = '' OR p1.post_password IS NULL)",
@@ -195,22 +167,23 @@ LEFT OUTER JOIN (
         
         $time_adj = gmdate('Y-m-d H:i', current_time('timestamp') );
 
-        // skip expired posts
+        // skip all expired posts
+        // postmeta intelliwidget_expire_date date format 
+        // MUST be YYYY-MM-DD HH:MM for this to work correctly!
         if ($instance['skip_expired']):
-            $clauses[] = "(  pm1.meta_value IS NULL  OR CAST( pm1.meta_value AS CHAR ) > '" . $time_adj . "' )";
+            $clauses[] = "(pm1.meta_value IS NULL OR (pm1.meta_value IS NOT NULL AND CAST( pm1.meta_value AS CHAR ) > '" . $time_adj . "'))";
         endif;
-        // use future events only
-        // note postmeta intelliwidget_event_date date format 
+        // show posts that have not started yet only
+        // postmeta intelliwidget_event_date date format 
         // MUST be YYYY-MM-DD HH:MM for this to work correctly!
         if ($instance['future_only'] ):
-            $clauses[] = "((pm1.meta_value IS NULL AND CAST( pm2.meta_value AS CHAR ) > '" . $time_adj . "')
-            OR (pm1.meta_value IS NOT NULL AND CAST( pm1.meta_value AS CHAR ) > '" . $time_adj . "'))";
+            $clauses[] = "(pm2.meta_value IS NOT NULL AND CAST( pm2.meta_value AS CHAR ) > '" . $time_adj . "')";
         endif;
-        // use started events only
-        // note postmeta intelliwidget_event_date date format 
+        // skip posts that have not started yet
+        // postmeta intelliwidget_event_date date format 
         // MUST be YYYY-MM-DD HH:MM for this to work correctly!
         if ($instance['active_only'] ):
-            $clauses[] = "(pm2.meta_value IS NOT NULL AND CAST( pm2.meta_value AS CHAR ) < '" . $time_adj . "')";
+            $clauses[] = "(pm2.meta_value IS NULL OR (pm2.meta_value IS NOT NULL AND CAST( pm2.meta_value AS CHAR ) < '" . $time_adj . "'))";
         endif;
 
         $order = $instance['sortorder'] == 'ASC' ? 'ASC' : 'DESC';
@@ -241,6 +214,7 @@ LEFT OUTER JOIN (
             $prepargs[] = $items;
         endif;
         $query = $select . implode(' ', $joins) . ' WHERE ' . implode("\n AND ", $clauses) . $orderby . $limit;
+        //echo 'query: ' . "\n" . $query . " \n";
         $this->posts      = $wpdb->get_results($wpdb->prepare($query, $prepargs), OBJECT);
         $this->post_count = count($this->posts);
     }
@@ -252,6 +226,19 @@ LEFT OUTER JOIN (
             $placeholders[] = ('d' == $type ? '%d' : '%s');
             $args[] = trim($val);
         endforeach;
+        
+/*
+        array_walk_recursive($values, array($this, 'trimming'),  use (&$placeholders, &$args, $type) { 
+            $placeholders[] = ('s' == $type ? '%s' : '%d');
+            $args[] = trim($a);
+        });
+*/
         return implode(',', $placeholders);
+    }
+    function trimming($data) {
+        if ('array' === gettype($data))
+            return array_map('trimming', $data);
+        else
+        return trim($data);
     }
 }

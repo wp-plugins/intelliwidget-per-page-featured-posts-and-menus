@@ -141,7 +141,7 @@ global $_wp_additional_image_sizes, $wp_registered_sidebars;
                 <?php _e('Post Date', 'intelliwidget'); ?>
                 </option>
                 <option value="event_date"<?php selected( $intelliwidget_data['sortby'], 'event_date' ); ?>>
-                <?php _e('Event Date', 'intelliwidget'); ?>
+                <?php _e('Start Date', 'intelliwidget'); ?>
                 </option>
                 <option value="menu_order"<?php selected( $intelliwidget_data['sortby'], 'menu_order' ); ?>>
                 <?php _e('Menu Order', 'intelliwidget'); ?>
@@ -183,14 +183,14 @@ global $_wp_additional_image_sizes, $wp_registered_sidebars;
             <label for="<?php echo 'intelliwidget_' . $pagesection . '_future_only'; ?>">
                 <input id="<?php echo 'intelliwidget_' . $pagesection . '_future_only'; ?>" name="<?php echo 'intelliwidget_' . $pagesection . '_future_only'; ?>" type="checkbox" <?php checked($intelliwidget_data['future_only'], 1); ?> />
                 &nbsp;
-                <?php _e('Only future events', 'intelliwidget'); ?>
+                <?php _e('Only future posts', 'intelliwidget'); ?>
             </label>
         </p>
         <p>
             <label for="<?php echo 'intelliwidget_' . $pagesection . '_active_only'; ?>">
                 <input id="<?php echo 'intelliwidget_' . $pagesection . '_active_only'; ?>" name="<?php echo 'intelliwidget_' . $pagesection . '_active_only'; ?>" type="checkbox" <?php checked($intelliwidget_data['active_only'], 1); ?> />
                 &nbsp;
-                <?php _e('Only active events', 'intelliwidget'); ?>
+                <?php _e('Exclude future posts', 'intelliwidget'); ?>
             </label>
         </p>
         <p>
@@ -267,9 +267,9 @@ global $_wp_additional_image_sizes, $wp_registered_sidebars;
             <?php _e('Post Types', 'intelliwidget'); ?>
             <br/>
             <?php foreach ( $this->get_eligible_post_types() as $type ) : ?>
-            <label>
-                <input id="<?php echo 'intelliwidget_' . $pagesection . '_post_types'; ?>" type="checkbox" name="<?php echo 'intelliwidget_' . $pagesection . '_post_types[]'; ?>" value="<?php echo $type; ?>" <?php checked(in_array($type, $intelliwidget_data['post_types']), 1); ?> />
-                &nbsp;<?php echo ucfirst($type); ?></label>
+            <label for="<?php echo 'intelliwidget_' . $pagesection . '_post_types_' . $type; ?>">
+                <input id="<?php echo 'intelliwidget_' . $pagesection . '_post_types_' . $type; ?>" type="checkbox" name="<?php echo 'intelliwidget_' . $pagesection . '_post_types[]'; ?>" value="<?php echo $type; ?>" <?php checked(in_array($type, $intelliwidget_data['post_types']), 1); ?> />
+            <?php echo ucfirst($type); ?></label>
             <?php endforeach; ?>
         </p>
     </div>
