@@ -12,7 +12,7 @@ if ( !defined('ABSPATH')) exit;
  */
 class IntelliWidget_Widget extends WP_Widget {
 
-    var $version     = '1.4.5';
+    var $version     = '1.4.6';
 
     /**
      * Constructor
@@ -57,7 +57,7 @@ class IntelliWidget_Widget extends WP_Widget {
                     $page_data = $this->get_page_data($other_page_id, $args['widget_id']);
                 endif;
             endif;
-            if (!is_archive() && !empty($page_data)):
+            if (is_singular() && !empty($page_data)):
                 $intelliwidget->build_widget($args, $page_data, $post_id);
                 // done -- restore original post object and return
                 $post = $old_post;

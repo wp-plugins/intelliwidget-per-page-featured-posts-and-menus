@@ -4,7 +4,7 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_i
 Tags: featured posts, events, page menu, plugin, textwidget, widget, custom post types, custom sidebar
 Requires at least: 3.5
 Tested up to: 3.8
-Stable tag: 1.4.5
+Stable tag: 1.4.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -108,6 +108,10 @@ Change the 'supports' parameter in the register_post_type function to include 'c
 5. Example of the Custom Data Fields Panel.
 
 == Changelog ==
+
+= 1.4.6 =
+* Added Spanish Translation by jelena kovacevic
+* Changed page-specific widget to run only if is_singular (excluding search, archive and date queries)
 
 = 1.4.5 =
 * Optimized left joins to avoid max_join_size error
@@ -300,3 +304,4 @@ The "Exclude Expired Posts" behavior has not changed.
 
 Can be found at http://www.lilaeamedia.com/plugins/intelliwidget/
 
+Interested in translating? Contact us at http://www.lilaeamedia.com/about/contact/
