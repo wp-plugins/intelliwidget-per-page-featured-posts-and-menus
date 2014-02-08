@@ -4,7 +4,7 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_i
 Tags: featured posts, events, page menu, plugin, textwidget, widget, custom post types, custom sidebar
 Requires at least: 3.5
 Tested up to: 3.8
-Stable tag: 1.4.2
+Stable tag: 1.4.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -55,7 +55,9 @@ IntelliWidget is flexible and versatile. Please read the documentation to see mo
 
 = Is there a quick tutorial? =
 
-See the "Getting Started" section.
+See the "Getting Started" section or watch the Quick Start Tutorial:
+
+http://www.youtube.com/watch?v=XwESsBRK9hg
 
 = Where can I find full documentation? =
 
@@ -106,6 +108,24 @@ Change the 'supports' parameter in the register_post_type function to include 'c
 5. Example of the Custom Data Fields Panel.
 
 == Changelog ==
+
+= 1.4.6 =
+* Added Spanish Translation by jelena kovacevic
+* Changed page-specific widget to run only if is_singular (excluding search, archive and date queries)
+
+= 1.4.5 =
+* Optimized left joins to avoid max_join_size error
+* Simplified date range options and behavior - see Additional Notes.
+
+= 1.4.4 =
+* rolled back array_walk_recursive function in prep_array() due to incompatibility with 5.4
+* fixed regression bug in widget admin text inputs
+
+= 1.4.3 =
+* Added kses filter for all text inputs
+* Modified id of post_types checkboxes to eliminate odd checking/unchecking behavior
+* Added esc_attr filter to title tags on links
+* Refactored prep_array function to flatten multi-dimensional arrays before passing values to trim()
 
 = 1.4.2 =
 * Fixed the inner postboxes so they cannot be dragged outside of the IntelliWidget options panel.
@@ -214,8 +234,13 @@ Change the 'supports' parameter in the register_post_type function to include 'c
 * Combined favorite functionality from different widgets into a single IntelliWidget.
 * Packaged for public consumption
 
-
 == Upgrade Notice ==
+
+= 1.4.5 =
+IMPORTANT: Definitions of "Future" and "Active" posts (events) have changed to simplify use. See Additional Notes.
+
+= 1.4.3 =
+This release fixes some very obscure bugs that have been reported.
 
 = 1.4.2 =
 Fixed a number of UI bugs that were causing problems. See changelog.
@@ -269,7 +294,14 @@ Here is a very simple example of how to use an IntelliWidget titled "My First In
 
 9. Lastly, you can select this page in the "Use Settings From..." menu from any other page to re-use these settings. This is useful if you have a sub-set of pages that need to re-use the same sidebar content. This feature alone can save hours of repetition wasted on many other "custom sidebar" plugins.
 
+IMPORTANT: As of 1.4.5 the definition of "Future" posts (formerly "events") has been modified to simplify use and to make the interface more intuitive. This may require adjustments to date-dependent IntelliWidgets and Post date fields.
+
+Checking "Only Future Posts" excludes posts with a Start Date < current date/time, regardless of Expire Date. (Formerly "Only Future Events.")
+Checking "Exclude Future Posts" hides posts with a Start Date > current date/time, regardless of Expire Date. (Formerly "Only Active Events.")  
+The "Exclude Expired Posts" behavior has not changed.
+
 == Documentation ==
 
 Can be found at http://www.lilaeamedia.com/plugins/intelliwidget/
 
+Interested in translating? Contact us at http://www.lilaeamedia.com/about/contact/
