@@ -1,15 +1,15 @@
-# Copyright (C) 2013 IntelliWidget Per Page Featured Posts and Menus
-# This file is distributed under the same license as the IntelliWidget Per Page Featured Posts and Menus package.
+# Copyright (C) 2014 
+# This file is distributed under the same license as the  package.
 msgid ""
 msgstr ""
-"Project-Id-Version: IntelliWidget Per Page Featured Posts and Menus 1.4.0\n"
+"Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: http://wordpress.org/tag/intelliwidget-per-page-"
 "featured-posts-and-menus\n"
-"POT-Creation-Date: 2013-12-10 02:00:31+00:00\n"
+"POT-Creation-Date: 2014-02-06 11:37:06+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"PO-Revision-Date: 2014-02-06 11:02+0100\n"
+"PO-Revision-Date: 2014-02-10 10:40+0100\n"
 "Last-Translator: jelena kovacevic <jecajeca260@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "X-Generator: Poedit 1.5.5\n"
@@ -24,9 +24,9 @@ msgstr "Sección IntelliWidget"
 
 #: includes/class-intelliwidget.php:190
 msgid "IntelliWidget Custom Fields"
-msgstr "Campos Personalizados IntelliWidget"
+msgstr "Campos personalizados IntelliWidget"
 
-#: includes/class-intelliwidget.php:581
+#: includes/class-intelliwidget.php:588
 msgid "Read More"
 msgstr "Leer más"
 
@@ -55,8 +55,8 @@ msgstr "Crear Nueva Sección"
 
 #: includes/post-form.php:94 includes/section-form.php:144
 #: includes/widget-form.php:135
-msgid "Event Date"
-msgstr "Fecha Evento"
+msgid "Start Date"
+msgstr "Fecha de Inicio:"
 
 #: includes/post-form.php:95 includes/post-form.php:101
 msgid "Edit"
@@ -76,11 +76,11 @@ msgstr "URL externa"
 
 #: includes/post-form.php:113
 msgid "Link Classes"
-msgstr "Clases de Enlace"
+msgstr "Clases Enlace"
 
 #: includes/post-form.php:116
 msgid "Link Target"
-msgstr "Objetivo del Enlace"
+msgstr "Enlace Objetivo"
 
 #. translators: 1: month input, 2: day input, 3: year input, 4: hour input, 5:
 #. minute input
@@ -102,7 +102,7 @@ msgstr "Cancelar"
 
 #: includes/section-form.php:19
 msgid "Override Copied Settings"
-msgstr "Sustituir Ajustes de Copiado"
+msgstr "Suprimir Configuración Copiada"
 
 #: includes/section-form.php:24
 msgid "Replaces"
@@ -165,11 +165,11 @@ msgstr "Texto/HTML personalizado"
 
 #: includes/section-form.php:87 includes/widget-form.php:74
 msgid "Above Posts"
-msgstr "Mensajes de Arriba"
+msgstr "Encima de Mensajes"
 
 #: includes/section-form.php:90 includes/widget-form.php:77
 msgid "Below Posts"
-msgstr "Mensajes de Abajo"
+msgstr "Debajo de Mensajes"
 
 #: includes/section-form.php:93 includes/widget-form.php:80
 msgid "Text Only-No Posts"
@@ -177,7 +177,7 @@ msgstr "Sólo texto-No Mensajes"
 
 #: includes/section-form.php:102 includes/widget-form.php:93
 msgid "Auto-format Custom Text"
-msgstr "Texto personalizado Auto-formateado"
+msgstr "Autoto-formato de texto personalizado"
 
 #: includes/section-form.php:110 includes/widget-form.php:102
 msgid "Advanced Settings"
@@ -189,7 +189,7 @@ msgstr "Menu WP Nav"
 
 #: includes/section-form.php:122 includes/widget-form.php:114
 msgid "Page Menu"
-msgstr "Menú de Páginas"
+msgstr "Menú de Página"
 
 #: includes/section-form.php:137 includes/widget-form.php:129
 msgid "Sort by"
@@ -197,11 +197,11 @@ msgstr "Clasificar por"
 
 #: includes/section-form.php:141 includes/widget-form.php:132
 msgid "Post Date"
-msgstr "Fecha Publicación"
+msgstr "Fecha de Publicación"
 
 #: includes/section-form.php:147 includes/widget-form.php:138
 msgid "Menu Order"
-msgstr "Orden del Menú"
+msgstr "Orden de Menú"
 
 #: includes/section-form.php:153 includes/widget-form.php:144
 msgid "Random"
@@ -217,23 +217,23 @@ msgstr "DESC"
 
 #: includes/section-form.php:167 includes/widget-form.php:158
 msgid "Max posts"
-msgstr "Máxima cantidad de mensajes"
+msgstr "Max publicaciones"
 
 #: includes/section-form.php:172 includes/widget-form.php:163
 msgid "Max words per post"
-msgstr "Máximas palabras por mensaje"
+msgstr "Max palabras por mensaje"
 
 #: includes/section-form.php:179 includes/widget-form.php:170
 msgid "Exclude current post"
-msgstr "Excluir mensaje actual"
+msgstr "Excluir publicación actual"
 
 #: includes/section-form.php:186 includes/widget-form.php:177
-msgid "Only future events"
-msgstr "Sólo eventos futuros"
+msgid "Only future posts"
+msgstr "Solamente futuras publicaciones"
 
 #: includes/section-form.php:193 includes/widget-form.php:184
-msgid "Only active events"
-msgstr "Sólo los eventos activos"
+msgid "Exclude future posts"
+msgstr "Excluir futuras publicaciones"
 
 #: includes/section-form.php:200 includes/widget-form.php:191
 msgid "Exclude expired posts"
@@ -241,7 +241,7 @@ msgstr "Excluir mensajes caducados"
 
 #: includes/section-form.php:205 includes/widget-form.php:196
 msgid "Allowed Tags"
-msgstr "Etiquetas Permitidas"
+msgstr "Etiquetas permitidas"
 
 #: includes/section-form.php:210 includes/widget-form.php:201
 msgid "Link Text"
@@ -285,7 +285,7 @@ msgstr "Sin imagen"
 
 #: includes/section-form.php:250 includes/widget-form.php:241
 msgid "Thumbnail"
-msgstr "Miniatura"
+msgstr "Vista Miniatura"
 
 #: includes/section-form.php:253 includes/widget-form.php:244
 msgid "Medium"
@@ -297,19 +297,19 @@ msgstr "Grande"
 
 #: includes/section-form.php:259 includes/widget-form.php:250
 msgid "Full"
-msgstr "Completas"
+msgstr "Completa"
 
 #: includes/section-form.php:267 includes/widget-form.php:258
 msgid "Post Types"
-msgstr "Tipos de Mensaje"
+msgstr "Tipos Mensaje"
 
 #: includes/section-form.php:281
 msgid "Delete"
-msgstr "Borrar"
+msgstr "Eliminar"
 
 #: includes/widget-form.php:20
 msgid "Hide if no Page Data is available"
-msgstr "Ocultar si no hay datos de Página disponibles"
+msgstr "Ocultar si no hay Página de datos disponible"
 
 #: includes/widget-form.php:24
 msgid "Widget"
@@ -322,28 +322,3 @@ msgstr "Mostrar"
 #: templates/events.php:25
 msgid "%1$s %2$s, %3$s"
 msgstr "%1$s %2$s, %3$s"
-
-#. Plugin Name of the plugin/theme
-msgid "IntelliWidget Per Page Featured Posts and Menus"
-msgstr "IntelliWidget por Página Publicaciones destacadas y Menús"
-
-#. Plugin URI of the plugin/theme
-msgid "http://www.lilaeamedia.com/plugins/intelliwidget"
-msgstr "http://www.lilaeamedia.com/plugins/intelliwidget"
-
-#. Description of the plugin/theme
-msgid ""
-"Display featured posts, custom menus, html content and more within a single "
-"dynamic sidebar that can be customized on a per-page or site-wide basis."
-msgstr ""
-"Mostrar Publicaciones destacadas, menús personalizados, el contenido HTML y "
-"mucho más en una sola barra lateral dinámica que se puede personalizar por "
-"página o en todo el sitio."
-
-#. Author of the plugin/theme
-msgid "Lilaea Media"
-msgstr "Medios Lilaea"
-
-#. Author URI of the plugin/theme
-msgid "http://www.lilaeamedia.com/"
-msgstr "http://www.lilaeamedia.com/"
