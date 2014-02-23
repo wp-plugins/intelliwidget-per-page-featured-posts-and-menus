@@ -25,9 +25,9 @@ if ( !defined('ABSPATH')) exit;
     </select>
 </p>
 <div class="iw-copy-container">
-    <input name="save" class="iw-copy button button-primary button-large" id="iw_copy" value="<?php _e('Save', 'intelliwidget'); ?>" type="button" style="float:right" />
+    <input name="save" class="iw-copy button button-large" id="iw_copy" value="<?php _e('Copy Settings', 'intelliwidget'); ?>" type="button" style="float:right" />
     <span class="spinner" id="intelliwidget_spinner"></span> </div>
 <a style="float:left;" href="<?php echo wp_nonce_url(admin_url('post.php?action=edit&iwadd=1&post=' . $post->ID), 'iwadd'); ?>" id="iw_add" class="iw-add">
-<?php _e('Add New Section', 'intelliwidget'); ?>:</a>
+<?php _e('Add New Section', 'intelliwidget'); ?></a>
 <?php wp_nonce_field('iwpage_' . $post->ID,'iwpage'); ?>
 <div style="clear:both"></div>

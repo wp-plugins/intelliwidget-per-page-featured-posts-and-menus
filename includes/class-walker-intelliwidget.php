@@ -40,7 +40,42 @@ class Walker_IntelliWidget extends Walker {
 		if (in_array( $page->ID, $args['page'] ))
 			$output .= ' selected="selected"';
 		$output .= '>';
-		$title = substr($pad . $page->post_title, 0, 60) . ' (' . ucfirst($page->post_type) . ')';
+		$title = substr($pad . $page->post_title, 0, 60) . ' (' . ucwords(str_replace('_', ' ', $page->post_type)) . ')';
+		$output .= esc_html( $title );
+		$output .= "</option>\n";
+	}
+}
+
+class Walker_IntelliWidget_Terms extends Walker {
+	/**
+	 * @see Walker::$tree_type
+	 * @var string
+	 */
+	var $tree_type = 'category';
+
+	/**
+	 * @see Walker::$db_fields
+	 * @var array
+	 */
+	var $db_fields = array ('parent' => 'parent', 'id' => 'term_taxonomy_id');
+
+	/**
+	 * @see Walker::start_el()
+	 *
+	 * @param string $output Passed by reference. Used to append additional content.
+	 * @param object $page Page data object.
+	 * @param int $depth Depth of page in reference to parent pages. Used for padding.
+	 * @param array $args Uses 'selected' argument for selected page to set selected HTML attribute for option element.
+	 * @param int $id
+	 */
+	function start_el(&$output, $term, $depth = 0, $args = array(), $id = 0) {
+		$pad = str_repeat('-&nbsp;', $depth);
+
+		$output .= "\t<option class=\"level-$depth\" value=\"$term->term_taxonomy_id\"";
+		if (in_array( (int)$term->term_taxonomy_id, $args['category'] ))
+			$output .= ' selected';
+		$output .= '>';
+		$title = substr($pad . $term->name, 0, 60) . ' (' . ucwords(str_replace('_', ' ', $term->taxonomy)) . ')';
 		$output .= esc_html( $title );
 		$output .= "</option>\n";
 	}

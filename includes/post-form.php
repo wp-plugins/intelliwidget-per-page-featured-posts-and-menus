@@ -72,7 +72,9 @@ input.intelliwidget-input, select.intelliwidget-input {
     float:right;
     margin-left:5%;
 }
-    
+select.intelliwidget-multiselect {
+    font-size:smaller;
+}
 </style>
 <?php 
         $keys = array(
@@ -91,7 +93,7 @@ input.intelliwidget-input, select.intelliwidget-input {
                 $fields[$key] = $custom_data[$key][0];
         endforeach;
 ?>
-<p>    <label for="intelliwidget_event_date"><?php _e('Event Date', 'intelliwidget');?>:
+<p>    <label for="intelliwidget_event_date"><?php _e('Start Date', 'intelliwidget');?>:
     <a href="#edit_timestamp" id="intelliwidget_event_date-edit" class="intelliwidget-edit-timestamp hide-if-no-js"><?php _e('Edit', 'intelliwidget') ?></a>
 <span id="intelliwidget_event_date_timestamp" class="intelliwidget-timestamp">
     <?php echo $fields['intelliwidget_event_date'] ?></span></label>
@@ -123,7 +125,7 @@ input.intelliwidget-input, select.intelliwidget-input {
     </select>
 </p>
 <div class="iw-cdf-container">
-  <input name="save" class="iw-cdfsave button button-primary button-large" id="iw_cdfsave" value="<?php _e('Save', 'intelliwidget');?>" type="button" style="float:right" />
+  <input name="save" class="iw-cdfsave button button-large" id="iw_cdfsave" value="<?php _e('Save Custom Fields', 'intelliwidget');?>" type="button" style="float:right" />
   <span class="spinner" id="intelliwidget_cpt_spinner"></span> </div>
 <?php wp_nonce_field('iwpage_' . $post->ID,'iwpage'); ?>
 <div style="clear:both"></div>
