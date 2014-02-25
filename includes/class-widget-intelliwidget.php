@@ -12,7 +12,7 @@ if ( !defined('ABSPATH')) exit;
  */
 class IntelliWidget_Widget extends WP_Widget {
 
-    var $version     = '1.4.6';
+    var $version     = '1.5.0';
 
     /**
      * Constructor
@@ -64,7 +64,7 @@ class IntelliWidget_Widget extends WP_Widget {
                 return;
             endif;
             // no page-specific settings, should we hide?
-            if ($instance['hide_if_empty']):
+            if (!empty($instance['hide_if_empty'])):
                 // done -- restore original post object and return
                 $post = $old_post;
                 return;
@@ -111,7 +111,8 @@ class IntelliWidget_Widget extends WP_Widget {
      */
     function update($new_instance, $old_instance) {
         $instance = $new_instance;
-        foreach(array('custom_text', 'title', 'link_text') as $field):
+        global $intelliwidget;
+        foreach($intelliwidget->get_text_fields() as $field):
             // handle custom text
             if ( current_user_can('unfiltered_html') ):
                 $instance[$field] =  $new_instance[$field];
@@ -121,8 +122,8 @@ class IntelliWidget_Widget extends WP_Widget {
                     wp_filter_post_kses( addslashes($new_instance[$field]) ) ); 
             endif;
         endforeach;
-        // special handling for checkboxes: //'replace_widget', 
-        foreach(array('skip_expired', 'skip_post', 'link_title', 'hide_if_empty', 'filter', 'future_only', 'active_only', 'nocopy') as $cb):
+        // special handling for checkboxes:  
+        foreach($intelliwidget->get_checkbox_fields() as $cb):
             $instance[$cb] = isset($new_instance[$cb]);
         endforeach;
         return $instance;
@@ -133,12 +134,9 @@ class IntelliWidget_Widget extends WP_Widget {
      * @param <array> $instance
      */
     function form($instance) {
-        global $intelliwidget;
-        // fill in any missing fields from unserialize or unsaved instance
+        global $intelliwidget, $intelliwidget_form;
         $instance = $intelliwidget->defaults($instance);
-        // normalize page and post_types into array datatype
-        //if (!is_array($instance['post_types'])) $instance['post_types'] = array($instance['post_types']);
-        include( $intelliwidget->pluginPath . 'includes/widget-form.php');
+        $intelliwidget_form->intelliwidget_form($instance, $this);
     }
     
 

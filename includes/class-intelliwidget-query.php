@@ -24,7 +24,7 @@ class IntelliWidget_Query {
     var $current_post = -1;
     
     function __construct($instance = array()) {
-        if (! empty($instance))
+        if (! empty($instance) && 'nav_menu' != $instance['content'])
             $this->iw_query($instance);
     }
     
