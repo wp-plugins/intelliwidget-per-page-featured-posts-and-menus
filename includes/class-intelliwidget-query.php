@@ -98,23 +98,27 @@ class IntelliWidget_Query {
         // filter = raw lets IW posts play nice with WP post functions for backward compatability
         $select = "
 SELECT DISTINCT
-    p1.ID,
-    p1.post_content, 
-    p1.post_excerpt, 
-    p1.post_title,
-    COALESCE(NULLIF(pm2.meta_value, ''), p1.post_date) AS post_date,
-    p1.post_author,
-    'raw' AS filter,
-    pm1.meta_value AS expire_date, 
-    pm2.meta_value AS event_date, 
-    pm3.meta_value AS link_classes,
-    pm4.meta_value AS alt_title,
-    pm5.meta_value AS link_target,
-    pm6.meta_value AS external_url,
-    pm7.meta_value AS thumbnail_id
-FROM {$wpdb->posts} p1
 ";
-    $joins = array("
+        $selects = array(
+            'p1.ID',
+            'p1.post_content', 
+            'p1.post_excerpt', 
+            'p1.post_title',
+            "COALESCE(NULLIF(pm2.meta_value, ''), p1.post_date) AS post_date",
+            'p1.post_author',
+            "'raw' AS filter",
+            'pm1.meta_value AS expire_date', 
+            'pm2.meta_value AS event_date', 
+            'pm3.meta_value AS link_classes',
+            'pm4.meta_value AS alt_title',
+            'pm5.meta_value AS link_target',
+            'pm6.meta_value AS external_url',
+            'pm7.meta_value AS thumbnail_id',
+        );
+        $from = "
+    FROM {$wpdb->posts} p1
+";
+        $joins = array("
 LEFT JOIN {$wpdb->postmeta} pm1 ON pm1.post_id = p1.ID
     AND pm1.meta_key = 'intelliwidget_expire_date'
             ", "
@@ -135,11 +139,12 @@ LEFT JOIN {$wpdb->postmeta} pm6 ON pm6.post_id = p1.ID
             ", "
 LEFT JOIN {$wpdb->postmeta} pm7 ON pm7.post_id = p1.ID
     AND pm7.meta_key = '_thumbnail_id'
-            ");
-        $clauses = array(
+            ",
+            );
+            $clauses = array(
             "(p1.post_status = 'publish')",
             "(p1.post_password = '' OR p1.post_password IS NULL)",
-        );
+            );
         // categories
         $prepargs = array();
         if (-1 != $instance['category']):
@@ -212,9 +217,19 @@ LEFT JOIN {$wpdb->postmeta} pm7 ON pm7.post_id = p1.ID
             $limit = ' LIMIT 0, %d';
             $prepargs[] = $items;
         endif;
-        $query = $select . implode(' ', $joins) . ' WHERE ' . implode("\n AND ", $clauses) . $orderby . $limit;
-        //echo 'query: ' . "\n" . $query . " \n";
-        $this->posts      = $wpdb->get_results($wpdb->prepare($query, $prepargs), OBJECT);
+        /* *************************
+         * ***   W A R N I N G   *** 
+         * *************************
+         * *** USE THESE FILTERS ***
+         * *** AT YOUR OWN PERIL ***
+         * *************************/
+        $query = $select . implode(', ', apply_filters('intelliwidget_query_selects', $selects) ) . $from
+            . implode(' ', apply_filters('intelliwidget_query_joins', $joins)) . ' WHERE ' 
+            . implode("\n AND ", apply_filters('intelliwidget_query_clauses', $clauses)) 
+            . apply_filters('intelliwidget_query_orderby', $orderby) 
+            . apply_filters('intelliwidget_query_limit', $limit);
+        // echo 'query: ' . "\n" . $query . " \n";
+        $this->posts      = $wpdb->get_results($wpdb->prepare($query, apply_filters('intelliwidget_query_args', $prepargs)), OBJECT);
         $this->post_count = count($this->posts);
     }
 

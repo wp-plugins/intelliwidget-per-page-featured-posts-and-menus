@@ -4,7 +4,7 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_i
 Tags: featured posts, events, page menu, plugin, textwidget, widget, custom post types, custom sidebar
 Requires at least: 3.5
 Tested up to: 3.8
-Stable tag: 1.4.6
+Stable tag: 1.5.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -108,6 +108,13 @@ Change the 'supports' parameter in the register_post_type function to include 'c
 5. Example of the Custom Data Fields Panel.
 
 == Changelog ==
+
+= 1.5.0 =
+* IMPORTANT: This release includes substantial changes to the User Interface. Please see the updated documentation.
+* Overhauled most of the code to simplify logic flow and enable filter and action hooks for extensibility
+* Extended 'Categories' to include any taxonomies associated with selected post types
+* Reorganized User Interface to be more intuitive
+* Added new 'content' option to allow action hooks to replace default content
 
 = 1.4.6 =
 * Added Spanish Translation by jelena kovacevic
@@ -235,6 +242,9 @@ Change the 'supports' parameter in the register_post_type function to include 'c
 * Packaged for public consumption
 
 == Upgrade Notice ==
+
+= 1.5.0 =
+IMPORTANT: This release includes substantial changes to the User Interface. Please see the updated documentation.
 
 = 1.4.5 =
 IMPORTANT: Definitions of "Future" and "Active" posts (events) have changed to simplify use. See Additional Notes.

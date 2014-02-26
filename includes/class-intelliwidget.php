@@ -888,9 +888,9 @@ class IntelliWidget {
                 is_object($instance['query']) && 
                 !empty($instance['query']->post_count)) {
                 // @params $post_ID, $text, $category_ID
-                the_intelliwidget_link($instance['query']->posts[0]->ID, apply_filters( 'widget_title', $title), $instance['category']);
+                return get_the_intelliwidget_link($instance['query']->posts[0]->ID, apply_filters( 'widget_title', $title), $instance['category']);
             } else {
-                echo apply_filters( 'widget_title', $title );
+                return apply_filters( 'widget_title', $title );
             }
         }
         return $title;

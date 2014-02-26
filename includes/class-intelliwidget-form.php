@@ -13,18 +13,18 @@ if ( !defined('ABSPATH')) exit;
 class IntelliWidgetForm {
     function __construct() {
 //        print_r(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS));
-        add_action('intelliwidget_form_general',        array($this, 'widget_form_general_settings'), 1, 3);
-        add_action('intelliwidget_form_general',        array($this, 'widget_form_custom_text_settings'), 2, 3);
+        add_action('intelliwidget_form_nav_menu',       array($this, 'widget_form_nav_menu'), 1, 3);
+        add_action('intelliwidget_form_general',        array($this, 'widget_form_general_settings'), 2, 3);
+        add_action('intelliwidget_form_general',        array($this, 'widget_form_custom_text_settings'), 3, 3);
         add_action('intelliwidget_form_post_list',      array($this, 'widget_form_post_list_settings'), 5, 3);
         add_action('intelliwidget_form_post_list',      array($this, 'widget_form_taxonomies_settings'), 10, 3);
         add_action('intelliwidget_form_post_list',      array($this, 'widget_form_specific_posts_settings'), 15, 3);
-        add_action('intelliwidget_form_nav_menu',       array($this, 'widget_form_nav_menu'), 5, 3);
-        add_action('intelliwidget_section_general',     array($this, 'section_form_general_settings'), 1, 3);
-        add_action('intelliwidget_section_general',     array($this, 'section_form_custom_text_settings'), 2, 3);
+        add_action('intelliwidget_section_nav_menu',    array($this, 'section_form_nav_menu'), 1, 3);
+        add_action('intelliwidget_section_general',     array($this, 'section_form_general_settings'), 2, 3);
+        add_action('intelliwidget_section_general',     array($this, 'section_form_custom_text_settings'), 3, 3);
         add_action('intelliwidget_section_post_list',   array($this, 'section_form_post_list_settings'), 5, 3);
         add_action('intelliwidget_section_post_list',   array($this, 'section_form_taxonomies_settings'), 10, 3);
         add_action('intelliwidget_section_post_list',   array($this, 'section_form_specific_posts_settings'), 15, 3);
-        add_action('intelliwidget_section_nav_menu',    array($this, 'section_form_nav_menu'), 5, 3);
     }
 
     function intelliwidget_form($instance, $widget) {
@@ -67,12 +67,12 @@ class IntelliWidgetForm {
   <div id="<?php echo $widget->get_field_id('generalsettings'); ?>-panel-inside" style="display:none;padding:8px" class="closed">
     <p>
       <label for="<?php echo $widget->get_field_id('title'); ?>"> <?php echo __('Widget', 'intelliwidget') . ' ' . __('Title', 'intelliwidget') . ' ' . __('(Optional)', 'intelliwidget'); ?>: </label>
-      <br/>
-      <input id="<?php echo $widget->get_field_id('title'); ?>" name="<?php echo $widget->get_field_name('title'); ?>" type="text" value="<?php echo esc_attr($instance['title']); ?>" />
       <label>
         <input name="<?php echo $widget->get_field_name('link_title'); ?>" id="<?php echo $widget->get_field_id('link_title'); ?>" type="checkbox" <?php checked($instance['link_title'], 1); ?> value="1" />
         <?php _e('Link', 'intelliwidget'); ?>
       </label>
+      <br/>
+      <input id="<?php echo $widget->get_field_id('title'); ?>" name="<?php echo $widget->get_field_name('title'); ?>" type="text" value="<?php echo esc_attr($instance['title']); ?>" />
     </p>
     <p>
       <label for="<?php echo $widget->get_field_id('container_id'); ?>">
@@ -452,7 +452,7 @@ input.intelliwidget-input, select.intelliwidget-input {
 }
 .intelliwidget-edit-timestamp, .intelliwidget-timestamp {
     float:right;
-    margin-left:5%;
+    margin-left:2.5%;
 }
 select.intelliwidget-multiselect {
     font-size:smaller;
@@ -657,11 +657,11 @@ select.intelliwidget-multiselect {
   <div  id="iw-generalsettings-<?php echo $pagesection; ?>-inside" class="inside">
     <p>
       <label for="<?php echo 'intelliwidget_' . $pagesection . '_title'; ?>"> <?php echo __('Section', 'intelliwidget') . ' ' . __('Title', 'intelliwidget') . ' ' . __('(Optional)', 'intelliwidget'); ?> </label>
-      <input id="<?php echo 'intelliwidget_' . $pagesection . '_title'; ?>" name="<?php echo 'intelliwidget_' . $pagesection . '_title'; ?>" type="text" value="<?php echo esc_attr($instance['title']); ?>" />
       <label>
         <input name="<?php echo 'intelliwidget_' . $pagesection . '_link_title'; ?>" id="<?php echo 'intelliwidget_' . $pagesection . '_link_title'; ?>" type="checkbox" <?php checked($instance['link_title'], 1); ?> value="1" />
         <?php _e('Link', 'intelliwidget'); ?>
       </label>
+      <input id="<?php echo 'intelliwidget_' . $pagesection . '_title'; ?>" name="<?php echo 'intelliwidget_' . $pagesection . '_title'; ?>" type="text" value="<?php echo esc_attr($instance['title']); ?>" />
     </p>
     <p>
       <label for="<?php echo 'intelliwidget_' . $pagesection . '_container_id'; ?>" style="display:block">
