@@ -10,10 +10,89 @@
  */
 
 jQuery(document).ready(function($) {
+    /*
+     * Use localization object to store tab data
+     */
+    var initTabs = function() {
+        IWAjax.viewWidth    = 0;
+        IWAjax.visWidth     = 0;
+        IWAjax.leftTabs     = []; 
+        IWAjax.rightTabs    = [];
+        IWAjax.visTabs      = [];
+        $('.iw-tab').each(function(){
+            IWAjax.visTabs.push($(this).prop('id'));
+            IWAjax.visWidth += $(this).outerWidth();
+            $(this).show();
+        });
+        //setArrows();
+        reflowTabs();
+    },
+
+    reflowTabs = function() {
+        IWAjax.viewWidth = $('#iw_tabs').width() - 24;
+        console.log('visible width: ' + IWAjax.visWidth + ' viewWidth: ' + IWAjax.viewWidth);
+        if (IWAjax.viewWidth > 0) {
+            count = 0;
+            while (IWAjax.visTabs.length && IWAjax.visWidth > IWAjax.viewWidth) {
+                var leftMost = IWAjax.visTabs.shift(),
+                    tabWidth = $('#' + leftMost).outerWidth();
+                console.log('leftMost: ' + leftMost + ' tabWidth: ' + tabWidth);
+                IWAjax.visWidth -= tabWidth;
+                $('#' + leftMost).hide();
+                IWAjax.leftTabs.push(leftMost);
+                console.log('visible width: ' + IWAjax.visWidth + ' viewWidth: ' + IWAjax.viewWidth);
+                console.log('visible count: ' + IWAjax.visTabs.length + ' left count: ' + IWAjax.leftTabs.length);
+                if (++count > 50) break; // infinite loop safety check
+            }
+        }
+        setArrows();
+    },
+    rightShiftTabs = function() {
+        // pop visibleTabs, unshift rightTabs; pop leftTabs, unshift visibleTabs
+        var rightMost;
+        if (rightMost = IWAjax.visTabs.pop()) {
+            IWAjax.visWidth -= $('#' + rightMost).outerWidth();
+            $('#' + rightMost).hide();
+            IWAjax.rightTabs.unshift(rightMost);
+        }
+        if (rightMost = IWAjax.leftTabs.pop()){
+            IWAjax.visWidth += $('#' + rightMost).outerWidth();
+            $('#' + rightMost).show();
+            IWAjax.visTabs.unshift(rightMost);
+        }
+        setArrows();
+    },
+    leftShiftTabs = function() {
+        // shift visibleTabs, push leftTabs;  shift rightTabs, push visibleTabs
+        var leftMost;
+        if (leftMost = IWAjax.visTabs.shift()) {
+            IWAjax.visWidth -= $('#' + leftMost).outerWidth();
+            $('#' + leftMost).hide();
+            IWAjax.leftTabs.push(leftMost);
+        }
+        if (leftMost = IWAjax.rightTabs.shift()){
+            IWAjax.visWidth += $('#' + leftMost).outerWidth();
+            $('#' + leftMost).show();
+            IWAjax.visTabs.push(leftMost);
+        }
+        setArrows();
+    },
+    setArrows = function() {
+        $('#iw_larr, #iw_rarr').css('visibility', 'hidden');
+        // if rightTabs, show >>
+        if (IWAjax.rightTabs.length) $('#iw_rarr').css('visibility', 'visible');
+        // if leftTabs, show <<
+        if (IWAjax.leftTabs.length) $('#iw_larr').css('visibility', 'visible');
+        console.log('left: ' + IWAjax.leftTabs.length);
+        console.log('visible: ' + IWAjax.visTabs.length);
+        console.log('right: ' + IWAjax.rightTabs.length);
+        console.log('visible width: ' + IWAjax.visWidth);
+        console.log('container width: ' + IWAjax.viewWidth);
+    },
     /**
      * Ajax Save Custom Post Type Data
      */
-    var iw_save_cdfdata = function(){
+    iw_save_cdfdata = function(){
         // disable the button until ajax returns
         $(this).prop('disabled', true);
         // clear previous success/fail icons
@@ -68,7 +147,7 @@ jQuery(document).ready(function($) {
         $('.iw-copy-container,.iw-save-container,.iw-cdf-container').removeClass('success failure');
         var thisID          = $(this).prop('id'),
             // get section selector
-            sectionform     = $(this).parents('.inside').first(),
+            sectionform     = $(this).parents('.iw-tabbed-section').first(),
             // get controls container selector
             savecontainer   = $(sectionform).find('.iw-save-container'),
             // get button selector
@@ -86,7 +165,9 @@ jQuery(document).ready(function($) {
         // special handling for post types (array of checkboxes)
         postData[ pre + '_post_types'] = [];
         // find inputs for this section
-        $('input[name=post_ID],input[name=iwpage],input[type=text][id^='+pre+'],input[type=checkbox][id^='+pre+']:checked,select[id^='+pre+'],textarea[id^='+pre+'],input[type=hidden][id^='+pre+']').each(
+        $('input[name=post_ID],input[name=iwpage],input[type=text][id^='
+            + pre + '],input[type=checkbox][id^=' + pre +']:checked,select[id^='
+            + pre +'],textarea[id^='+pre+'],input[type=hidden][id^='+pre+']').each(
             function(index, element) {
             // get field id
             fieldID = $(this).attr('id');
@@ -191,10 +272,11 @@ jQuery(document).ready(function($) {
     },
 
     /**
-     * Ajax Add new IntelliWidget Meta Box Section
+     * Ajax Add new IntelliWidget Tab Section
      */
-    iw_add_meta_box = function (e){ 
+    iw_add_tabbed_section = function (e){ 
         // don't act like a link
+        e.preventDefault();
         e.stopPropagation();
         // ignore click if we are in process
         if ($(this).hasClass('disabled')) return false;
@@ -222,17 +304,24 @@ jQuery(document).ready(function($) {
             postData,
             //on success function  
             function(response){
+                console.log(response);
                 $(sel).removeClass('disabled');
                 $('#intelliwidget_spinner').hide();
                 if ('fail' == response) {
                     $('.iw-copy-container').addClass('failure');
                 } else {
-                    $('#side-sortables').append(response);
+                    form = $(response.form).hide();
+                    tab  = $(response.tab).hide();
+                    $('#iw_tabbed_sections').append(form);
+                    $('#iw_tabs').append(tab);
+                    tab.show();
+                    $('#iw_tabbed_sections').tabs('refresh').tabs({active: tab.index()});
+                    initTabs();
                     // show check mark
                     $('.iw-copy-container').addClass('success');
                 }
                 return false;  
-            }
+            }, 'json'
         ).fail(function(){
             // release button
             $(sel).removeClass('disabled');
@@ -247,10 +336,11 @@ jQuery(document).ready(function($) {
     },
 
     /**
-     * Ajax Delete IntelliWidget Meta Box Section
+     * Ajax Delete IntelliWidget Tab Section
      */
-    iw_delete_meta_box = function (e){ 
+    iw_delete_tabbed_section = function (e){ 
         // don't act like a link
+        e.preventDefault();
         e.stopPropagation();
         // ignore click if we are in process
         if ($(this).hasClass('disabled')) return false;
@@ -283,9 +373,15 @@ jQuery(document).ready(function($) {
                 $(sel).removeClass('disabled');
                 $('#intelliwidget_' + pre + '_spinner').hide();
                 if ('success' == response ) {
-                    $('#intelliwidget_section_meta_box_' + pre).slideUp('fast', function(){
-                        $('#intelliwidget_section_meta_box_' + pre).remove();
-                    });
+                        var target = $('#iw_tabbed_section_' + pre),
+                            survivor = target.index();
+                        console.log('survivor: ' + survivor);
+                        target.remove();
+                        $('#iw_tab_' + pre).remove();
+                        $('#iw_tabbed_sections').tabs('refresh');
+                        initTabs();
+                        survivor -= IWAjax.leftTabs.length;
+                        $('#iw_tabbed_sections').tabs({active:survivor});
                 }
                 return false;  
             }
@@ -380,6 +476,8 @@ jQuery(document).ready(function($) {
         }
         return true;
     };
+    $('#iw_tabbed_sections').tabs(); //{ active: 0 });
+    
     // add collapsibles to widgets admin
     $('body').on('click', '.iw-collapsible', function() {
         id = $(this).attr('id');
@@ -390,8 +488,8 @@ jQuery(document).ready(function($) {
     $('body').on('click', '.iw-save', iw_save_postdata);    
     $('body').on('click', '.iw-cdfsave', iw_save_cdfdata);    
     $('body').on('click', '.iw-copy', iw_copy_page);    
-    $('body').on('click', '.iw-add', iw_add_meta_box);    
-    $('body').on('click', '.iw-delete', iw_delete_meta_box);
+    $('body').on('click', '.iw-add', iw_add_tabbed_section);    
+    $('body').on('click', '.iw-delete', iw_delete_tabbed_section);
     // update visibility of form inputs
     $('body').on('change', '.iw-control', iw_save_postdata);    
     $('body').on('change', '.iw-widget-control', function(e){
@@ -410,6 +508,7 @@ jQuery(document).ready(function($) {
     });
     // prevent link action on h3 
     $('body').on('click', '.iw_new_box h3 a, .iw_new_box .postbox h3 a', function(e) {
+        e.preventDefault();
         e.stopPropagation();
     });
     /**
@@ -471,4 +570,15 @@ jQuery(document).ready(function($) {
         }
         return false;
     });
+    $('#iw_tabbed_sections').on('click', '#iw_larr, #iw_rarr', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        if ($(this).is(':visible')) {
+            if ('iw_larr' == $(this).prop('id')) rightShiftTabs();
+            else leftShiftTabs();
+        }
+    });
+    $(window).resize(reflowTabs);
+    $('#iw_tabbed_sections').slideDown();
+    initTabs();
 });

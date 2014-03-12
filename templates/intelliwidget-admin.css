@@ -1,0 +1,128 @@
+@charset "UTF-8";
+/* CSS Document */
+
+.iw-save-container, .iw-copy-container, .iw-cdf-container {
+    position: relative;
+    float: right;
+}
+.iw-save-container.success:before, .iw-copy-container.success:before, .iw-cdf-container.success:before,
+.iw-save-container.failure:before, .iw-copy-container.failure:before, .iw-cdf-container.failure:before {
+    content: "\2713";
+    display: block;
+    position: absolute;
+    height: 16px;
+    width: 16px;
+    top: 4px;
+    left: -20px;
+    color:#238301;
+    font-size:18px;
+}
+.iw-save-container.failure:before, .iw-copy-container.failure:before, .iw-cdf-container.failure:before {
+    content: "\2715";
+    color: #C00D10;
+}
+.intelliwidget-timestamp-div select {
+    height: 20px;
+    line-height: 14px;
+    padding: 0;
+    vertical-align: top
+}
+.intelliwidget-aa, .intelliwidget-jj, .intelliwidget-hh, .intelliwidget-mn {
+    padding: 1px;
+    font-size: 12px
+}
+.intelliwidget-jj, .intelliwidget-hh, .intelliwidget-mn {
+    width: 2em
+}
+.intelliwidget-aa {
+    width: 3.4em
+}
+.intelliwidget-timestamp-div {
+    position:relative;
+    padding-top: 5px;
+    line-height: 23px
+}
+.intelliwidget-timestamp-div p {
+    margin: 8px 0 6px
+}
+.intelliwidget-timestamp-div input {
+    border-width: 1px;
+    border-style: solid
+}
+input.intelliwidget-input, select.intelliwidget-input {
+    float:right;
+    width:65%;
+}
+.intelliwidget-edit-timestamp, .intelliwidget-timestamp {
+    float:right;
+    margin-left:2.5%;
+}
+#intelliwidget_main_meta_box select {
+    font-size:small;
+}
+select.intelliwidget-multiselect {
+    resize:both;
+    font-size:smaller;
+}
+
+#intelliwidget_main_meta_box .postbox {
+    min-width:200px;
+    max-width:100%;
+    margin-bottom:10px;
+}
+/* tabs and tab sections */
+
+#iw_tabbed_sections {
+    /*margin-top:6px;*/
+    display:none;
+}
+
+#iw_tabs {
+    /*border-bottom:1px solid #ddd;*/
+}
+
+.iw-tabbed-section {
+    border: 1px solid #ddd;
+    /*border-top:none;*/
+    padding:0 6px 6px;
+}
+
+li.iw-tab {
+    border:1px solid transparent;
+    float:left;
+    display:block;
+    margin-top:1px;
+    margin-bottom:-1px;
+}
+
+.iw-add {
+    font-weight: bold;
+}
+
+.iw-tab a {
+    display: block;
+    padding:4px 1em;
+    background-color:transparent;
+    outline:none;
+    text-decoration:none;
+}
+
+.iw-tab.ui-tabs-active {
+    border:1px solid #ddd;
+    border-bottom:1px solid #fff;
+}
+
+.iw-tab.ui-tabs-active a, .iw-tab a:active {
+    background-color:#fff;
+    outline:none;
+}
+#iw_larr { 
+    float:left;
+    padding:2px 6px 0 0;
+    cursor:pointer;
+}
+#iw_rarr {
+    float:right;
+    padding:2px 0 0 6px;
+    cursor:pointer;
+}

@@ -13,7 +13,7 @@ if ( !defined('ABSPATH')) exit;
 class IntelliWidget_Widget extends WP_Widget {
 
     var $version     = '1.5.0';
-
+    var $tax_query;
     /**
      * Constructor
      */
@@ -21,13 +21,13 @@ class IntelliWidget_Widget extends WP_Widget {
         global $intelliwidget;
         $widget_ops          = array('description' => __('Menus, Featured Posts, HTML and more, customized per page or site-wide.', 'intelliwidget'));
         $control_ops         = array('width' => 400, 'height' => 350);
-        add_action('wp_print_styles', array(&$this, 'wp_print_styles'));
+        add_action('wp_enqueue_scripts', array(&$this, 'enqueue_styles'));
         $this->WP_Widget('intelliwidget', $intelliwidget->pluginName, $widget_ops, $control_ops);
     }
     /**
      * Stub for front-end css
      */
-    function wp_print_styles() {
+    function enqueue_styles() {
         global $intelliwidget;
         wp_enqueue_style('intelliwidget', $intelliwidget->get_stylesheet(false));
         if ($override = $intelliwidget->get_stylesheet(true)):
@@ -47,21 +47,22 @@ class IntelliWidget_Widget extends WP_Widget {
         // save global post object for later
         $old_post = $post;
         $post_id = is_object($post) ? $post->ID : null;
-        if ($post_id):            
+        if ($post_id):    
             // if there are page-specific settings for this widget, use them
-            $page_data = $this->get_page_data($post_id, $args['widget_id']);
-            // check for no-copy override
-            if (empty($page_data['nocopy'])):
-                // if this page is using another page's settings and they exist for this widget, use them
-                if ($other_page_id = get_post_meta($post_id, '_intelliwidget_widget_page_id', true)) :
-                    $page_data = $this->get_page_data($other_page_id, $args['widget_id']);
+            if ($page_data = $this->get_page_data($post_id, $args['widget_id'])):
+                // check for no-copy override
+                if (empty($page_data['nocopy'])):
+                    // if this page is using another page's settings and they exist for this widget, use them
+                    if ($other_page_id = get_post_meta($post_id, '_intelliwidget_widget_page_id', true)) :
+                        $page_data = $this->get_page_data($other_page_id, $args['widget_id']);
+                    endif;
                 endif;
-            endif;
-            if (is_singular() && !empty($page_data)):
-                $intelliwidget->build_widget($args, $page_data, $post_id);
-                // done -- restore original post object and return
-                $post = $old_post;
-                return;
+                if (is_singular() && !empty($page_data)):
+                    $intelliwidget->build_widget($args, $page_data, $post_id);
+                    // done -- restore original post object and return
+                    $post = $old_post;
+                    return;
+                endif;
             endif;
             // no page-specific settings, should we hide?
             if (!empty($instance['hide_if_empty'])):
@@ -103,6 +104,7 @@ class IntelliWidget_Widget extends WP_Widget {
         return false;
     }
     
+    
     /**
      * Widget Update method
      * @param <array> $new_instance
@@ -134,8 +136,10 @@ class IntelliWidget_Widget extends WP_Widget {
      * @param <array> $instance
      */
     function form($instance) {
+        //echo 'BEFORE defaults: ' . "\n" . print_r($instance, true) . "\n\n";
         global $intelliwidget, $intelliwidget_form;
         $instance = $intelliwidget->defaults($instance);
+        //echo 'AFTER defaults: ' . "\n" . print_r($instance, true) . "\n\n";
         $intelliwidget_form->intelliwidget_form($instance, $this);
     }
     

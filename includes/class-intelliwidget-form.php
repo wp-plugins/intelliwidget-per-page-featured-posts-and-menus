@@ -16,15 +16,15 @@ class IntelliWidgetForm {
         add_action('intelliwidget_form_nav_menu',       array($this, 'widget_form_nav_menu'), 1, 3);
         add_action('intelliwidget_form_general',        array($this, 'widget_form_general_settings'), 2, 3);
         add_action('intelliwidget_form_general',        array($this, 'widget_form_custom_text_settings'), 3, 3);
+
         add_action('intelliwidget_form_post_list',      array($this, 'widget_form_post_list_settings'), 5, 3);
-        add_action('intelliwidget_form_post_list',      array($this, 'widget_form_taxonomies_settings'), 10, 3);
+        add_action('intelliwidget_form_post_list',      array($this, 'widget_form_post_taxonomies_settings'), 10, 3);
         add_action('intelliwidget_form_post_list',      array($this, 'widget_form_specific_posts_settings'), 15, 3);
         add_action('intelliwidget_section_nav_menu',    array($this, 'section_form_nav_menu'), 1, 3);
-        add_action('intelliwidget_section_general',     array($this, 'section_form_general_settings'), 2, 3);
-        add_action('intelliwidget_section_general',     array($this, 'section_form_custom_text_settings'), 3, 3);
-        add_action('intelliwidget_section_post_list',   array($this, 'section_form_post_list_settings'), 5, 3);
-        add_action('intelliwidget_section_post_list',   array($this, 'section_form_taxonomies_settings'), 10, 3);
-        add_action('intelliwidget_section_post_list',   array($this, 'section_form_specific_posts_settings'), 15, 3);
+        add_action('intelliwidget_section_all_before',     array($this, 'section_form_general_settings'), 2, 3);
+        add_action('intelliwidget_section_post_list',   array($this, 'section_form_post_selection_settings'), 3, 3);
+        add_action('intelliwidget_section_post_list',   array($this, 'section_form_appearance_settings'), 5, 3);
+        add_action('intelliwidget_section_all_after',     array($this, 'section_form_addl_text_settings'), 10, 3);
     }
 
     function intelliwidget_form($instance, $widget) {
@@ -33,11 +33,10 @@ class IntelliWidgetForm {
 
 <p> <?php echo $intelliwidget->docsLink; ?>
   <label>
-    <input name="<?php echo $widget->get_field_name('hide_if_empty'); ?>" id="<?php echo $widget->get_field_id('hide_if_empty'); ?>" type="checkbox" <?php checked($instance['hide_if_empty'], 1); ?> class="iw-widget-control" value="1"/>
-    <?php _e('Placeholder (post-specific only)', 'intelliwidget'); ?>
+    <input name="<?php echo $widget->get_field_name('hide_if_empty'); ?>" id="<?php echo $widget->get_field_id('hide_if_empty'); ?>" type="checkbox" <?php checked($instance['hide_if_empty'], 1); ?> value="1"/>
+    <?php _e('Placeholder Only (do not display)', 'intelliwidget'); ?>
   </label>
 </p>
-<?php if (!$instance['hide_if_empty']): ?>
 <p>
   <label for="<?php echo $widget->get_field_id('content'); ?>">
     <?php _e('Content', 'intelliwidget'); ?>
@@ -49,9 +48,9 @@ class IntelliWidgetForm {
   </select>
 </p>
 <?php // execute custom action hook for content value if it exists
-            do_action('intelliwidget_form_general', $instance, $widget);
+            do_action('intelliwidget_form_all_before', $instance, $widget);
             do_action('intelliwidget_form_' . $instance['content'], $instance, $widget);
-        endif;
+            do_action('intelliwidget_form_all_after', $instance, $widget);
     }
 
     function widget_form_general_settings($instance, $widget) { 
@@ -125,7 +124,7 @@ class IntelliWidgetForm {
   <div class="iw-collapsible" id="<?php echo $widget->get_field_id('customtext'); ?>-panel" title="<?php _e('Click to toggle', 'intelliwidget'); ?>">
     <div class="handlediv" title="<?php _e('Click to toggle', 'intelliwidget'); ?>"></div>
     <h4 style="margin:0;padding:8px">
-      <?php _e('Custom Text/HTML', 'intelliwidget'); ?>
+      <?php _e('Additional Text/HTML', 'intelliwidget'); ?>
     </h4>
   </div>
   <div id="<?php echo $widget->get_field_id('customtext'); ?>-panel-inside" style="display:none;padding:8px" class="closed">
@@ -172,7 +171,7 @@ name="<?php echo $widget->get_field_name('custom_text'); ?>">
   <div class="iw-collapsible" id="<?php echo $widget->get_field_id('listsettings'); ?>-panel" title="<?php _e('Click to toggle', 'intelliwidget'); ?>">
     <div class="handlediv" title="<?php _e('Click to toggle', 'intelliwidget'); ?>"></div>
     <h4 style="margin:0;padding:8px">
-      <?php _e('List Settings', 'intelliwidget'); ?>
+      <?php _e('Display Settings', 'intelliwidget'); ?>
     </h4>
   </div>
   <div id="<?php echo $widget->get_field_id('listsettings'); ?>-panel-inside" style="display:none;padding:8px" class="closed">
@@ -180,7 +179,7 @@ name="<?php echo $widget->get_field_name('custom_text'); ?>">
       <label>
         <?php _e('Post Types', 'intelliwidget'); ?>
         :</label>
-      <?php foreach ( $intelliwidget->get_eligible_post_types() as $type ) : ?>
+      <?php foreach ( $intelliwidget->post_types as $type ) : ?>
       <label style="white-space:nowrap;margin-right:10px" for="<?php echo $widget->get_field_id('post_types_' . $type); ?>">
         <input type="checkbox" id="<?php echo $widget->get_field_id('post_types_' . $type); ?>" name="<?php echo $widget->get_field_name('post_types'); ?>[]" value="<?php echo $type; ?>" <?php checked(in_array($type, $instance['post_types']), 1); ?> />
         <?php echo ucfirst($type); ?></label>
@@ -327,19 +326,19 @@ name="<?php echo $widget->get_field_name('custom_text'); ?>">
 <?php
     }
 
-    function widget_form_taxonomies_settings($instance, $widget) { 
+    function widget_form_post_taxonomies_settings($instance, $widget) { 
         global $intelliwidget; 
     ?>
 <div class="postbox">
   <div class="iw-collapsible" id="<?php echo $widget->get_field_id('taxonomies'); ?>-panel" title="<?php _e('Click to toggle', 'intelliwidget'); ?>">
     <div class="handlediv" title="<?php _e('Click to toggle', 'intelliwidget'); ?>"></div>
     <h4 style="margin:0;padding:8px">
-      <?php _e('Taxonomies', 'intelliwidget'); ?>
+      <?php _e('Post Taxonomies', 'intelliwidget'); ?>
     </h4>
   </div>
   <div id="<?php echo $widget->get_field_id('taxonomies'); ?>-panel-inside" style="display:none;padding:8px" class="closed">
     <select class="widefat intelliwidget-multiselect" name="<?php echo $widget->get_field_name('category'); ?>[]" size="1" style="font-size:smaller;height:100px;" multiple="multiple" id="<?php echo $widget->get_field_id('category'); ?>">
-      <?php echo $intelliwidget->get_relevant_terms($instance, $widget); ?>
+      <?php echo $intelliwidget->get_relevant_terms($instance); ?>
     </select>
   </div>
 </div>
@@ -358,7 +357,7 @@ name="<?php echo $widget->get_field_name('custom_text'); ?>">
   </div>
   <div id="<?php echo $widget->get_field_id('specificposts'); ?>-panel-inside" style="display:none;padding:8px" class="closed">
     <select  class="widefat intelliwidget-multiselect" name="<?php echo $widget->get_field_name('page'); ?>[]" style="font-size:smaller;height:100px;" multiple="multiple" id="<?php echo $widget->get_field_id('page'); ?>">
-      <?php echo $intelliwidget->get_pages($instance, $widget); ?>
+      <?php echo $intelliwidget->get_posts($instance); ?>
     </select>
   </div>
 </div>
@@ -374,16 +373,15 @@ name="<?php echo $widget->get_field_name('custom_text'); ?>">
   <label for="<?php echo 'intelliwidget_widget_page_id'; ?>">
     <?php _e('Use settings from', 'intelliwidget'); ?>
     : </label>
-  <select style="width:100%" name="<?php echo 'intelliwidget_widget_page_id'; ?>" id="<?php echo 'intelliwidget_widget_page_id'; ?>">
+  <input name="save" class="iw-copy button button-large" id="iw_copy" value="<?php _e('Save', 'intelliwidget'); ?>" type="button" style="max-width:24%;float:right;clear:both;margin-top:4px" />
+  <select style="width:75%" name="<?php echo 'intelliwidget_widget_page_id'; ?>" id="<?php echo 'intelliwidget_widget_page_id'; ?>">
     <option value=""> <?php printf(__('This %s', 'intelliwidget'), ucfirst($post->post_type)); ?> </option>
-    <?php echo $intelliwidget->get_pages(array('post_types' => array($post->post_type), 'page' => array($widget_page_id))); ?>
+    <?php echo $intelliwidget->get_posts(array('post_types' => array($post->post_type), 'page' => array($widget_page_id))); ?>
   </select>
 </p>
-<div class="iw-copy-container">
-  <input name="save" class="iw-copy button button-large" id="iw_copy" value="<?php _e('Copy Settings', 'intelliwidget'); ?>" type="button" style="float:right" />
-  <span class="spinner" id="intelliwidget_spinner"></span> </div>
+<div class="iw-copy-container"> <span class="spinner" id="intelliwidget_spinner"></span> </div>
 <a style="float:left;" href="<?php echo wp_nonce_url(admin_url('post.php?action=edit&iwadd=1&post=' . $post->ID), 'iwadd'); ?>" id="iw_add" class="iw-add">
-<?php _e('Add New Section', 'intelliwidget'); ?>
+<?php _e('+ Add New Section', 'intelliwidget'); ?>
 </a>
 <?php wp_nonce_field('iwpage_' . $post->ID,'iwpage'); ?>
 <div style="clear:both"></div>
@@ -392,74 +390,6 @@ name="<?php echo $widget->get_field_name('custom_text'); ?>">
     
     function post_form($post) {
         global $intelliwidget;
-        ?>
-<style>
-.iw-save-container, .iw-copy-container, .iw-cdf-container {
-    position: relative;
-    float: right;
-}
-.iw-save-container.success:before, .iw-copy-container.success:before, .iw-cdf-container.success:before {
-    content: "";
-    display: block;
-    position: absolute;
-    height: 16px;
-    width: 16px;
-    top: 8px;
-    left: -26px;
-    background:url(<?php echo admin_url( 'images/yes.png' ); ?>) no-repeat;
-}
-input.iw-save.failure:before, input.iw-copy.failure:before {
-    content: "";
-    display: block;
-    position: absolute;
-    height: 16px;
-    width: 16px;
-    top: 8px;
-    left: -26px;
-    background:url(<?php echo admin_url( 'images/no.png') ; ?>) no-repeat;
-}
-.intelliwidget-timestamp-div select {
-    height: 20px;
-    line-height: 14px;
-    padding: 0;
-    vertical-align: top
-}
-.intelliwidget-aa, .intelliwidget-jj, .intelliwidget-hh, .intelliwidget-mn {
-    padding: 1px;
-    font-size: 12px
-}
-.intelliwidget-jj, .intelliwidget-hh, .intelliwidget-mn {
-    width: 2em
-}
-.intelliwidget-aa {
-    width: 3.4em
-}
-.intelliwidget-timestamp-div {
-    position:relative;
-    padding-top: 5px;
-    line-height: 23px
-}
-.intelliwidget-timestamp-div p {
-    margin: 8px 0 6px
-}
-.intelliwidget-timestamp-div input {
-    border-width: 1px;
-    border-style: solid
-}
-input.intelliwidget-input, select.intelliwidget-input {
-    float:right;
-    width:65%;
-}
-.intelliwidget-edit-timestamp, .intelliwidget-timestamp {
-    float:right;
-    margin-left:2.5%;
-}
-select.intelliwidget-multiselect {
-    font-size:smaller;
-    resize:both;
-}
-</style>
-<?php 
         $fields = $intelliwidget->get_custom_fields();
         $custom_data = get_post_custom($post->ID);
         $keys = array();
@@ -589,127 +519,133 @@ select.intelliwidget-multiselect {
 <?php
     }
 
-    function intelliwidget_section($post_ID, $pagesection, $instance) {
-        
-        global $intelliwidget, $wp_registered_sidebars;
+    function intelliwidget_section($post_id, $box_id, $instance) {
+        global $wp_registered_sidebars;
+        ?>
+    <p>
+      <input type="hidden" id="<?php echo 'intelliwidget_' . $box_id . '_box_id'; ?>" name="<?php echo 'intelliwidget_' . $box_id . '_box_id'; ?>" value="<?php echo $box_id; ?>" />
+      <label for="<?php echo 'intelliwidget_' . $box_id . '_replace_widget'; ?>">
+        <?php _e( 'Use these settings to replace', 'intelliwidget'); ?>
+        : </label>
+      <select name="<?php echo 'intelliwidget_' . $box_id . '_replace_widget'; ?>" id="<?php echo 'intelliwidget_' . $box_id . '_replace_widget'; ?>">
+        <option value="none"<?php selected( $instance['replace_widget'], 'none' ); ?>>
+        <?php _e('None selected', 'intelliwidget');?>
+        </option>
+        <option value="content"<?php selected( $instance['replace_widget'], 'content' ); ?>>
+        <?php _e('Shortcode (use tab number)', 'intelliwidget');?>
+        </option>
+        <?php 
+    foreach(wp_get_sidebars_widgets() as $sidebar_id => $sidebar_widgets): 
+        if (false === strpos($sidebar_id, 'wp_inactive') && false === strpos($sidebar_id, 'orphaned')):
+            $count = 0;
+            foreach ($sidebar_widgets as $sidebar_widget_id):
+                if (false !== strpos($sidebar_widget_id, 'intelliwidget') ):
 ?>
-<input type="hidden" id="<?php echo 'intelliwidget_' . $pagesection . '_pagesection'; ?>" name="<?php echo 'intelliwidget_' . $pagesection . '_pagesection'; ?>" value="<?php echo $pagesection; ?>" />
-<p>
-  <label for="<?php echo 'intelliwidget_' . $pagesection . '_replace_widget'; ?>">
-    <?php _e( 'Replaces', 'intelliwidget'); ?>
-    : </label>
-  <select name="<?php echo 'intelliwidget_' . $pagesection . '_replace_widget'; ?>" id="<?php echo 'intelliwidget_' . $pagesection . '_replace_widget'; ?>">
-    <option value="none"<?php selected( $instance['replace_widget'], 'none' ); ?>>
-    <?php _e('No Widget Selected', 'intelliwidget');?>
-    </option>
-    <option value="content"<?php selected( $instance['replace_widget'], 'content' ); ?>>
-    <?php _e('Use in Page Content', 'intelliwidget');?>
-    </option>
-    <?php 
-        foreach(wp_get_sidebars_widgets() as $sidebar_id => $sidebar_widgets): 
-             if (false === strpos($sidebar_id, 'wp_inactive') && false === strpos($sidebar_id, 'orphaned')):
-            $count = 1;
-              foreach ($sidebar_widgets as $sidebar_widget_id):
-                 if (false !== strpos($sidebar_widget_id, 'intelliwidget') ):
-  ?>
-    <option value="<?php echo $sidebar_widget_id; ?>"<?php selected( $instance['replace_widget'], $sidebar_widget_id ); ?>> <?php echo $wp_registered_sidebars[$sidebar_id]['name'] . ' [' . $count . ']'; ?> </option>
-    <?php $count++; endif; endforeach; endif; endforeach?>
-  </select>
-</p>
-<p>
-  <label>
-    <input name="<?php echo 'intelliwidget_' . $pagesection . '_nocopy'; ?>" id="<?php echo 'intelliwidget_' . $pagesection . '_nocopy'; ?>" type="checkbox" <?php checked($instance['nocopy'], 1); ?> value="1"/>
-    <?php _e('Override Copied Settings', 'intelliwidget'); ?>
-  </label>
-</p>
-<p>
-  <label for="<?php echo 'intelliwidget_' . $pagesection . '_content'; ?>">
-    <?php _e('Content', 'intelliwidget'); ?>
-    : </label>
-  <select class="iw-control" id="<?php echo 'intelliwidget_' . $pagesection . '_content'; ?>" name="<?php echo 'intelliwidget_' . $pagesection . '_content'; ?>" autocomplete="off">
-    <?php foreach ($intelliwidget->get_content_menu() as $value => $label): ?>
-    <option value="<?php echo $value; ?>" <?php selected($instance['content'], $value); ?>><?php echo $label; ?></option>
-    <?php endforeach; ?>
-  </select>
-</p>
+        <option value="<?php echo $sidebar_widget_id; ?>"<?php selected( $instance['replace_widget'], $sidebar_widget_id ); 
+        ?>> <?php echo $wp_registered_sidebars[$sidebar_id]['name'] . ' [' . ++$count . ']'; ?> </option>
+        <?php 
+                endif; 
+            endforeach; 
+        endif; 
+    endforeach;
+?>
+      </select>
+    </p>
 <?php
     // execute custom action hook for content value if it exists
-            do_action('intelliwidget_section_general', $post_ID, $pagesection, $instance);
-            do_action('intelliwidget_section_' . $instance['content'], $post_ID, $pagesection, $instance); ?>
+            do_action('intelliwidget_section_all_before', $post_id, $box_id, $instance);
+            do_action('intelliwidget_section_' . $instance['content'], $post_id, $box_id, $instance);
+            do_action('intelliwidget_section_all_after', $post_id, $box_id, $instance); ?>
 <div class="iw-save-container">
-  <input name="save" class="button button-large iw-save" id="<?php echo 'intelliwidget_' . $pagesection . '_save'; ?>" value="<?php _e('Save Settings', 'intelliwidget'); ?>" type="button" style="float:right">
-  <span class="spinner" id="<?php echo 'intelliwidget_' . $pagesection . '_spinner'; ?>"></span> </div>
-<a style="float:left;" href="<?php echo wp_nonce_url(admin_url('post.php?action=edit&iwdelete='.$pagesection.'&post=' . $post_ID), 'iwdelete'); ?>" id="iw_delete_<?php echo $pagesection; ?>" class="iw-delete">
+  <input name="save" class="button button-large iw-save" id="<?php echo 'intelliwidget_' . $box_id . '_save'; ?>" value="<?php _e('Save Settings', 'intelliwidget'); ?>" type="button" style="float:right">
+  <span class="spinner" id="<?php echo 'intelliwidget_' . $box_id . '_spinner'; ?>"></span> </div>
+<a style="float:left;" href="<?php echo wp_nonce_url(admin_url('post.php?action=edit&iwdelete='.$box_id.'&post=' . $post_id), 'iwdelete'); ?>" id="iw_delete_<?php echo $box_id; ?>" class="iw-delete">
 <?php _e('Delete', 'intelliwidget'); ?>
 </a>
 <div style="clear:both"></div>
 <?php
     }
     
-    function section_form_general_settings($post_ID, $pagesection, $instance) {
-//        global $intelliwidget;
+    function section_form_general_settings($post_id, $box_id, $instance) {
+        global $intelliwidget;
         ?>
-<div id="iw-generalsettings-<?php echo $pagesection; ?>" class="postbox closed">
+<div id="iw-generalsettings-<?php echo $box_id; ?>" class="postbox closed">
   <div class="handlediv" title="<?php _e('Click to toggle', 'intelliwidget'); ?>"></div>
   <h3><span>
     <?php _e('General Settings', 'intelliwidget'); ?>
     </span></h3>
-  <div  id="iw-generalsettings-<?php echo $pagesection; ?>-inside" class="inside">
+  <div  id="iw-generalsettings-<?php echo $box_id; ?>-inside" class="inside">
     <p>
-      <label for="<?php echo 'intelliwidget_' . $pagesection . '_title'; ?>"> <?php echo __('Section', 'intelliwidget') . ' ' . __('Title', 'intelliwidget') . ' ' . __('(Optional)', 'intelliwidget'); ?> </label>
+      <label for="<?php echo 'intelliwidget_' . $box_id . '_content'; ?>">
+        <?php _e('IntelliWidget Type', 'intelliwidget'); ?>
+        : </label>
+      <select class="iw-control" id="<?php echo 'intelliwidget_' . $box_id . '_content'; ?>" name="<?php echo 'intelliwidget_' . $box_id . '_content'; ?>" autocomplete="off">
+        <?php foreach ($intelliwidget->get_content_menu() as $value => $label): ?>
+        <option value="<?php echo $value; ?>" <?php selected($instance['content'], $value); ?>><?php echo $label; ?></option>
+        <?php endforeach; ?>
+      </select>
+    </p>
+    <p>
+      <label for="<?php echo 'intelliwidget_' . $box_id . '_title'; ?>"> <?php echo __('Section', 'intelliwidget') . ' ' . __('Title', 'intelliwidget') . ' ' . __('(Optional)', 'intelliwidget'); ?> </label>
       <label>
-        <input name="<?php echo 'intelliwidget_' . $pagesection . '_link_title'; ?>" id="<?php echo 'intelliwidget_' . $pagesection . '_link_title'; ?>" type="checkbox" <?php checked($instance['link_title'], 1); ?> value="1" />
+        <input name="<?php echo 'intelliwidget_' . $box_id . '_link_title'; ?>" id="<?php echo 'intelliwidget_' . $box_id . '_link_title'; ?>" type="checkbox" <?php checked($instance['link_title'], 1); ?> value="1" />
         <?php _e('Link', 'intelliwidget'); ?>
       </label>
-      <input id="<?php echo 'intelliwidget_' . $pagesection . '_title'; ?>" name="<?php echo 'intelliwidget_' . $pagesection . '_title'; ?>" type="text" value="<?php echo esc_attr($instance['title']); ?>" />
+      <input id="<?php echo 'intelliwidget_' . $box_id . '_title'; ?>" name="<?php echo 'intelliwidget_' . $box_id . '_title'; ?>" type="text" value="<?php echo esc_attr($instance['title']); ?>" />
     </p>
     <p>
-      <label for="<?php echo 'intelliwidget_' . $pagesection . '_container_id'; ?>" style="display:block">
-        <?php _e('ID', 'intelliwidget'); ?>
+      <label for="<?php echo 'intelliwidget_' . $box_id . '_container_id'; ?>" style="display:block">
+        <?php _e('Container ID', 'intelliwidget'); ?>
         : </label>
-      <input name="<?php echo 'intelliwidget_' . $pagesection . '_container_id'; ?>" id="<?php echo 'intelliwidget_' . $pagesection . '_container_id'; ?>" type="text" value="<?php echo esc_attr($instance['container_id']); ?>" />
+      <input name="<?php echo 'intelliwidget_' . $box_id . '_container_id'; ?>" id="<?php echo 'intelliwidget_' . $box_id . '_container_id'; ?>" type="text" value="<?php echo esc_attr($instance['container_id']); ?>" />
     </p>
     <p>
-      <label for="<?php echo 'intelliwidget_' . $pagesection . '_classes'; ?>" style="display:block">
-        <?php _e('Classes', 'intelliwidget'); ?>
+      <label for="<?php echo 'intelliwidget_' . $box_id . '_classes'; ?>" style="display:block">
+        <?php _e('Style Classes', 'intelliwidget'); ?>
         : </label>
-      <input name="<?php echo 'intelliwidget_' . $pagesection . '_classes'; ?>" id="<?php echo 'intelliwidget_' . $pagesection . '_classes'; ?>" type="text" value="<?php echo esc_attr($instance['classes']); ?>" />
+      <input name="<?php echo 'intelliwidget_' . $box_id . '_classes'; ?>" id="<?php echo 'intelliwidget_' . $box_id . '_classes'; ?>" type="text" value="<?php echo esc_attr($instance['classes']); ?>" />
+    </p>
+    <p>
+      <label>
+        <input name="<?php echo 'intelliwidget_' . $box_id . '_nocopy'; ?>" id="<?php echo 'intelliwidget_' . $box_id . '_nocopy'; ?>" type="checkbox" <?php checked($instance['nocopy'], 1); ?> value="1"/>
+        <?php _e('Use these settings even if using settings from another page/post', 'intelliwidget'); ?>
+      </label>
     </p>
   </div>
 </div>
 <?php
     }
     
-    function section_form_custom_text_settings($post_ID, $pagesection, $instance) {
+    function section_form_addl_text_settings($post_id, $box_id, $instance) {
         global $intelliwidget;
         ?>
-<div id="iw-customtext-<?php echo $pagesection; ?>" class="postbox closed">
+<div id="iw-addltext-<?php echo $box_id; ?>" class="postbox closed">
   <div class="handlediv" title="<?php _e('Click to toggle', 'intelliwidget'); ?>"></div>
   <h3><span>
-    <?php _e('Custom Text/HTML', 'intelliwidget'); ?>
+    <?php _e('Additional Text/HTML', 'intelliwidget'); ?>
     </span></h3>
-  <div  id="iw-customtext-<?php echo $pagesection; ?>-inside" class="inside">
-    <select name="<?php echo 'intelliwidget_' . $pagesection . '_text_position'; ?>" id="<?php echo 'intelliwidget_' . $pagesection . '_text_position'; ?>">
+  <div  id="iw-addltext-<?php echo $box_id; ?>-inside" class="inside">
+    <select name="<?php echo 'intelliwidget_' . $box_id . '_text_position'; ?>" id="<?php echo 'intelliwidget_' . $box_id . '_text_position'; ?>">
       <option value="">
       <?php _e('None', 'intelliwidget'); ?>
       </option>
       <option value="above"<?php selected( $instance['text_position'], 'above' ); ?>>
-      <?php _e('Above Content', 'intelliwidget'); ?>
+      <?php _e('Above Posts', 'intelliwidget'); ?>
       </option>
       <option value="below"<?php selected( $instance['text_position'], 'below' ); ?>>
-      <?php _e('Below Content', 'intelliwidget'); ?>
+      <?php _e('Below Posts', 'intelliwidget'); ?>
       </option>
       <option value="only"<?php selected( $instance['text_position'], 'only' ); ?>>
-      <?php _e('Custom Text Only (No Content)', 'intelliwidget'); ?>
+      <?php _e('This text only (no posts)', 'intelliwidget'); ?>
       </option>
     </select>
-    <textarea class="widefat" rows="3" cols="20" id="<?php echo 'intelliwidget_' . $pagesection . '_custom_text'; ?>" name="<?php echo 'intelliwidget_' . $pagesection . '_custom_text'; ?>">
+    <textarea class="widefat" rows="3" cols="20" id="<?php echo 'intelliwidget_' . $box_id . '_custom_text'; ?>" name="<?php echo 'intelliwidget_' . $box_id . '_custom_text'; ?>">
 <?php echo esc_textarea($instance['custom_text']); ?></textarea>
     <p>
-      <label for="<?php echo 'intelliwidget_' . $pagesection . '_filter'; ?>">
-        <input id="<?php echo 'intelliwidget_' . $pagesection . '_filter'; ?>" name="<?php echo 'intelliwidget_' . $pagesection . '_filter'; ?>" type="checkbox" <?php checked($instance['filter'], 1); ?> value="1" />
+      <label for="<?php echo 'intelliwidget_' . $box_id . '_filter'; ?>">
+        <input id="<?php echo 'intelliwidget_' . $box_id . '_filter'; ?>" name="<?php echo 'intelliwidget_' . $box_id . '_filter'; ?>" type="checkbox" <?php checked($instance['filter'], 1); ?> value="1" />
         &nbsp;
-        <?php _e('Auto-format Custom Text', 'intelliwidget'); ?>
+        <?php _e('Automatically add paragraphs', 'intelliwidget'); ?>
       </label>
     </p>
   </div>
@@ -717,40 +653,31 @@ select.intelliwidget-multiselect {
 <?php
     }
     
-    function section_form_post_list_settings($post_ID, $pagesection, $instance) {
+    function section_form_appearance_settings($post_id, $box_id, $instance) {
         global $intelliwidget, $_wp_additional_image_sizes;
         ?>
-<div id="iw-listsettings-<?php echo $pagesection; ?>" class="postbox closed">
+<div id="iw-appearance-<?php echo $box_id; ?>" class="postbox closed">
   <div class="handlediv" title="<?php _e('Click to toggle', 'intelliwidget'); ?>"></div>
   <h3><span>
-    <?php _e('List Settings', 'intelliwidget'); ?>
+    <?php _e('Appearance Settings', 'intelliwidget'); ?>
     </span></h3>
-  <div id="iw-listsettings-<?php echo $pagesection; ?>-inside" class="inside">
+  <div id="iw-appearance-<?php echo $box_id; ?>-inside" class="inside">
     <p>
-      <label>
-        <?php _e('Post Types', 'intelliwidget'); ?>
-        :</label>
-      <?php foreach ( $intelliwidget->get_eligible_post_types() as $type ) : ?>
-      <label style="white-space:nowrap;margin-right:10px" for="<?php echo 'intelliwidget_' . $pagesection . '_post_types_' . $type; ?>">
-        <input id="<?php echo 'intelliwidget_' . $pagesection . '_post_types_' . $type; ?>" type="checkbox" name="<?php echo 'intelliwidget_' . $pagesection . '_post_types[]'; ?>" value="<?php echo $type; ?>" <?php checked(in_array($type, $instance['post_types']), 1); ?> />
-        <?php echo ucfirst($type); ?></label>
-      <?php endforeach; ?>
-    </p>
-    <p>
-      <label for="<?php echo 'intelliwidget_' . $pagesection . '_template'; ?>">
+      <label for="<?php echo 'intelliwidget_' . $box_id . '_template'; ?>">
         <?php _e('Template', 'intelliwidget'); ?>
         :</label>
-      <select name="<?php echo 'intelliwidget_' . $pagesection . '_template'; ?>" id="<?php echo 'intelliwidget_' . $pagesection . '_template'; ?>">
+      <select name="<?php echo 'intelliwidget_' . $box_id . '_template'; ?>" id="<?php echo 'intelliwidget_' . $box_id . '_template'; ?>">
         <?php foreach ( $intelliwidget->templates as $template => $name ) : ?>
         <option value="<?php echo $template; ?>" <?php selected($instance['template'], $template); ?>><?php echo $name; ?></option>
         <?php endforeach; ?>
       </select>
     </p>
     <p>
-      <label for="<?php echo 'intelliwidget_' . $pagesection . '_sortby'; ?>">
-        <?php _e( 'Sort by', 'intelliwidget'); ?>
-      </label>
-      <select name="<?php echo 'intelliwidget_' . $pagesection . '_sortby'; ?>" id="<?php echo 'intelliwidget_' . $pagesection . '_sortby'; ?>">
+      <label for="<?php echo 'intelliwidget_' . $box_id . '_sortby'; ?>">
+        <?php _e( 'Sort Posts by', 'intelliwidget'); ?>
+        : </label>
+      <br/>
+      <select name="<?php echo 'intelliwidget_' . $box_id . '_sortby'; ?>" id="<?php echo 'intelliwidget_' . $box_id . '_sortby'; ?>">
         <option value="date"<?php selected( $instance['sortby'], 'date' ); ?>>
         <?php _e('Post Date', 'intelliwidget'); ?>
         </option>
@@ -764,10 +691,10 @@ select.intelliwidget-multiselect {
         <?php _e('Title', 'intelliwidget'); ?>
         </option>
         <option value="rand"<?php selected( $instance['sortby'], 'rand' ); ?>>
-        <?php _e( 'Random', 'intelliwidget'); ?>
+        <?php _e( 'Random Order', 'intelliwidget'); ?>
         </option>
       </select>
-      <select name="<?php echo 'intelliwidget_' . $pagesection . '_sortorder'; ?>" id="<?php echo 'intelliwidget_' . $pagesection . '_sortorder'; ?>">
+      <select name="<?php echo 'intelliwidget_' . $box_id . '_sortorder'; ?>" id="<?php echo 'intelliwidget_' . $box_id . '_sortorder'; ?>">
         <option value="ASC"<?php selected( $instance['sortorder'], 'ASC' ); ?>>
         <?php _e('ASC', 'intelliwidget'); ?>
         </option>
@@ -777,62 +704,34 @@ select.intelliwidget-multiselect {
       </select>
     </p>
     <p>
-      <label for="<?php echo 'intelliwidget_' . $pagesection . '_items'; ?>">
+      <label for="<?php echo 'intelliwidget_' . $box_id . '_items'; ?>">
         <?php _e('Max posts', 'intelliwidget'); ?>
         : </label>
-      <input id="<?php echo 'intelliwidget_' . $pagesection . '_items'; ?>" name="<?php echo 'intelliwidget_' . $pagesection . '_items'; ?>" size="3" type="text" value="<?php echo esc_attr($instance['items']); ?>" />
+      <input id="<?php echo 'intelliwidget_' . $box_id . '_items'; ?>" name="<?php echo 'intelliwidget_' . $box_id . '_items'; ?>" size="3" type="text" value="<?php echo esc_attr($instance['items']); ?>" />
     </p>
     <p>
-      <label for="<?php echo 'intelliwidget_' . $pagesection . '_skip_post'; ?>">
-        <input id="<?php echo 'intelliwidget_' . $pagesection . '_skip_post'; ?>" name="<?php echo 'intelliwidget_' . $pagesection . '_skip_post'; ?>" type="checkbox" <?php checked($instance['skip_post'], 1); ?> value="1" />
-        &nbsp;
-        <?php _e('Exclude current post', 'intelliwidget'); ?>
-      </label>
-    </p>
-    <p>
-      <label for="<?php echo 'intelliwidget_' . $pagesection . '_future_only'; ?>">
-        <input id="<?php echo 'intelliwidget_' . $pagesection . '_future_only'; ?>" name="<?php echo 'intelliwidget_' . $pagesection . '_future_only'; ?>" type="checkbox" <?php checked($instance['future_only'], 1); ?> value="1" />
-        &nbsp;
-        <?php _e('Only future posts', 'intelliwidget'); ?>
-      </label>
-    </p>
-    <p>
-      <label for="<?php echo 'intelliwidget_' . $pagesection . '_active_only'; ?>">
-        <input id="<?php echo 'intelliwidget_' . $pagesection . '_active_only'; ?>" name="<?php echo 'intelliwidget_' . $pagesection . '_active_only'; ?>" type="checkbox" <?php checked($instance['active_only'], 1); ?> value="1" />
-        &nbsp;
-        <?php _e('Exclude future posts', 'intelliwidget'); ?>
-      </label>
-    </p>
-    <p>
-      <label for="<?php echo 'intelliwidget_' . $pagesection . '_skip_expired'; ?>">
-        <input id="<?php echo 'intelliwidget_' . $pagesection . '_skip_expired'; ?>" name="<?php echo 'intelliwidget_' . $pagesection . '_skip_expired'; ?>" type="checkbox" <?php checked($instance['skip_expired'], 1); ?> value="1" />
-        &nbsp;
-        <?php _e('Exclude expired posts', 'intelliwidget'); ?>
-      </label>
-    </p>
-    <p>
-      <label for="<?php echo 'intelliwidget_' . $pagesection . '_length'; ?>">
+      <label for="<?php echo 'intelliwidget_' . $box_id . '_length'; ?>">
         <?php _e('Max words per post', 'intelliwidget'); ?>
         : </label>
-      <input id="<?php echo 'intelliwidget_' . $pagesection . '_length'; ?>" name="<?php echo 'intelliwidget_' . $pagesection . '_length'; ?>" size="3" type="text" value="<?php echo esc_attr($instance['length']); ?>" />
+      <input id="<?php echo 'intelliwidget_' . $box_id . '_length'; ?>" name="<?php echo 'intelliwidget_' . $box_id . '_length'; ?>" size="3" type="text" value="<?php echo esc_attr($instance['length']); ?>" />
     </p>
     <p>
-      <label for="<?php echo 'intelliwidget_' . $pagesection . '_allowed_tags'; ?>">
-        <?php _e('Allowed HTML Elements', 'intelliwidget'); ?>
+      <label for="<?php echo 'intelliwidget_' . $box_id . '_allowed_tags'; ?>">
+        <?php _e('Allowed HTML Elements', 'intelliwidget'); ?><br/><?php _e('(p, br, em, strong, etc.)', 'intelliwidget'); ?>
         : </label>
-      <input name="<?php echo 'intelliwidget_' . $pagesection . '_allowed_tags'; ?>" id="<?php echo 'intelliwidget_' . $pagesection . '_allowed_tags'; ?>" type="text" value="<?php echo esc_attr($instance['allowed_tags']); ?>" />
+      <input name="<?php echo 'intelliwidget_' . $box_id . '_allowed_tags'; ?>" id="<?php echo 'intelliwidget_' . $box_id . '_allowed_tags'; ?>" type="text" value="<?php echo esc_attr($instance['allowed_tags']); ?>" />
     </p>
     <p>
-      <label for="<?php echo 'intelliwidget_' . $pagesection . '_link_text'; ?>">
-        <?php _e('Link Text', 'intelliwidget'); ?>
+      <label for="<?php echo 'intelliwidget_' . $box_id . '_link_text'; ?>">
+        <?php _e("'Read More' Text", 'intelliwidget'); ?>
         : </label>
-      <input name="<?php echo 'intelliwidget_' . $pagesection . '_link_text'; ?>" id="<?php echo 'intelliwidget_' . $pagesection . '_link_text'; ?>" type="text" value="<?php echo esc_attr($instance['link_text']); ?>" />
+      <input name="<?php echo 'intelliwidget_' . $box_id . '_link_text'; ?>" id="<?php echo 'intelliwidget_' . $box_id . '_link_text'; ?>" type="text" value="<?php echo esc_attr($instance['link_text']); ?>" />
     </p>
     <p>
-      <label for="<?php echo 'intelliwidget_' . $pagesection . '_imagealign'; ?>">
+      <label for="<?php echo 'intelliwidget_' . $box_id . '_imagealign'; ?>">
         <?php _e('Image Align', 'intelliwidget'); ?>
       </label>
-      <select name="<?php echo 'intelliwidget_' . $pagesection . '_imagealign'; ?>" id="<?php echo 'intelliwidget_' . $pagesection . '_imagealign'; ?>">
+      <select name="<?php echo 'intelliwidget_' . $box_id . '_imagealign'; ?>" id="<?php echo 'intelliwidget_' . $box_id . '_imagealign'; ?>">
         <option value="none" <?php selected($instance['imagealign'], 'none'); ?> >
         <?php _e('Auto', 'intelliwidget'); ?>
         </option>
@@ -848,10 +747,10 @@ select.intelliwidget-multiselect {
       </select>
     </p>
     <p>
-      <label for="<?php echo 'intelliwidget_' . $pagesection . '_image_size'; ?>">
+      <label for="<?php echo 'intelliwidget_' . $box_id . '_image_size'; ?>">
         <?php _e('Image Size', 'intelliwidget'); ?>
         : </label>
-      <select id="<?php echo 'intelliwidget_' . $pagesection . '_image_size'; ?>" name="<?php  echo 'intelliwidget_' . $pagesection . '_image_size'; ?>">
+      <select id="<?php echo 'intelliwidget_' . $box_id . '_image_size'; ?>" name="<?php  echo 'intelliwidget_' . $box_id . '_image_size'; ?>">
         <option value="none" <?php selected($instance['image_size'], 'none'); ?> >
         <?php _e('No Image', 'intelliwidget'); ?>
         </option>
@@ -877,54 +776,89 @@ select.intelliwidget-multiselect {
 <?php
     }
     
-    function section_form_taxonomies_settings($post_ID, $pagesection, $instance) {
+    function section_form_post_selection_settings($post_id, $box_id, $instance) {
         global $intelliwidget;
         ?>
-<div id="iw-taxonomies-<?php echo $pagesection; ?>" class="postbox closed">
+<div id="iw-selection-<?php echo $box_id; ?>" class="postbox closed">
   <div class="handlediv" title="<?php _e('Click to toggle', 'intelliwidget'); ?>"></div>
   <h3><span>
-    <?php _e('Taxonomies', 'intelliwidget'); ?>
+    <?php _e('Post Selection Settings', 'intelliwidget'); ?>
     </span></h3>
-  <div id="iw-taxonomies-<?php echo $pagesection; ?>-inside" class="inside">
-    <select class="widefat intelliwidget-multiselect" name="<?php echo 'intelliwidget_' . $pagesection . '_category'; ?>[]" size="1" style="height:100px;" multiple="multiple" id="<?php echo 'intelliwidget_' . $pagesection . '_category'; ?>">
-      <?php echo $intelliwidget->get_relevant_terms($instance); ?>
-    </select>
+  <div id="iw-selection-<?php echo $box_id; ?>-inside" class="inside">
+    <p>
+      <label>
+        <?php _e('Select from these Post Types', 'intelliwidget'); ?>
+        :</label>
+      <?php foreach ( $intelliwidget->post_types as $type ) : ?>
+      <label style="white-space:nowrap;margin-right:10px" for="<?php echo 'intelliwidget_' . $box_id . '_post_types_' . $type; ?>">
+        <input id="<?php echo 'intelliwidget_' . $box_id . '_post_types_' . $type; ?>" type="checkbox" name="<?php echo 'intelliwidget_' . $box_id . '_post_types[]'; ?>" value="<?php echo $type; ?>" <?php checked(in_array($type, $instance['post_types']), 1); ?> />
+        <?php echo ucfirst($type); ?></label>
+      <?php endforeach; ?>
+    </p>
+    <p>
+      <label>
+        <?php _e('Select by Category, Tag, etc...', 'intelliwidget');?>
+        :</label>
+      <select class="widefat intelliwidget-multiselect" name="<?php echo 'intelliwidget_' . $box_id . '_category'; ?>[]" size="1" style="height:100px;" multiple="multiple" id="<?php echo 'intelliwidget_' . $box_id . '_category'; ?>">
+        <?php echo $intelliwidget->get_relevant_terms($instance); ?>
+      </select>
+    </p>
+    <p>
+      <label>
+        <?php _e('... -OR- select specific posts', 'intelliwidget');?>
+        :</label>
+      <select class="widefat intelliwidget-multiselect" name="<?php echo 'intelliwidget_' . $box_id . '_page'; ?>[]" size="1" style="height:100px;" multiple="multiple" id="<?php echo 'intelliwidget_' . $box_id . '_page'; ?>">
+        <?php echo $intelliwidget->get_posts($instance); ?>
+      </select>
+    </p>
+    <p>
+      <label for="<?php echo 'intelliwidget_' . $box_id . '_skip_post'; ?>">
+        <input id="<?php echo 'intelliwidget_' . $box_id . '_skip_post'; ?>" name="<?php echo 'intelliwidget_' . $box_id . '_skip_post'; ?>" type="checkbox" <?php checked($instance['skip_post'], 1); ?> value="1" />
+        &nbsp;
+        <?php _e('Exclude current post', 'intelliwidget'); ?>
+      </label>
+    </p>
+    <p>
+      <label for="<?php echo 'intelliwidget_' . $box_id . '_future_only'; ?>">
+        <input id="<?php echo 'intelliwidget_' . $box_id . '_future_only'; ?>" name="<?php echo 'intelliwidget_' . $box_id . '_future_only'; ?>" type="checkbox" <?php checked($instance['future_only'], 1); ?> value="1" />
+        &nbsp;
+        <?php _e('Include only future posts', 'intelliwidget'); ?>
+      </label>
+    </p>
+    <p>
+      <label for="<?php echo 'intelliwidget_' . $box_id . '_active_only'; ?>">
+        <input id="<?php echo 'intelliwidget_' . $box_id . '_active_only'; ?>" name="<?php echo 'intelliwidget_' . $box_id . '_active_only'; ?>" type="checkbox" <?php checked($instance['active_only'], 1); ?> value="1" />
+        &nbsp;
+        <?php _e('Exclude future posts', 'intelliwidget'); ?>
+      </label>
+    </p>
+    <p>
+      <label for="<?php echo 'intelliwidget_' . $box_id . '_skip_expired'; ?>">
+        <input id="<?php echo 'intelliwidget_' . $box_id . '_skip_expired'; ?>" name="<?php echo 'intelliwidget_' . $box_id . '_skip_expired'; ?>" type="checkbox" <?php checked($instance['skip_expired'], 1); ?> value="1" />
+        &nbsp;
+        <?php _e('Exclude expired posts', 'intelliwidget'); ?>
+      </label>
+    </p>
   </div>
 </div>
 <?php
     }
 
-    function section_form_specific_posts_settings($post_ID, $pagesection, $instance) {    
-        global $intelliwidget;
-    ?>
-<div id="iw-specificposts-<?php echo $pagesection; ?>" class="postbox closed">
-  <div class="handlediv" title="<?php _e('Click to toggle', 'intelliwidget'); ?>"></div>
-  <h3><span>
-    <?php _e('Specific Posts', 'intelliwidget'); ?>
-    </span></h3>
-  <div id="iw-specificposts-<?php echo $pagesection; ?>-inside" class="inside">
-    <select class="widefat intelliwidget-multiselect" name="<?php echo 'intelliwidget_' . $pagesection . '_page'; ?>[]" size="1" style="height:100px;" multiple="multiple" id="<?php echo 'intelliwidget_' . $pagesection . '_page'; ?>">
-      <?php echo $intelliwidget->get_pages($instance); ?>
-    </select>
-  </div>
-</div>
-<?php
-    }
-    function section_form_nav_menu($post_ID, $pagesection, $instance){
+    function section_form_nav_menu($post_id, $box_id, $instance){
         global $intelliwidget;
         ?>
-    <p>
-      <label for="<?php echo 'intelliwidget_' . $pagesection . '_nav_menu'; ?>">
-        <?php _e('WordPress Menu', 'intelliwidget'); ?>
-        : </label>
-      <select id="<?php echo 'intelliwidget_' . $pagesection . '_nav_menu'; ?>" name="<?php echo 'intelliwidget_' . $pagesection . '_nav_menu'; ?>">
-        <option value="" <?php selected( $instance['nav_menu'], '' ); ?>>
-        <?php _e('None', 'intelliwidget'); ?>
-        </option>
-        <option value="-1" <?php selected( $instance['nav_menu'], '-1' ); ?>>
-        <?php _e('Automatic Page Menu', 'intelliwidget'); ?>
-        </option>
-        <?php
+<p>
+  <label for="<?php echo 'intelliwidget_' . $box_id . '_nav_menu'; ?>">
+    <?php _e('WordPress Menu', 'intelliwidget'); ?>
+    : </label>
+  <select id="<?php echo 'intelliwidget_' . $box_id . '_nav_menu'; ?>" name="<?php echo 'intelliwidget_' . $box_id . '_nav_menu'; ?>">
+    <option value="" <?php selected( $instance['nav_menu'], '' ); ?>>
+    <?php _e('None', 'intelliwidget'); ?>
+    </option>
+    <option value="-1" <?php selected( $instance['nav_menu'], '-1' ); ?>>
+    <?php _e('Automatic Page Menu', 'intelliwidget'); ?>
+    </option>
+    <?php
             // Get menus
             foreach ( $intelliwidget->menus as $menu ):
                 echo '<option value="' . $menu->term_id . '"'
@@ -933,9 +867,11 @@ select.intelliwidget-multiselect {
             endforeach;
 
         ?>
-      </select>
-    </p>
+  </select>
+</p>
 <?php
     }
 }
+
+
 

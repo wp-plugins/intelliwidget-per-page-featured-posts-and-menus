@@ -23,9 +23,7 @@ class IntelliWidget_Query {
     
     var $current_post = -1;
     
-    function __construct($instance = array()) {
-        if (! empty($instance) && 'nav_menu' != $instance['content'])
-            $this->iw_query($instance);
+    function __construct() {
     }
     
 	/**
@@ -217,17 +215,11 @@ LEFT JOIN {$wpdb->postmeta} pm7 ON pm7.post_id = p1.ID
             $limit = ' LIMIT 0, %d';
             $prepargs[] = $items;
         endif;
-        /* *************************
-         * ***   W A R N I N G   *** 
-         * *************************
-         * *** USE THESE FILTERS ***
-         * *** AT YOUR OWN PERIL ***
-         * *************************/
-        $query = $select . implode(', ', apply_filters('intelliwidget_query_selects', $selects) ) . $from
-            . implode(' ', apply_filters('intelliwidget_query_joins', $joins)) . ' WHERE ' 
-            . implode("\n AND ", apply_filters('intelliwidget_query_clauses', $clauses)) 
-            . apply_filters('intelliwidget_query_orderby', $orderby) 
-            . apply_filters('intelliwidget_query_limit', $limit);
+        $query = $select . implode(', ', $selects ) . $from
+            . implode(' ', $joins) . ' WHERE ' 
+            . implode("\n AND ", $clauses) 
+            . $orderby
+            . $limit;
         // echo 'query: ' . "\n" . $query . " \n";
         $this->posts      = $wpdb->get_results($wpdb->prepare($query, apply_filters('intelliwidget_query_args', $prepargs)), OBJECT);
         $this->post_count = count($this->posts);
@@ -241,18 +233,28 @@ LEFT JOIN {$wpdb->postmeta} pm7 ON pm7.post_id = p1.ID
             $args[] = trim($val);
         endforeach;
         
-/*
-        array_walk_recursive($values, array($this, 'trimming'),  use (&$placeholders, &$args, $type) { 
-            $placeholders[] = ('s' == $type ? '%s' : '%d');
-            $args[] = trim($a);
-        });
-*/
         return implode(',', $placeholders);
     }
-    function trimming($data) {
-        if ('array' === gettype($data))
-            return array_map('trimming', $data);
-        else
-        return trim($data);
+    
+    /* post_list_query
+     * lightweight post query for use in menus
+     */
+    function post_list_query($post_types) {
+        global $wpdb;
+        $args = array();
+        $query = "
+        SELECT
+            ID,
+            post_title,
+            post_type,
+            post_parent
+        FROM {$wpdb->posts}
+        WHERE post_type IN (" . $this->prep_array($post_types, $args) . ")
+            AND (post_status = 'publish')
+            AND (post_password = '' OR post_password IS NULL)
+        ORDER BY post_type, post_title
+        ";
+        // echo 'query: ' . "\n" . $query . " \n";
+        return $wpdb->get_results($wpdb->prepare($query, $args), OBJECT);
     }
 }

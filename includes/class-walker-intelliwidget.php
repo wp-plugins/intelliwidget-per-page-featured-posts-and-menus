@@ -70,9 +70,17 @@ class Walker_IntelliWidget_Terms extends Walker {
 	 */
 	function start_el(&$output, $term, $depth = 0, $args = array(), $id = 0) {
 		$pad = str_repeat('-&nbsp;', $depth);
-
-		$output .= "\t<option class=\"level-$depth\" value=\"$term->term_taxonomy_id\"";
-		if (in_array( (int)$term->term_taxonomy_id, $args['category'] ))
+        if (empty($args['showall'])):
+            // fast index for iw query
+            $matchval = (int)$term->term_taxonomy_id;
+            $matcharr = $args['category'];
+        else:
+            // required for tax query
+            $matchval = $term->taxonomy . ":" . $term->slug;
+            $matcharr = $args['tax_spec'];
+        endif;
+		$output .= "\t<option class=\"level-$depth\" value=\"$matchval\"";
+		if (in_array( $matchval, $matcharr))
 			$output .= ' selected';
 		$output .= '>';
 		$title = substr($pad . $term->name, 0, 60) . ' (' . ucwords(str_replace('_', ' ', $term->taxonomy)) . ')';
