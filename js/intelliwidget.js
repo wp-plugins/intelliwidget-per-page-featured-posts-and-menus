@@ -194,7 +194,10 @@ jQuery(document).ready(function($) {
                     $(savecontainer).addClass('failure');
                 } else {
                     // refresh section form
-                    $(sectionform).html(response);
+                    var tab = $(response.tab);
+                    console.log('response tab: ' + tab.prop('id') + ' ' + tab.html());
+                    $('#iw_tabs').find('#' + tab.prop('id')).html(tab.html());
+                    $(sectionform).html(response.form);
                     // since postbox.js does not delegate events, we have to rebind toggles on refresh
                     $(sectionform).find('.postbox h3, .postbox, .handlediv').on('click', function(e){
                         $(this).parent('.postbox').toggleClass('closed');
@@ -207,7 +210,7 @@ jQuery(document).ready(function($) {
                 // hide spinner
                 $('#' + pre + '_spinner').hide();
                 return false;  
-            }
+            }, 'json'
         ).fail(function(){
             // release button
             $(savebutton).prop('disabled', false);

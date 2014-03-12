@@ -520,7 +520,7 @@ name="<?php echo $widget->get_field_name('custom_text'); ?>">
     }
 
     function intelliwidget_section($post_id, $box_id, $instance) {
-        global $wp_registered_sidebars;
+        global $intelliwidget;
         ?>
     <p>
       <input type="hidden" id="<?php echo 'intelliwidget_' . $box_id . '_box_id'; ?>" name="<?php echo 'intelliwidget_' . $box_id . '_box_id'; ?>" value="<?php echo $box_id; ?>" />
@@ -528,34 +528,17 @@ name="<?php echo $widget->get_field_name('custom_text'); ?>">
         <?php _e( 'Use these settings to replace', 'intelliwidget'); ?>
         : </label>
       <select name="<?php echo 'intelliwidget_' . $box_id . '_replace_widget'; ?>" id="<?php echo 'intelliwidget_' . $box_id . '_replace_widget'; ?>">
-        <option value="none"<?php selected( $instance['replace_widget'], 'none' ); ?>>
-        <?php _e('None selected', 'intelliwidget');?>
-        </option>
-        <option value="content"<?php selected( $instance['replace_widget'], 'content' ); ?>>
-        <?php _e('Shortcode (use tab number)', 'intelliwidget');?>
-        </option>
-        <?php 
-    foreach(wp_get_sidebars_widgets() as $sidebar_id => $sidebar_widgets): 
-        if (false === strpos($sidebar_id, 'wp_inactive') && false === strpos($sidebar_id, 'orphaned')):
-            $count = 0;
-            foreach ($sidebar_widgets as $sidebar_widget_id):
-                if (false !== strpos($sidebar_widget_id, 'intelliwidget') ):
-?>
-        <option value="<?php echo $sidebar_widget_id; ?>"<?php selected( $instance['replace_widget'], $sidebar_widget_id ); 
-        ?>> <?php echo $wp_registered_sidebars[$sidebar_id]['name'] . ' [' . ++$count . ']'; ?> </option>
-        <?php 
-                endif; 
-            endforeach; 
-        endif; 
-    endforeach;
-?>
+        <?php foreach ($intelliwidget->intelliwidgets as $value => $label): ?>
+        <option value="<?php echo $value; ?>" <?php selected($instance['replace_widget'], $value); ?>><?php echo $label; ?></option>
+        <?php endforeach; ?>
       </select>
     </p>
 <?php
     // execute custom action hook for content value if it exists
-            do_action('intelliwidget_section_all_before', $post_id, $box_id, $instance);
-            do_action('intelliwidget_section_' . $instance['content'], $post_id, $box_id, $instance);
-            do_action('intelliwidget_section_all_after', $post_id, $box_id, $instance); ?>
+    do_action('intelliwidget_section_all_before', $post_id, $box_id, $instance);
+    do_action('intelliwidget_section_' . $instance['content'], $post_id, $box_id, $instance);
+    do_action('intelliwidget_section_all_after', $post_id, $box_id, $instance); 
+?>
 <div class="iw-save-container">
   <input name="save" class="button button-large iw-save" id="<?php echo 'intelliwidget_' . $box_id . '_save'; ?>" value="<?php _e('Save Settings', 'intelliwidget'); ?>" type="button" style="float:right">
   <span class="spinner" id="<?php echo 'intelliwidget_' . $box_id . '_spinner'; ?>"></span> </div>

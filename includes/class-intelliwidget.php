@@ -27,6 +27,7 @@ class IntelliWidget {
     var $posts;
     var $terms;
     var $post_types;
+    var $intelliwidgets;
     /**
      * Object constructor
      * @param <string> $file
@@ -49,12 +50,11 @@ class IntelliWidget {
         $this->templatesURL  = $this->pluginURL . 'templates/';        
 
         $this->docsLink      = '<a href="http://www.lilaeamedia.com/plugins/intelliwidget/" target="_blank" title="Help" style="float:right">Help</a>';
-        $this->load_settings();
         
         add_shortcode('intelliwidget',                  array(&$this, 'intelliwidget_shortcode'));
         register_activation_hook($file,                 array(&$this, 'intelliwidget_activate'));
-        // these actions only apply to admin users
         if (is_admin()):
+            // these actions only apply to admin users
             add_action('admin_init',                    array(&$this, 'admin_init'));
             add_action('admin_init',                    array(&$this, 'admin_scripts'));
             add_action('add_meta_boxes',                array(&$this, 'main_meta_box'));
@@ -75,23 +75,13 @@ class IntelliWidget {
             add_filter('intelliwidget_classes',         array(&$this, 'filter_classes'),        10, 2);
             add_filter('intelliwidget_menu_classes',    array(&$this, 'filter_menu_classes'),   10, 2);
             // default content actions
-            add_action('intelliwidget_display_query',   array(&$this, 'action_display_query'),  10, 2);
             add_action('intelliwidget_post_list',       array(&$this, 'action_post_list'),      10, 3);
             add_action('intelliwidget_nav_menu',        array(&$this, 'action_nav_menu'),       10, 2);
         endif;
         // thanks to woothemes for this
         add_action( 'after_setup_theme',                array(&$this, 'ensure_post_thumbnails_support' ) );
     }
-    function action_display_query($msg = 'DEBUG:') {
-        global $wp_query;
-        echo '<pre style="font-size:9px"><code>' . $msg . "\n\n" . print_r($wp_query, true) . '</code></pre>' . LF;
-    }
-    /**
-     * Stub for loading settings in future release.
-     */
-    function load_settings() {
-    }
-    
+
     function index_query_objects($property, $keyfield, $data) {
         $indexarray = array();
         if (isset($data) && count($data)):
@@ -120,8 +110,28 @@ class IntelliWidget {
                 preg_grep('/post_format/', get_object_taxonomies($this->post_types), PREG_GREP_INVERT), 
                 get_taxonomies(array('public' => TRUE, 'query_var' => TRUE))
             ), array('hide_empty' => FALSE)));
+            // cache intelliwidgets
+            $this->intelliwidgets = $this->get_intelliwidgets();
     }
     
+    function get_intelliwidgets() {
+        global $wp_registered_sidebars;
+        $widgets = array();
+        foreach ($this->get_replaces_menu() as $value => $label):
+            $widgets[$value] = $label;
+        endforeach;
+        foreach(wp_get_sidebars_widgets() as $sidebar_id => $sidebar_widgets): 
+            if (false === strpos($sidebar_id, 'wp_inactive') && false === strpos($sidebar_id, 'orphaned')):
+                $count = 0;
+                foreach ($sidebar_widgets as $sidebar_widget_id):
+                    if (false !== strpos($sidebar_widget_id, 'intelliwidget') ):
+                        $widgets[$sidebar_widget_id] = $wp_registered_sidebars[$sidebar_id]['name'] . ' [' . ++$count . ']';
+                    endif; 
+                endforeach; 
+            endif; 
+        endforeach;
+        return $widgets;
+    }
     /**
      * Stub for printing the scripts needed for the admin.
      */
@@ -147,48 +157,6 @@ class IntelliWidget {
 <?php
     }
     
-    /**
-     * Generate input form on page edit
-     * @return  void
-     *//*
-    function section_meta_box() {
-        global $post;
-        // box_map contains map of meta boxes to their related widgets
-        $box_map = $this->get_box_map($post->ID);
-        if (is_array($box_map)):
-            if (array_key_exists('_wpnonce', $_GET)):
-                $nonce = $_GET['_wpnonce'];
-                // add or delete boxes from previous page
-                if (array_key_exists('iwdelete', $_GET)):
-                    $iwdelete = intval($_GET['iwdelete']);
-                    // delete box
-                    $this->delete_meta_box($post->ID, $iwdelete, $nonce, $box_map);
-                elseif (array_key_exists('iwadd', $_GET)):
-                    // add box
-                    $this->add_meta_box($post->ID, $nonce, $box_map);
-                endif;
-                // redirect so post data is not cached
-                wp_redirect(admin_url('post.php?action=edit&post=' . $post->ID));
-                die();
-            else:
-                // display notice from previous update (if exists)
-                add_action('admin_notices', array(&$this, 'display_notice'));
-            endif;
-            // refresh the meta box forms on the page
-            foreach($box_map as $box_id => $sidebar_widget_id):
-                add_meta_box( 
-                    'intelliwidget_section_meta_box_' . $box_id,
-                    __( 'IntelliWidget Section ', 'intelliwidget') . $box_id,
-                    array( &$this, 'section_meta_box_form' ),
-                    $post->post_type,
-                    'side',
-                    'low',
-                    array('box_id' => $box_id)
-                );
-            endforeach;
-        endif;
-    }
-*/
     /**
      * Generate input form that applies to entire page (add new, copy settings)
      * @return  void
@@ -235,21 +203,6 @@ class IntelliWidget {
     }
     
     /**
-     * Output the form in the section meta box(es). Params are passed by add_meta_box() function
-     * @param <object> $post
-     * @param <array>  $metabox
-     * @return  void
-     *//*
-    function section_meta_box_form($post, $metabox) {
-        $box_id = $metabox['args']['box_id'];
-        $meta_name = '_intelliwidget_data_' . $box_id;
-        $instance = $this->defaults(unserialize(get_post_meta( $post->ID, $meta_name, true ) ));
-        $instance['custom_text'] = stripslashes(base64_decode($instance['custom_text']));
-        $post_ID = $post->ID;
-        echo $this->render_section_form($post_ID, $box_id, $instance);
-    }
-    */
-    /**
      * Output the form in the page-wide meta box. Params are passed by add_meta_box() function
      * @param <object> $post
      * @param <array>  $metabox
@@ -262,22 +215,23 @@ class IntelliWidget {
         // box_map contains map of meta boxes to their related widgets
         $box_map = $this->get_box_map($post->ID);
         if (is_array($box_map)):
-            // refresh the meta box forms on the page
-            $this->begin_tab_container();
+            $tabs = $section = '';
             foreach($box_map as $box_id => $sidebar_widget_id):
-                $this->add_tab( $box_id );
+                list($tab, $form) = $this->get_section($box_id, $post->ID);
+                $tabs .= $tab . "\n";
+                $section .= $form . "\n";
             endforeach;
+            $this->begin_tab_container();
+            echo $tabs;
             $this->end_tab_container();
             $this->begin_section_container();
-            // refresh the meta box forms on the page
-            foreach($box_map as $box_id => $sidebar_widget_id):
-                $this->get_section( $box_id, $post->ID ); // , $sidebar_widget_id
-            endforeach;
+            echo $section;
             $this->end_section_container();
         endif;
     }
     function begin_tab_container() {
-        echo apply_filters('intelliwidget_start_tab_container', '<div id="iw_tabbed_sections"><a id="iw_larr">&#171</a><a id="iw_rarr">&#187;</a><ul id="iw_tabs" class="">');
+        echo apply_filters('intelliwidget_start_tab_container', 
+            '<div id="iw_tabbed_sections"><a id="iw_larr">&#171</a><a id="iw_rarr">&#187;</a><ul id="iw_tabs" class="">');
     }
     
     function end_tab_container() {
@@ -291,8 +245,10 @@ class IntelliWidget {
         echo apply_filters('intelliwidget_end_section_container', '</div>');
     }
     
-    function add_tab($box_id) {
-        echo apply_filters('intelliwidget_tab', '<li id="iw_tab_' . $box_id . '" class="iw-tab"><a href="#iw_tabbed_section_' . $box_id . '">' . $box_id . '</a></li>', $box_id);
+    function get_tab($box_id, $replace_widget = '') {
+        $title = (empty($this->intelliwidgets[$replace_widget]) ? $this->intelliwidgets['none'] : $this->intelliwidgets[$replace_widget]);
+        return apply_filters('intelliwidget_tab', '<li id="iw_tab_' . $box_id . '" class="iw-tab">
+        <a href="#iw_tabbed_section_' . $box_id . '" title="' . $title . '">' . $box_id . '</a></li>', $box_id);
     }
     
     function begin_section($box_id) {
@@ -303,14 +259,6 @@ class IntelliWidget {
         return apply_filters('intelliwidget_end_section', '</div>');
     }
     
-    function get_section($box_id, $post_ID) { // , $sidebar_widget_id
-        $meta_name = '_intelliwidget_data_' . $box_id;
-        $instance = $this->defaults(unserialize(get_post_meta( $post_ID, $meta_name, true ) ));
-        $instance['custom_text'] = stripslashes(base64_decode($instance['custom_text']));
-        echo $this->begin_section($box_id);
-        echo $this->render_section_form($post_ID, $box_id, $instance);
-        echo $this->end_section($box_id);
-    }
     /**
      * Output the form in the post meta box. Params are passed by add_meta_box() function
      * @param <object> $post
@@ -410,8 +358,12 @@ class IntelliWidget {
         $box_id_key = current(preg_grep("/_box_id$/", array_keys($_POST)));
         $box_id = intval($_POST[$box_id_key]);
         $instance = $this->get_page_data($post_ID, $box_id);
-        $response = $this->render_section_form($post_ID, $box_id, $instance);
-        die($response);
+        
+        $response = array(
+            'tab'   => $this->get_tab($box_id, $instance['replace_widget']),
+            'form'  => $this->get_section_form($post_ID, $box_id, $instance),
+        );
+        die(json_encode($response));
     }
     
     function ajax_save_cdfdata() {
@@ -465,15 +417,10 @@ class IntelliWidget {
             $this->get_box_map($post_ID));
         if (false === $box_id) die('fail');
         $instance = $this->defaults();
-        // buffer output for response
-        ob_start();
-        $this->add_tab($box_id);
-        $tab = ob_get_contents();
-        ob_end_clean();
-        
+
         $response = array(
-            'tab'   => $tab,
-            'form'  => $this->begin_section($box_id) . $this->render_section_form($post_ID, $box_id, $instance) . $this->end_section(),
+            'tab'   => $this->get_tab($box_id, $instance['replace_widget']),
+            'form'  => $this->begin_section($box_id) . $this->get_section_form($post_ID, $box_id, $instance) . $this->end_section(),
         );
         die(json_encode($response));
     }
@@ -484,11 +431,18 @@ class IntelliWidget {
         // note that the query string version uses "post" instead of "post_ID"
         $box_id = intval($_POST['iw_box_id']);
         $post_ID   = intval($_POST['post_ID']);
-        $form = $this->get_section( $box_id, $post_ID); // , $sidebar_widget_id
+        list($tab, $form) = $this->get_section($box_id, $post_ID); // , $sidebar_widget_id
         die($form);
     }
     
-    function render_section_form($post_ID = NULL, $box_id = NULL, $instance = array()) {
+    function get_section($box_id, $post_ID) {
+        $instance   = $this->get_page_data($post_ID, $box_id);
+        $tab        = $this->get_tab($box_id, $instance['replace_widget']);
+        $section    = $this->begin_section($box_id) . $this->get_section_form($post_ID, $box_id, $instance) . $this->end_section();
+        return array($tab, $section);
+    }
+
+    function get_section_form($post_ID = NULL, $box_id = NULL, $instance = array()) {
         global $intelliwidget_form;
         ob_start();
         $intelliwidget_form->intelliwidget_section($post_ID, $box_id, $instance);
@@ -571,11 +525,10 @@ class IntelliWidget {
         return $value;
     }
     
-    function get_relevant_terms($instance = NULL, $showall = FALSE) {
+    function get_relevant_terms($instance = NULL) {
     	$output = '';
-        $post_types = $showall ? $this->post_types : $this->val2array($instance['post_types']);
+        $post_types = $this->val2array($instance['post_types']);
         $instance['category']   = $this->val2array($instance['category']);
-        $instance['showall']    = $showall;
         $terms = array();
         foreach ($this->val2array(preg_grep('/post_format/', get_object_taxonomies($post_types), PREG_GREP_INVERT)) as $tax):
             if (isset($this->terms[$tax]))
@@ -985,6 +938,14 @@ class IntelliWidget {
         return apply_filters('intelliwidget_content_menu', array(
             'post_list' => __('List of Posts', 'intelliwidget'),
             'nav_menu'  => __('WordPress Nav Menu', 'intelliwidget'),
+            )
+        );
+    }
+    
+    function get_replaces_menu() {
+        return apply_filters('intelliwidget_replaces_menu', array(
+            'none'      => __('Unassigned', 'intelliwidget'),
+            'content'   => __('Shortcode (use tab number)', 'intelliwidget'),
             )
         );
     }
