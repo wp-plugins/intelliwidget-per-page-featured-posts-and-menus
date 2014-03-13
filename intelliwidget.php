@@ -22,5 +22,5 @@ require_once( 'includes/class-intelliwidget.php' );
 require_once( 'includes/class-widget-intelliwidget.php' );
 require_once( 'includes/template-tags.php' );
     
-global $intelliwidget, $intelliwidget_form;
+global $intelliwidget;
 $intelliwidget = new IntelliWidget( __FILE__ );
