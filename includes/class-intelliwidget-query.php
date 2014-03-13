@@ -90,52 +90,23 @@ class IntelliWidget_Query {
 	}
     /* Intelliwidget has a lot of internal logic that can't be done efficiently using the standard
      * WP_Query parameters. This function dyanamically builds a custom query so that the majority of the 
-     * post and postmeta data can be retrieved in a single db query.
+     * post and postmeta data can be retrieved in two optimized db queries.
      */
     function iw_query($instance = null) {
         if (empty($instance)) return;
         global $wpdb, $post;
-        // filter = raw lets IW posts play nice with WP post functions for backward compatability
         $select = "
 SELECT DISTINCT
-    p1.ID,
-    p1.post_content, 
-    p1.post_excerpt, 
-    p1.post_title,
-    COALESCE(NULLIF(pm2.meta_value, ''), p1.post_date) AS post_date,
-    p1.post_author,
-    'raw' AS filter,
-    pm1.meta_value AS expire_date, 
-    pm2.meta_value AS event_date, 
-    pm3.meta_value AS link_classes,
-    pm4.meta_value AS alt_title,
-    pm5.meta_value AS link_target,
-    pm6.meta_value AS external_url,
-    pm7.meta_value AS thumbnail_id
+    p1.ID
 FROM {$wpdb->posts} p1
-";
-    $joins = array("
+        ";
+        $joins = array("
 LEFT JOIN {$wpdb->postmeta} pm1 ON pm1.post_id = p1.ID
     AND pm1.meta_key = 'intelliwidget_expire_date'
             ", "
 LEFT JOIN {$wpdb->postmeta} pm2 ON pm2.post_id = p1.ID
     AND pm2.meta_key = 'intelliwidget_event_date'
-            ", "
-LEFT JOIN {$wpdb->postmeta} pm3 ON pm3.post_id = p1.ID
-    AND pm3.meta_key = 'intelliwidget_link_classes'
-            ", "
-LEFT JOIN {$wpdb->postmeta} pm4 ON pm4.post_id = p1.ID
-    AND pm4.meta_key = 'intelliwidget_alt_title'
-            ", "
-LEFT JOIN {$wpdb->postmeta} pm5 ON pm5.post_id = p1.ID
-    AND pm5.meta_key = 'intelliwidget_link_target'
-            ", "
-LEFT JOIN {$wpdb->postmeta} pm6 ON pm6.post_id = p1.ID
-    AND pm6.meta_key = 'intelliwidget_external_url'
-            ", "
-LEFT JOIN {$wpdb->postmeta} pm7 ON pm7.post_id = p1.ID
-    AND pm7.meta_key = '_thumbnail_id'
-            ");
+            ",);
         $clauses = array(
             "(p1.post_status = 'publish')",
             "(p1.post_password = '' OR p1.post_password IS NULL)",
@@ -204,7 +175,6 @@ LEFT JOIN {$wpdb->postmeta} pm7 ON pm7.post_id = p1.ID
             default:
                 $orderby = 'p1.post_title ' . $order;
                 break;
-            
         endswitch;
         $orderby = ' ORDER BY ' . $orderby;
         $items = intval($instance['items']);
@@ -214,6 +184,55 @@ LEFT JOIN {$wpdb->postmeta} pm7 ON pm7.post_id = p1.ID
             $prepargs[] = $items;
         endif;
         $query = $select . implode(' ', $joins) . ' WHERE ' . implode("\n AND ", $clauses) . $orderby . $limit;
+        //echo 'query: ' . "\n" . $query . " \n";
+        $res      = $wpdb->get_results($wpdb->prepare($query, $prepargs));
+        $clauses = $prepargs = $ids = array();
+        foreach ($res as $obj)
+            $ids[] = $obj->ID;
+        $clauses[] = '(p1.ID IN ('. $this->prep_array($ids, $prepargs, 'd') . ') )';
+
+        // now flesh out objects
+        $select = "
+SELECT DISTINCT
+    p1.ID,
+    p1.post_content, 
+    p1.post_excerpt, 
+    p1.post_title,
+    COALESCE(NULLIF(pm2.meta_value, ''), p1.post_date) AS post_date,
+    p1.post_author,
+    'raw' AS filter,
+    pm1.meta_value AS expire_date, 
+    pm2.meta_value AS event_date, 
+    pm3.meta_value AS link_classes,
+    pm4.meta_value AS alt_title,
+    pm5.meta_value AS link_target,
+    pm6.meta_value AS external_url,
+    pm7.meta_value AS thumbnail_id
+FROM {$wpdb->posts} p1
+";
+    $joins = array("
+LEFT JOIN {$wpdb->postmeta} pm1 ON pm1.post_id = p1.ID
+    AND pm1.meta_key = 'intelliwidget_expire_date'
+            ", "
+LEFT JOIN {$wpdb->postmeta} pm2 ON pm2.post_id = p1.ID
+    AND pm2.meta_key = 'intelliwidget_event_date'
+            ", "
+LEFT JOIN {$wpdb->postmeta} pm3 ON pm3.post_id = p1.ID
+    AND pm3.meta_key = 'intelliwidget_link_classes'
+            ", "
+LEFT JOIN {$wpdb->postmeta} pm4 ON pm4.post_id = p1.ID
+    AND pm4.meta_key = 'intelliwidget_alt_title'
+            ", "
+LEFT JOIN {$wpdb->postmeta} pm5 ON pm5.post_id = p1.ID
+    AND pm5.meta_key = 'intelliwidget_link_target'
+            ", "
+LEFT JOIN {$wpdb->postmeta} pm6 ON pm6.post_id = p1.ID
+    AND pm6.meta_key = 'intelliwidget_external_url'
+            ", "
+LEFT JOIN {$wpdb->postmeta} pm7 ON pm7.post_id = p1.ID
+    AND pm7.meta_key = '_thumbnail_id'
+            ");
+        $query = $select . implode(' ', $joins) . ' WHERE ' . implode("\n AND ", $clauses) . $orderby;
         //echo 'query: ' . "\n" . $query . " \n";
         $this->posts      = $wpdb->get_results($wpdb->prepare($query, $prepargs), OBJECT);
         $this->post_count = count($this->posts);
@@ -226,19 +245,6 @@ LEFT JOIN {$wpdb->postmeta} pm7 ON pm7.post_id = p1.ID
             $placeholders[] = ('d' == $type ? '%d' : '%s');
             $args[] = trim($val);
         endforeach;
-        
-/*
-        array_walk_recursive($values, array($this, 'trimming'),  use (&$placeholders, &$args, $type) { 
-            $placeholders[] = ('s' == $type ? '%s' : '%d');
-            $args[] = trim($a);
-        });
-*/
         return implode(',', $placeholders);
-    }
-    function trimming($data) {
-        if ('array' === gettype($data))
-            return array_map('trimming', $data);
-        else
-        return trim($data);
     }
 }
