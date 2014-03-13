@@ -14,6 +14,7 @@ class IntelliWidget_Widget extends WP_Widget {
 
     var $version     = '1.5.0';
     var $tax_query;
+    var $intelliwidget_form;
     /**
      * Constructor
      */
@@ -22,6 +23,10 @@ class IntelliWidget_Widget extends WP_Widget {
         $widget_ops          = array('description' => __('Menus, Featured Posts, HTML and more, customized per page or site-wide.', 'intelliwidget'));
         $control_ops         = array('width' => 400, 'height' => 350);
         add_action('wp_enqueue_scripts', array(&$this, 'enqueue_styles'));
+        if (is_admin()):
+            include_once('class-intelliwidget-form.php');
+            $this->intelliwidget_form = new IntelliWidgetForm();
+        endif;
         $this->WP_Widget('intelliwidget', $intelliwidget->pluginName, $widget_ops, $control_ops);
     }
     /**
@@ -49,12 +54,12 @@ class IntelliWidget_Widget extends WP_Widget {
         $post_id = is_object($post) ? $post->ID : null;
         if ($post_id):    
             // if there are page-specific settings for this widget, use them
-            if ($page_data = $this->get_page_data($post_id, $args['widget_id'])):
+            if ($page_data = $this->get_page_data($args['widget_id'], $post_id)):
                 // check for no-copy override
                 if (empty($page_data['nocopy'])):
                     // if this page is using another page's settings and they exist for this widget, use them
                     if ($other_page_id = get_post_meta($post_id, '_intelliwidget_widget_page_id', true)) :
-                        $page_data = $this->get_page_data($other_page_id, $args['widget_id']);
+                        $page_data = $this->get_page_data($args['widget_id'], $other_page_id);
                     endif;
                 endif;
                 if (is_singular() && !empty($page_data)):
@@ -85,7 +90,7 @@ class IntelliWidget_Widget extends WP_Widget {
      * @param <string> $widget_id
      * @return <array> if exists or false if empty
      */
-    function get_page_data($post_id, $widget_id) {
+    function get_page_data($widget_id, $post_id) {
         global $intelliwidget;
         // the box map stores meta box => widget id relations in page meta data
         $box_map = unserialize(get_post_meta($post_id, '_intelliwidget_map', true));
@@ -95,7 +100,7 @@ class IntelliWidget_Widget extends WP_Widget {
             if (array_key_exists($widget_id, $widget_map)):
                 $box_id = $widget_map[$widget_id];
                 // are there settings for this widget?
-                if ($page_data = $intelliwidget->get_page_data($post_id, $box_id)):
+                if ($page_data = $intelliwidget->get_page_data($box_id, $post_id)):
                     return $page_data;
                 endif;
             endif;
@@ -137,10 +142,10 @@ class IntelliWidget_Widget extends WP_Widget {
      */
     function form($instance) {
         //echo 'BEFORE defaults: ' . "\n" . print_r($instance, true) . "\n\n";
-        global $intelliwidget, $intelliwidget_form;
+        global $intelliwidget;
         $instance = $intelliwidget->defaults($instance);
         //echo 'AFTER defaults: ' . "\n" . print_r($instance, true) . "\n\n";
-        $intelliwidget_form->intelliwidget_form($instance, $this);
+        $this->intelliwidget_form->intelliwidget_form($instance, $this);
     }
     
 

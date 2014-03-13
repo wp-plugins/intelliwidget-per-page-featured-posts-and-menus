@@ -13,6 +13,7 @@ jQuery(document).ready(function($) {
     /*
      * Use localization object to store tab data
      */
+    IWAjax.openPanels   = [];
     var initTabs = function() {
         IWAjax.viewWidth    = 0;
         IWAjax.visWidth     = 0;
@@ -24,24 +25,24 @@ jQuery(document).ready(function($) {
             IWAjax.visWidth += $(this).outerWidth();
             $(this).show();
         });
-        //setArrows();
         reflowTabs();
     },
-
+    openRefreshedPanels = function() {
+        while(IWAjax.openPanels.length) {
+            el = IWAjax.openPanels.shift();
+            $('#' + el).toggleClass('closed').show();
+        }
+    },
     reflowTabs = function() {
         IWAjax.viewWidth = $('#iw_tabs').width() - 24;
-        console.log('visible width: ' + IWAjax.visWidth + ' viewWidth: ' + IWAjax.viewWidth);
         if (IWAjax.viewWidth > 0) {
             count = 0;
             while (IWAjax.visTabs.length && IWAjax.visWidth > IWAjax.viewWidth) {
                 var leftMost = IWAjax.visTabs.shift(),
                     tabWidth = $('#' + leftMost).outerWidth();
-                console.log('leftMost: ' + leftMost + ' tabWidth: ' + tabWidth);
                 IWAjax.visWidth -= tabWidth;
                 $('#' + leftMost).hide();
                 IWAjax.leftTabs.push(leftMost);
-                console.log('visible width: ' + IWAjax.visWidth + ' viewWidth: ' + IWAjax.viewWidth);
-                console.log('visible count: ' + IWAjax.visTabs.length + ' left count: ' + IWAjax.leftTabs.length);
                 if (++count > 50) break; // infinite loop safety check
             }
         }
@@ -83,22 +84,31 @@ jQuery(document).ready(function($) {
         if (IWAjax.rightTabs.length) $('#iw_rarr').css('visibility', 'visible');
         // if leftTabs, show <<
         if (IWAjax.leftTabs.length) $('#iw_larr').css('visibility', 'visible');
-        console.log('left: ' + IWAjax.leftTabs.length);
-        console.log('visible: ' + IWAjax.visTabs.length);
-        console.log('right: ' + IWAjax.rightTabs.length);
-        console.log('visible width: ' + IWAjax.visWidth);
-        console.log('container width: ' + IWAjax.viewWidth);
+    },
+    bind_events = function(el) {
+        // since postbox.js does not delegate events, 
+        // we have to rebind toggles on refresh
+        $(el).find('.postbox h3, .postbox, .handlediv').on('click', function(e){
+            var p = $(this).parent('.postbox'), id = p.attr('id');
+            p.toggleClass('closed');
+            if ( id ) {
+                if ( !p.hasClass('closed') && $.isFunction(postboxes.pbshow) )
+                    postboxes.pbshow(id);
+                else if ( p.hasClass('closed') && $.isFunction(postboxes.pbhide) )
+                    postboxes.pbhide(id);
+            }
+        });
     },
     /**
      * Ajax Save Custom Post Type Data
      */
-    iw_save_cdfdata = function(){
+    save_cdfdata = function(){
         // disable the button until ajax returns
         $(this).prop('disabled', true);
         // clear previous success/fail icons
         $('.iw-copy-container,.iw-save-container,.iw-cdf-container').removeClass('success failure');
         // unbind button from click event
-        $('body').off('click', '#iw_cdfsave', iw_save_cdfdata);
+        $('body').off('click', '#iw_cdfsave', save_cdfdata);
         // show spinner
         $('#intelliwidget_cpt_spinner').show();
         // build post data array
@@ -142,7 +152,7 @@ jQuery(document).ready(function($) {
     /**
      * Ajax Save IntelliWidget Meta Box Data
      */
-    iw_save_postdata = function (){ 
+    save_postdata = function (){ 
                 
         $('.iw-copy-container,.iw-save-container,.iw-cdf-container').removeClass('success failure');
         var thisID          = $(this).prop('id'),
@@ -155,19 +165,24 @@ jQuery(document).ready(function($) {
             // parse id to get section number
             pre             = 'intelliwidget_' + thisID.split('_')[1],
             // build post data array
-            postData        = {};
+            postData        = {},
+            // save any open panels to reopen on refresh
+            openPanels      = [];
+        sectionform.find('.postbox').not('.closed').each(function(){
+            IWAjax.openPanels.push($(this).prop('id'));
+        });
         // disable the button until ajax returns
         $(savebutton).prop('disabled', true);;
         // show spinner
         $('#' + pre + '_spinner').show();
         // unbind button from click event
-        $('body').off('click', savebutton, iw_save_postdata);
+        $('body').off('click', savebutton, save_postdata);
         // special handling for post types (array of checkboxes)
         postData[ pre + '_post_types'] = [];
         // find inputs for this section
         $('input[name=post_ID],input[name=iwpage],input[type=text][id^='
             + pre + '],input[type=checkbox][id^=' + pre +']:checked,select[id^='
-            + pre +'],textarea[id^='+pre+'],input[type=hidden][id^='+pre+']').each(
+            + pre + '],textarea[id^=' + pre + '],input[type=hidden][id^=' + pre + ']').each(
             function(index, element) {
             // get field id
             fieldID = $(this).attr('id');
@@ -194,14 +209,12 @@ jQuery(document).ready(function($) {
                     $(savecontainer).addClass('failure');
                 } else {
                     // refresh section form
-                    var tab = $(response.tab);
-                    console.log('response tab: ' + tab.prop('id') + ' ' + tab.html());
-                    $('#iw_tabs').find('#' + tab.prop('id')).html(tab.html());
-                    $(sectionform).html(response.form);
-                    // since postbox.js does not delegate events, we have to rebind toggles on refresh
-                    $(sectionform).find('.postbox h3, .postbox, .handlediv').on('click', function(e){
-                        $(this).parent('.postbox').toggleClass('closed');
-                    });
+                    var tab = $(response.tab),
+                        curtab = $('#iw_tabs').find('#' + tab.prop('id'));
+                    curtab.html(tab.html());
+                    sectionform.html(response.form);
+                    bind_events(sectionform);
+                    $('#iw_tabbed_sections').tabs('refresh').tabs({active: curtab.index()});
                     // show check mark
                     $(sectionform).find('.iw-save-container').addClass('success');
                 }
@@ -222,17 +235,16 @@ jQuery(document).ready(function($) {
         });  
         return false;  
     },
-
     /**
      * Ajax Save Copy Page Input
      */
-    iw_copy_page = function (){ 
+    copy_page = function (){ 
         // disable the button until ajax returns
         $(this).prop('disabled', true);
         // clear previous success/fail icons
         $('.iw-copy-container,.iw-save-container,.iw-cdf-container').removeClass('success failure');
         // unbind button from click event
-        $('body').off('click', '#iw_copy', iw_copy_page);
+        $('body').off('click', '#iw_copy', copy_page);
         // show spinner
         $('#intelliwidget_spinner').show();
         // build post data array
@@ -277,7 +289,7 @@ jQuery(document).ready(function($) {
     /**
      * Ajax Add new IntelliWidget Tab Section
      */
-    iw_add_tabbed_section = function (e){ 
+    add_tabbed_section = function (e){ 
         // don't act like a link
         e.preventDefault();
         e.stopPropagation();
@@ -294,7 +306,7 @@ jQuery(document).ready(function($) {
             // get href from link
             href     = $(this).attr('href'),
             // build post data array from query string
-            postData = iw_url_to_array(href);
+            postData = url_to_array(href);
         // show spinner
         $('#intelliwidget_spinner').show();
         // add wp ajax action to array
@@ -307,7 +319,6 @@ jQuery(document).ready(function($) {
             postData,
             //on success function  
             function(response){
-                console.log(response);
                 $(sel).removeClass('disabled');
                 $('#intelliwidget_spinner').hide();
                 if ('fail' == response) {
@@ -316,6 +327,7 @@ jQuery(document).ready(function($) {
                     form = $(response.form).hide();
                     tab  = $(response.tab).hide();
                     $('#iw_tabbed_sections').append(form);
+                    bind_events(form);
                     $('#iw_tabs').append(tab);
                     tab.show();
                     $('#iw_tabbed_sections').tabs('refresh').tabs({active: tab.index()});
@@ -341,7 +353,7 @@ jQuery(document).ready(function($) {
     /**
      * Ajax Delete IntelliWidget Tab Section
      */
-    iw_delete_tabbed_section = function (e){ 
+    delete_tabbed_section = function (e){ 
         // don't act like a link
         e.preventDefault();
         e.stopPropagation();
@@ -358,7 +370,7 @@ jQuery(document).ready(function($) {
             // get href from link
             href     = $(this).attr('href'),
             // build post data array from query string
-            postData = iw_url_to_array(href),
+            postData = url_to_array(href),
             // get box id 
             pre      = postData['iwdelete'];
         // show spinner
@@ -378,7 +390,6 @@ jQuery(document).ready(function($) {
                 if ('success' == response ) {
                         var target = $('#iw_tabbed_section_' + pre),
                             survivor = target.index();
-                        console.log('survivor: ' + survivor);
                         target.remove();
                         $('#iw_tab_' + pre).remove();
                         $('#iw_tabbed_sections').tabs('refresh');
@@ -401,7 +412,7 @@ jQuery(document).ready(function($) {
     /**
      * nice little url -> name:value pairs codex
      */
-    iw_url_to_array = function(url) {
+    url_to_array = function(url) {
         var pair, i, request = {},
             pairs = url.substring(url.indexOf('?') + 1).split('&');
         for (i = 0; i < pairs.length; i++) {
@@ -479,41 +490,36 @@ jQuery(document).ready(function($) {
         }
         return true;
     };
+    
+    /*
+     * Bind events
+     */
+
+    $(document).ajaxComplete(openRefreshedPanels);
     $('#iw_tabbed_sections').tabs(); //{ active: 0 });
     
     // add collapsibles to widgets admin
     $('body').on('click', '.iw-collapsible', function() {
         id = $(this).attr('id');
         sel = '#' + id + '-inside';
-        $(sel).stop().slideToggle();
+        $(sel).toggleClass('closed').stop().slideToggle();
     });
     // bind click events to edit page meta box buttons
-    $('body').on('click', '.iw-save', iw_save_postdata);    
-    $('body').on('click', '.iw-cdfsave', iw_save_cdfdata);    
-    $('body').on('click', '.iw-copy', iw_copy_page);    
-    $('body').on('click', '.iw-add', iw_add_tabbed_section);    
-    $('body').on('click', '.iw-delete', iw_delete_tabbed_section);
+    $('body').on('click', '.iw-save', save_postdata);    
+    $('body').on('click', '.iw-cdfsave', save_cdfdata);    
+    $('body').on('click', '.iw-copy', copy_page);    
+    $('body').on('click', '.iw-add', add_tabbed_section);    
+    $('body').on('click', '.iw-delete', delete_tabbed_section);
     // update visibility of form inputs
-    $('body').on('change', '.iw-control', iw_save_postdata);    
+    $('body').on('change', '.iw-control', save_postdata);    
     $('body').on('change', '.iw-widget-control', function(e){
-        wpWidgets.save( $(this).parents('div.widget').first(), 0, 0, 0 );
+        var sectionform = $(this).parents('div.widget').first();
+            sectionform.find('.iw-section-inside').not('.closed').each(function(){
+            IWAjax.openPanels.push($(this).prop('id'));
+        });
+        wpWidgets.save( sectionform, 0, 0, 0 );
     });    
-    // bind toggle events to new content - using native wp postboxes class
-    $('body').on('click', '.iw_new_box h3, .iw_new_box .handlediv, .iw_new_box .postbox h3, .iw_new_box .postbox .handlediv', function() {
-        var p = $(this).parent('.postbox'), id = p.attr('id');
-        p.toggleClass('closed');
-        if ( id ) {
-            if ( !p.hasClass('closed') && $.isFunction(postboxes.pbshow) )
-                postboxes.pbshow(id);
-            else if ( p.hasClass('closed') && $.isFunction(postboxes.pbhide) )
-                postboxes.pbhide(id);
-        }
-    });
-    // prevent link action on h3 
-    $('body').on('click', '.iw_new_box h3 a, .iw_new_box .postbox h3 a', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-    });
+    
     /**
      * manipulate IntelliWidget timestamp inputs
      * Adapted from wp-admin/js/post.js in Wordpress Core

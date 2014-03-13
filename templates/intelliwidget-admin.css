@@ -57,12 +57,10 @@ input.intelliwidget-input, select.intelliwidget-input {
     float:right;
     margin-left:2.5%;
 }
-#intelliwidget_main_meta_box select {
-    font-size:small;
-}
 select.intelliwidget-multiselect {
     resize:both;
-    font-size:smaller;
+    font-size:x-small;
+    min-height:100px;
 }
 
 #intelliwidget_main_meta_box .postbox {

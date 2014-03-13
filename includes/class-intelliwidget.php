@@ -82,16 +82,6 @@ class IntelliWidget {
         add_action( 'after_setup_theme',                array(&$this, 'ensure_post_thumbnails_support' ) );
     }
 
-    function index_query_objects($property, $keyfield, $data) {
-        $indexarray = array();
-        if (isset($data) && count($data)):
-            foreach ($data as $object):
-                $indexarray[$object->{$keyfield}][] = $object;
-            endforeach;
-        endif;
-        $this->{$property} = $indexarray;
-    }
-    
     /**
      * Stub for registering scripts in future release.
      */
@@ -114,24 +104,6 @@ class IntelliWidget {
             $this->intelliwidgets = $this->get_intelliwidgets();
     }
     
-    function get_intelliwidgets() {
-        global $wp_registered_sidebars;
-        $widgets = array();
-        foreach ($this->get_replaces_menu() as $value => $label):
-            $widgets[$value] = $label;
-        endforeach;
-        foreach(wp_get_sidebars_widgets() as $sidebar_id => $sidebar_widgets): 
-            if (false === strpos($sidebar_id, 'wp_inactive') && false === strpos($sidebar_id, 'orphaned')):
-                $count = 0;
-                foreach ($sidebar_widgets as $sidebar_widget_id):
-                    if (false !== strpos($sidebar_widget_id, 'intelliwidget') ):
-                        $widgets[$sidebar_widget_id] = $wp_registered_sidebars[$sidebar_id]['name'] . ' [' . ++$count . ']';
-                    endif; 
-                endforeach; 
-            endif; 
-        endforeach;
-        return $widgets;
-    }
     /**
      * Stub for printing the scripts needed for the admin.
      */
@@ -143,18 +115,12 @@ class IntelliWidget {
             'ajaxurl' => admin_url( 'admin-ajax.php' )
         ));
     }
-    
+        
     /**
-     * Display message in admin after create/update/delete
-     * FIXME: future release
-     * @return  void
+     * Stub for plugin activation
      */
-    function display_notice($msg) {
-        if (empty($msg)) return; ?>
-<div class="updated">
-  <p><?php echo $msg; ?></p>
-</div>
-<?php
+    function intelliwidget_activate() {
+        
     }
     
     /**
@@ -209,8 +175,8 @@ class IntelliWidget {
      * @return  void
      */
     function main_meta_box_form($post, $metabox) {
-        global $intelliwidget_form;
-        $intelliwidget_form->page_form($post);
+        global $intelliwidget_metabox;
+        $intelliwidget_metabox->page_form($post);
 
         // box_map contains map of meta boxes to their related widgets
         $box_map = $this->get_box_map($post->ID);
@@ -229,6 +195,18 @@ class IntelliWidget {
             $this->end_section_container();
         endif;
     }
+    
+    /**
+     * Output the form in the post meta box. Params are passed by add_meta_box() function
+     * @param <object> $post
+     * @param <array>  $metabox
+     * @return  void
+     */
+    function post_meta_box_form($post, $metabox) {
+        global $intelliwidget_metabox;
+        $intelliwidget_metabox->post_form($post);
+    }
+    
     function begin_tab_container() {
         echo apply_filters('intelliwidget_start_tab_container', 
             '<div id="iw_tabbed_sections"><a id="iw_larr">&#171</a><a id="iw_rarr">&#187;</a><ul id="iw_tabs" class="">');
@@ -245,29 +223,12 @@ class IntelliWidget {
         echo apply_filters('intelliwidget_end_section_container', '</div>');
     }
     
-    function get_tab($box_id, $replace_widget = '') {
-        $title = (empty($this->intelliwidgets[$replace_widget]) ? $this->intelliwidgets['none'] : $this->intelliwidgets[$replace_widget]);
-        return apply_filters('intelliwidget_tab', '<li id="iw_tab_' . $box_id . '" class="iw-tab">
-        <a href="#iw_tabbed_section_' . $box_id . '" title="' . $title . '">' . $box_id . '</a></li>', $box_id);
-    }
-    
     function begin_section($box_id) {
         return apply_filters('intelliwidget_begin_section', '<div id="iw_tabbed_section_' . $box_id . '" class="iw-tabbed-section">');
     }
     
     function end_section() {
         return apply_filters('intelliwidget_end_section', '</div>');
-    }
-    
-    /**
-     * Output the form in the post meta box. Params are passed by add_meta_box() function
-     * @param <object> $post
-     * @param <array>  $metabox
-     * @return  void
-     */
-    function post_meta_box_form($post, $metabox) {
-        global $intelliwidget_form;
-        $intelliwidget_form->post_form($post);
     }
     
     /**
@@ -284,15 +245,15 @@ class IntelliWidget {
          */
         if (empty($_POST['iwpage']) || ( defined('DOING_AUTOSAVE') && DOING_AUTOSAVE ) || ( !empty($post) && 'revision' == $post->post_type )) return false;
         
-        $post_ID   = intval($_POST['post_ID']);
+        $post_id   = intval($_POST['post_ID']);
         // security checkpoint
-        if ( empty($post_ID) || !current_user_can('edit_post', $post_ID) || !wp_verify_nonce($_POST['iwpage'],'iwpage_' . $post_ID) ) return false;
+        if ( empty($post_id) || !current_user_can('edit_post', $post_id) || !wp_verify_nonce($_POST['iwpage'],'iwpage_' . $post_id) ) return false;
         // reset the data array
         $post_data = array();
         $prefix    = 'intelliwidget_';
         // since we can now save a single meta box via ajax post, 
         // we need to manipulate the existing boxmap
-        $box_map = $this->get_box_map($post_ID);
+        $box_map = $this->get_box_map($post_id);
         // allow customization of input fields
         $checkbox_fields = $this->get_checkbox_fields();
         $text_fields = $this->get_text_fields();
@@ -339,29 +300,80 @@ class IntelliWidget {
             $box_map[$box_id] = empty($_POST[$prefix . $box_id . '_replace_widget']) ? NULL : $_POST[$prefix . $box_id . '_replace_widget'];
             // serialize and save new data
             $savedata = serialize($post_data[$box_id]);
-            update_post_meta($post_ID, '_intelliwidget_data_' . $box_id, $savedata);
+            update_post_meta($post_id, '_intelliwidget_data_' . $box_id, $savedata);
             // increment box counter
             $boxcounter++;
         endforeach;
         if ($boxcounter)
             // if we have updates, serialize and save new map
-            update_post_meta($post_ID, '_intelliwidget_map', serialize($box_map));
+            update_post_meta($post_id, '_intelliwidget_map', serialize($box_map));
         // save custom post data if it exists
         $this->save_cdfdata();
         // save copy page id (i.e., "use settings from ..." ) if it exists
-        $this->save_copy_page($post_ID);
+        $this->save_copy_page($post_id);
     }
 
+    function save_cdfdata() {
+        if (empty($_POST['iwpage']) ) return false;
+        $post_id   = intval($_POST['post_ID']);
+        // security checkpoint
+        if ( empty($post_id) || !current_user_can('edit_post', $post_id) || !wp_verify_nonce($_POST['iwpage'],'iwpage_' . $post_id) ) return false;
+        // reset the data array
+        $prefix    = 'intelliwidget_';
+        foreach ($this->get_custom_fields() as $cfield):
+            $cdfield = $prefix . $cfield;
+            if (array_key_exists($cdfield, $_POST)):
+                if (empty($_POST[$cdfield])):
+                    delete_post_meta($post_id, $cdfield);
+                else:
+                    $newdata = $_POST[$cdfield];
+                    if ( !current_user_can('unfiltered_html') ):
+                        $newdata = stripslashes( 
+                        wp_filter_post_kses( addslashes($newdata) ) ); 
+                    endif;
+                    update_post_meta($post_id, $cdfield, $newdata);
+                endif;
+            endif;
+        endforeach;
+    }
+    
+    function save_copy_page($post_id = NULL) {
+        if (empty($post_id) || !array_key_exists('intelliwidget_widget_page_id', $_POST)) return false;
+        // save copy page id (i.e., "use settings from ..." ) if it exists
+        $copy_page_id = intval($_POST['intelliwidget_widget_page_id']);
+        update_post_meta($post_id, '_intelliwidget_widget_page_id', $copy_page_id);
+    }
+    
+    function delete_tabbed_section($box_id = NULL, $post_id = NULL, $nonce = NULL, $box_map = array()) {
+        if (empty($post_id) || empty($nonce) || empty($box_id) || !wp_verify_nonce( $nonce, 'iwdelete' ) 
+            || !array_key_exists($box_id, $box_map) || !current_user_can('edit_post', $post_id)) return false;
+        delete_post_meta($post_id, '_intelliwidget_data_' . $box_id);
+        unset($box_map[$box_id]);
+        update_post_meta($post_id, '_intelliwidget_map', serialize($box_map));
+    }
+    
+    function add_tabbed_section($post_id = NULL, $nonce = NULL, $box_map = array()) {
+        if (empty($post_id) || empty($nonce)  || ! wp_verify_nonce( $nonce, 'iwadd' ) || !current_user_can('edit_post', $post_id)) return false;
+        if (count($box_map)): 
+            $newkey = max(array_keys($box_map)) + 1;
+        else: 
+            $newkey = 1;
+        endif;
+        $box_map[$newkey] = '';
+        update_post_meta($post_id, '_intelliwidget_map', serialize($box_map));
+        return $newkey;
+    }
+    
     function ajax_save_postdata() {
         if (false === $this->save_postdata()) die('fail');
-        $post_ID = intval($_POST['post_ID']);
+        $post_id = intval($_POST['post_ID']);
         $box_id_key = current(preg_grep("/_box_id$/", array_keys($_POST)));
         $box_id = intval($_POST[$box_id_key]);
-        $instance = $this->get_page_data($post_ID, $box_id);
+        $instance = $this->get_page_data($box_id, $post_id);
         
         $response = array(
             'tab'   => $this->get_tab($box_id, $instance['replace_widget']),
-            'form'  => $this->get_section_form($post_ID, $box_id, $instance),
+            'form'  => $this->get_metabox($box_id, $post_id, $instance),
         );
         die(json_encode($response));
     }
@@ -371,39 +383,15 @@ class IntelliWidget {
         die('success');
     }
     
-    function save_cdfdata() {
-        if (empty($_POST['iwpage']) ) return false;
-        $post_ID   = intval($_POST['post_ID']);
-        // security checkpoint
-        if ( empty($post_ID) || !current_user_can('edit_post', $post_ID) || !wp_verify_nonce($_POST['iwpage'],'iwpage_' . $post_ID) ) return false;
-        // reset the data array
-        $prefix    = 'intelliwidget_';
-        foreach ($this->get_custom_fields() as $cfield):
-            $cdfield = $prefix . $cfield;
-            if (array_key_exists($cdfield, $_POST)):
-                if (empty($_POST[$cdfield])):
-                    delete_post_meta($post_ID, $cdfield);
-                else:
-                    $newdata = $_POST[$cdfield];
-                    if ( !current_user_can('unfiltered_html') ):
-                        $newdata = stripslashes( 
-                        wp_filter_post_kses( addslashes($newdata) ) ); 
-                    endif;
-                    update_post_meta($post_ID, $cdfield, $newdata);
-                endif;
-            endif;
-        endforeach;
-    }
-    
     function ajax_delete_tabbed_section() {
         if (!array_key_exists('post', $_POST) || !array_key_exists('iwdelete', $_POST) || 
             !array_key_exists('_wpnonce', $_POST)) die('fail');
         // note that the query string version uses "post" instead of "post_ID"
-        $post_ID = intval($_POST['post']);
+        $post_id = intval($_POST['post']);
         $box_id = intval($_POST['iwdelete']);
         $nonce = $_POST['_wpnonce'];
-        if ($this->delete_tabbed_section($post_ID, $box_id, $nonce, 
-            $this->get_box_map($post_ID)) === false) die('fail');
+        if (false === $this->delete_tabbed_section($box_id, $post_id, $nonce, 
+            $this->get_box_map($post_id))) die('failure');
         die('success');
     }
 
@@ -411,16 +399,16 @@ class IntelliWidget {
         if (!array_key_exists('post', $_POST) || 
             !array_key_exists('_wpnonce', $_POST)) die('fail');
         // note that the query string version uses "post" instead of "post_ID"
-        $post_ID = intval($_POST['post']);
+        $post_id = intval($_POST['post']);
         $nonce = $_POST['_wpnonce'];
-        $box_id = $this->add_tabbed_section($post_ID, $nonce, 
-            $this->get_box_map($post_ID));
+        $box_id = $this->add_tabbed_section($post_id, $nonce, 
+            $this->get_box_map($post_id));
         if (false === $box_id) die('fail');
         $instance = $this->defaults();
 
         $response = array(
             'tab'   => $this->get_tab($box_id, $instance['replace_widget']),
-            'form'  => $this->begin_section($box_id) . $this->get_section_form($post_ID, $box_id, $instance) . $this->end_section(),
+            'form'  => $this->begin_section($box_id) . $this->get_metabox($box_id, $post_id, $instance) . $this->end_section(),
         );
         die(json_encode($response));
     }
@@ -430,67 +418,65 @@ class IntelliWidget {
             !array_key_exists('_wpnonce', $_POST) || !wp_verify_nonce($_POST['_wpnonce'])) die('fail');
         // note that the query string version uses "post" instead of "post_ID"
         $box_id = intval($_POST['iw_box_id']);
-        $post_ID   = intval($_POST['post_ID']);
-        list($tab, $form) = $this->get_section($box_id, $post_ID); // , $sidebar_widget_id
+        $post_id   = intval($_POST['post_ID']);
+        list($tab, $form) = $this->get_section($box_id, $post_id); // , $sidebar_widget_id
         die($form);
-    }
-    
-    function get_section($box_id, $post_ID) {
-        $instance   = $this->get_page_data($post_ID, $box_id);
-        $tab        = $this->get_tab($box_id, $instance['replace_widget']);
-        $section    = $this->begin_section($box_id) . $this->get_section_form($post_ID, $box_id, $instance) . $this->end_section();
-        return array($tab, $section);
-    }
-
-    function get_section_form($post_ID = NULL, $box_id = NULL, $instance = array()) {
-        global $intelliwidget_form;
-        ob_start();
-        $intelliwidget_form->intelliwidget_section($post_ID, $box_id, $instance);
-        $form = ob_get_contents();
-        ob_end_clean();
-        return $form;
-    }
-    
-    function get_box_map($post_ID = NULL) {
-        if (empty($post_ID) || (! $box_map = unserialize(get_post_meta($post_ID, '_intelliwidget_map', true)))) 
-            $box_map = array();
-        return $box_map;
     }
     
     function ajax_copy_page() {
         if (!array_key_exists('post_ID', $_POST) || !array_key_exists('iwpage', $_POST))
             die('fail');
-        $post_ID   = intval($_POST['post_ID']);
-        if (!current_user_can('edit_post', $post_ID) || !wp_verify_nonce($_POST['iwpage'],'iwpage_' . $post_ID)) die('fail');
+        $post_id   = intval($_POST['post_ID']);
+        if (!current_user_can('edit_post', $post_id) || !wp_verify_nonce($_POST['iwpage'],'iwpage_' . $post_id)) die('fail');
         if (false === $this->save_copy_page($_POST['post_ID'])) die('fail');
         die('success');
     }
     
-    function save_copy_page($post_ID = NULL) {
-        if (empty($post_ID) || !array_key_exists('intelliwidget_widget_page_id', $_POST)) return false;
-        // save copy page id (i.e., "use settings from ..." ) if it exists
-        $copy_page_id = intval($_POST['intelliwidget_widget_page_id']);
-        update_post_meta($post_ID, '_intelliwidget_widget_page_id', $copy_page_id);
+    function get_intelliwidgets() {
+        global $wp_registered_sidebars;
+        $widgets = array();
+        foreach ($this->get_replaces_menu() as $value => $label):
+            $widgets[$value] = $label;
+        endforeach;
+        foreach(wp_get_sidebars_widgets() as $sidebar_id => $sidebar_widgets): 
+            if (false === strpos($sidebar_id, 'wp_inactive') && false === strpos($sidebar_id, 'orphaned')):
+                $count = 0;
+                foreach ($sidebar_widgets as $sidebar_widget_id):
+                    if (false !== strpos($sidebar_widget_id, 'intelliwidget') ):
+                        $widgets[$sidebar_widget_id] = $wp_registered_sidebars[$sidebar_id]['name'] . ' [' . ++$count . ']';
+                    endif; 
+                endforeach; 
+            endif; 
+        endforeach;
+        return $widgets;
+    }
+
+    function get_tab($box_id, $replace_widget = '') {
+        $title = (empty($this->intelliwidgets[$replace_widget]) ? $this->intelliwidgets['none'] : $this->intelliwidgets[$replace_widget]);
+        return apply_filters('intelliwidget_tab', '<li id="iw_tab_' . $box_id . '" class="iw-tab">
+        <a href="#iw_tabbed_section_' . $box_id . '" title="' . $title . '">' . $box_id . '</a></li>', $box_id);
     }
     
-    function delete_tabbed_section($post_ID = NULL, $box_id = NULL, $nonce = NULL, $box_map = array()) {
-        if (empty($post_ID) || empty($nonce) || empty($box_id) || !wp_verify_nonce( $nonce, 'iwdelete' ) 
-            || !array_key_exists($box_id, $box_map) || !current_user_can('edit_post', $post_ID)) return false;
-        delete_post_meta($post_ID, '_intelliwidget_data_' . $box_id);
-        unset($box_map[$box_id]);
-        update_post_meta($post_ID, '_intelliwidget_map', serialize($box_map));
+    function get_section($box_id, $post_id) {
+        $instance   = $this->defaults($this->get_page_data($box_id, $post_id));
+        $tab        = $this->get_tab($box_id, $instance['replace_widget']);
+        $section    = $this->begin_section($box_id) . $this->get_metabox($box_id, $post_id, $instance) . $this->end_section();
+        return array($tab, $section);
+    }
+
+    function get_metabox($box_id = NULL, $post_id = NULL, $instance = array()) {
+        global $intelliwidget_metabox;
+        ob_start();
+        $intelliwidget_metabox->intelliwidget_metabox($box_id, $post_id, $instance);
+        $form = ob_get_contents();
+        ob_end_clean();
+        return $form;
     }
     
-    function add_tabbed_section($post_ID = NULL, $nonce = NULL, $box_map = array()) {
-        if (empty($post_ID) || empty($nonce)  || ! wp_verify_nonce( $nonce, 'iwadd' ) || !current_user_can('edit_post', $post_ID)) return false;
-        if (count($box_map)): 
-            $newkey = max(array_keys($box_map)) + 1;
-        else: 
-            $newkey = 1;
-        endif;
-        $box_map[$newkey] = '';
-        update_post_meta($post_ID, '_intelliwidget_map', serialize($box_map));
-        return $newkey;
+    function get_box_map($post_id = NULL) {
+        if (empty($post_id) || (! $box_map = unserialize(get_post_meta($post_id, '_intelliwidget_map', true)))) 
+            $box_map = array();
+        return $box_map;
     }
     
     /**
@@ -500,7 +486,7 @@ class IntelliWidget {
      * @param <array> $instance
      * @return <string> 
      */
-    function get_posts($instance = NULL) {
+    function get_posts_list($instance = NULL) {
         $instance['page'] = $this->val2array($instance['page']);
         $posts = array();
         foreach ($this->val2array($instance['post_types']) as $post_type):
@@ -515,14 +501,6 @@ class IntelliWidget {
 	    }
 
 	    return $output;
-    }
-    
-    function val2array($value) {
-        $value = empty($value) ? 
-            array() : (is_array($value) ?
-                $value : explode(',', $value));
-        sort($value);
-        return $value;
     }
     
     function get_relevant_terms($instance = NULL) {
@@ -542,14 +520,6 @@ class IntelliWidget {
 	        $output .= call_user_func_array(array($walker, 'walk'), $args);
 	    }
 	    return $output;
-    }
-    
-    function sort_terms($a, $b) {
-        $c = strcmp($a->taxonomy, $b->taxonomy);
-        if($c != 0) {
-            return $c;
-        }
-        return strcmp($a->name, $b->name);
     }
     
     /**
@@ -626,76 +596,6 @@ class IntelliWidget {
         return false;
     }
 
-    /**
-     * Ensure that "post-thumbnails" support is available for those themes that don't register it.
-     * @return  void
-     */
-    public function ensure_post_thumbnails_support () {
-        if ( ! current_theme_supports( 'post-thumbnails' ) ) { add_theme_support( 'post-thumbnails' ); }
-    } // End ensure_post_thumbnails_support()
-
-    /**
-     * Stub for data validation
-     * @param <string> $unclean - data to parse
-     * @param <array> $rules
-     * @return <string> $clean - sanitized data
-     */
-    function filter_sanitize_input($unclean = NULL) {
-        if (is_array($unclean)):
-            return array_map(array($this, __FUNCTION__), $unclean);
-        else:
-            return sanitize_text_field($unclean);
-        endif;
-    }
-    
-    /**
-     * Widget Defaults
-     * This will utilize an options form in a future release for customization
-     * @param <array> $instance
-     * @return <array> -- merged data
-     */
-    public function defaults($instance = array()) {
-        //if (empty($instance)) $instance = array();
-        $defaults = apply_filters('intelliwidget_defaults', array(
-            // these apply to all intelliwidgets
-            'content'        => 'post_list', // this is the main control, determines hook to use
-            'nav_menu'       => '', // built-in extension, uses wordpress menu instead of post_list
-            'title'          => '',
-            'link_title'     => 0,
-            'classes'        => '',
-            'container_id'   => '',
-            'custom_text'    => '',
-            'text_position'  => '',
-            'filter'         => 0,
-            'hide_if_empty'  => 0,      // applies to site-wide intelliwidgets
-            'replace_widget' => 'none', // applies to post-specific intelliwidgets
-            'nocopy'         => 0,      // applies to post-specific intelliwidgets
-            // these apply to post_list intelliwidgets
-            'post_types'     => array('page', 'post'),
-            'template'       => 'menu',
-            'page'           => array(), // stores any post_type, not just pages
-            'category'       => -1, // stores any taxonomy_terms, not just categories
-            'items'          => 5,
-            'sortby'         => 'title',
-            'sortorder'      => 'ASC',
-            'skip_expired'   => 0,
-            'skip_post'      => 0,
-            'future_only'    => 0,
-            'active_only'    => 0,
-            // these apply to post_list items
-            'length'         => 15,
-            'link_text'      => __('Read More', 'intelliwidget'),
-            'allowed_tags'   => '',
-            'imagealign'     => 'none',
-            'image_size'     => 'none',
-        ));
-        if (empty($instance['content']) && !empty($instance['nav_menu']) && '' != ($instance['nav_menu'])) $instance['content'] = 'nav_menu';
-        // standard WP function for merging argument lists
-        $merged = wp_parse_args($instance, $defaults);
-        // backwards compatibility: add content=nav_menu if nav_menu param set
-        return $merged;
-    }
-    
     function get_eligible_post_types() {
         $eligible = array();
         if ( function_exists('get_post_types') ):
@@ -710,6 +610,289 @@ class IntelliWidget {
             endif;
         endforeach;
         return apply_filters('intelliwidget_post_types', $eligible);
+    }
+    
+    function get_page_data($box_id, $post_id) {
+        // are there settings for this widget?
+        if ($instance = unserialize(get_post_meta($post_id, '_intelliwidget_data_' . $box_id, true))):
+            if (!empty($instance['custom_text'])):
+                // base64 encoding saves us from markup serialization heartburn
+                $instance['custom_text'] = stripslashes(base64_decode($instance['custom_text']));
+            endif;
+            return $instance;
+        endif;
+        return false;
+    }
+    
+    function get_words_html($text, $length) {
+        $opentags   = array();
+        $excerpt    = '';
+        $text       = preg_replace('/<(br|hr)[ \/]*>/', "<$1/>", $text);
+        preg_match_all('/(<[^>]+?>)?([^<]*)/', $text, $elements);
+        if (!empty($elements[2])):
+            $count = 0;
+            foreach($elements[2] as $string):
+                $html = array_shift($elements[1]);
+                if (preg_match('/<(\w+)[^\/]*>/', $html, $matches)):
+                    $opentags[] = $matches[1];
+                elseif (preg_match('/<\/(\w+)/', $html, $matches)):
+                    $close = array_pop($opentags);
+                endif;
+                $excerpt .= $html;
+                $words = preg_split('/[\r\n\t ]+/', $string);
+                foreach ($words as $word):
+                    if (empty($word)) continue;
+                    $count++;
+                    if ($count <= $length):
+                        $excerpt .= $word . ' ';
+                    else:
+                        $excerpt .= '...';
+                        break;
+                    endif;
+                endforeach;
+                if ($count > $length) break;
+            endforeach;
+            while (count($opentags)):
+                $close = array_pop($opentags);
+                $excerpt .= '</' . $close . '>';
+            endwhile;
+        endif;
+        return $excerpt;
+    }
+    
+    function get_content_menu() {
+        return apply_filters('intelliwidget_content_menu', array(
+            'post_list' => __('List of Posts (default)', 'intelliwidget'),
+            'nav_menu'  => __('WordPress Nav Menu', 'intelliwidget'),
+            )
+        );
+    }
+    
+    function get_replaces_menu() {
+        return apply_filters('intelliwidget_replaces_menu', array(
+            'none'      => __('Unassigned', 'intelliwidget'),
+            'content'   => __('Shortcode (use tab number)', 'intelliwidget'),
+            )
+        );
+    }
+    
+    function get_text_position_menu() {
+        return apply_filters('intelliwidget_text_position_menu', array(
+            ''          => __('None', 'intelliwidget'),
+            'above'     => __('Above Posts', 'intelliwidget'),
+            'below'     => __('Below Posts', 'intelliwidget'),
+            'only'      => __('This text only (no posts)', 'intelliwidget'),
+            )
+        );
+    }
+
+    function get_sortby_menu() {
+        return apply_filters('intelliwidget_sortby_menu', array(
+            'date'          => __('Post Date', 'intelliwidget'),
+            'event_date'    => __('Start Date', 'intelliwidget'),
+            'menu_order'    => __('Menu Order', 'intelliwidget'),
+            'title'         => __('Title', 'intelliwidget'),
+            'rand'          => __('Random', 'intelliwidget'),
+            )
+        );
+    }
+
+    function get_image_size_menu() {
+        return apply_filters('intelliwidget_image_size_menu', array(
+            'none'      => __('No Image', 'intelliwidget'),
+            'thumbnail' => __('Thumbnail', 'intelliwidget'),
+            'medium'    => __('Medium', 'intelliwidget'),
+            'large'     => __('Large', 'intelliwidget'),
+            'full'      => __('Full', 'intelliwidget'),
+            )
+        );
+    }
+
+    function get_imagealign_menu() {
+        return apply_filters('intelliwidget_imagealign_menu', array(
+            'none'      => __('Auto', 'intelliwidget'),
+            'left'      => __('Left', 'intelliwidget'),
+            'center'    => __('Center', 'intelliwidget'),
+            'right'     => __('Right', 'intelliwidget'),
+            )
+        );
+    }
+
+    function get_link_target_menu() {
+        return apply_filters('intelliwidget_link_target_menu', array(
+            ''          => __('None', 'intelliwidget'),
+            '_new'      => '_new',
+            '_blank'    => '_blank',
+            '_self'     => '_self',
+            '_top'      => '_top',
+            )
+        );
+    }
+
+    function get_checkbox_fields() {
+        return apply_filters('intelliwidget_checkbox_fields', array(
+            'skip_expired', 
+            'skip_post', 
+            'link_title', 
+            'hide_if_empty', 
+            'filter', 
+            'future_only', 
+            'active_only', 
+            'nocopy',
+            )
+        );
+    }
+    
+    function get_text_fields() {
+        return apply_filters('intelliwidget_text_fields', array(
+            'custom_text', 
+            'title', 
+            'link_text',
+            )
+        );
+    }
+    
+    function get_custom_fields() {
+        return apply_filters('intelliwidget_custom_fields', array(
+            'event_date',
+            'expire_date',
+            'alt_title',
+            'external_url',
+            'link_classes',
+            'link_target',
+            )
+        );
+    }
+    
+    /**
+     * Stub for data validation
+     * @param <string> $unclean - data to parse
+     * @param <array> $rules
+     * @return <string> $clean - sanitized data
+     */
+    function filter_sanitize_input($unclean = NULL) {
+        if (is_array($unclean)):
+            return array_map(array($this, __FUNCTION__), $unclean);
+        else:
+            return sanitize_text_field($unclean);
+        endif;
+    }
+    
+    function filter_custom_text($custom_text, $instance = array()) {
+        if ( !empty( $instance['filter'] ))
+            $custom_text = wpautop( $custom_text );
+        return '<div class="textwidget">' . $custom_text . '</div>';
+    }
+    
+    function filter_before_widget($before_widget, $instance = array()) {
+        if (!empty($instance['container_id'])):
+            $before_widget = preg_replace('/id=".+?"/', 'id="' . $instance['container_id'] . '"', $before_widget);
+        endif;
+        // do not apply classes to widget wrapper, but rather to wordpress menu
+        if (!empty($instance['content']) && $instance['content'] != 'nav_menu'):
+            $before_widget = preg_replace('/class="/', 'class="' . apply_filters('intelliwidget_classes', $instance['classes']) . ' ', $before_widget);
+        endif;
+        return $before_widget;
+    }
+    
+    function filter_classes($classes) {
+        return preg_replace("/[, ;]+/", ' ', $classes);
+    }
+        
+    function filter_title($title, $instance = array()) {
+        if ( !empty( $title ) ) {
+            if ( !empty($instance['link_title']) && 
+                !empty($instance['query']) && 
+                is_object($instance['query']) && 
+                !empty($instance['query']->post_count)) {
+                // @params $post_id, $text, $category_ID
+                return get_the_intelliwidget_link($instance['query']->posts[0]->ID, apply_filters( 'widget_title', $title), $instance['category']);
+            } else {
+                return apply_filters( 'widget_title', $title );
+            }
+        }
+        return $title;
+    }
+        
+    function filter_menu_classes($classes, $instance = array()) {
+        return $classes . (empty($instance['classes']) ? '' : ' ' . $instance['classes']);
+    }
+        
+    function action_post_list($instance = array(), $post_id = NULL) {
+        if (!empty($instance['template'])):
+            if (has_action('intelliwidget_action_' . $instance['template'])):
+                do_action('intelliwidget_action_' . $instance['template'], $instance);
+            elseif ($template = $this->get_template($instance['template'])):
+                $selected = is_object($instance['query']) ? $instance['query'] : new IntelliWidget_Query($instance);
+                include ($template);
+            endif;
+        endif;
+    }
+    
+    function action_nav_menu($instance = array()) {
+        if (!empty($instance['nav_menu'])):
+            if ('-1' == $instance['nav_menu'] ):
+                wp_page_menu( array( 
+                    'show_home' => true, 
+                    'menu_class' => apply_filters('intelliwidget_menu_classes', 'iw-menu', $instance),
+                    )
+                );
+            else:
+                $nav_menu =  wp_get_nav_menu_object( $instance['nav_menu'] );
+                wp_nav_menu( array( 
+                    'fallback_cb'   => '', 
+                    'menu'          => $nav_menu, 
+                    'menu_class'    => apply_filters('intelliwidget_menu_classes', 'iw-menu', $instance),
+                    )
+                );
+            endif;
+        endif;
+    }
+
+    /**
+     * Shortcode handler
+     *
+     * @global <object> $intelliwidget
+     * @global <object> $post
+     * @global <array> $this_instance
+     * @param <array> $atts
+     * @return <string>
+     */
+
+    function intelliwidget_shortcode($atts) {
+        global $post;
+        $old_post = $post;
+        // section parameter lets us use page-specific IntelliWidgets in shortcode without all the params
+        if (is_object($post) && !empty($atts['section'])):
+            $atts = $this->get_page_data(intval($atts['section']), $post->ID);
+            if (empty($atts)): 
+                return;
+            endif;
+        else:
+            if (!empty($atts['custom_text'])) unset($atts['custom_text']);
+            if (!empty($atts['text_position'])) unset($atts['text_position']);
+            if (!empty($atts['title'])) $atts['title'] = strip_tags($atts['title']);
+            if (!empty($atts['link_text'])) $atts['link_text'] = strip_tags($atts['link_text']);
+            // backwards compatability: if nav_menu has value, add attr 'content=nav_menu' 
+            if (!empty($atts['nav_menu'])) $atts['content'] = 'nav_menu';
+        endif;
+        $atts = $this->defaults($atts);
+        $args = array(
+            'before_title'  => '',
+            'after_title'   => '',
+            'before_widget' => empty($atts['nav_menu']) ? '<div class="widget_intelliwidget">' : '',
+            'after_widget'  => empty($atts['nav_menu']) ? '</div>' : '',
+        );
+        // buffer standard output
+        ob_start();
+        // generate widget from arguments
+        $this->build_widget($args, $atts);
+        // retrieve widget content from buffer
+        $content = ob_get_contents();
+        ob_end_clean();
+        $post = $old_post;
+        // return widget content
+        return $content;
     }
     
     /**
@@ -759,64 +942,6 @@ class IntelliWidget {
         echo apply_filters('intelliwidget_after_widget', $after_widget, $instance);
     }
     
-    function get_page_data($post_id, $box_id) {
-        // are there settings for this widget?
-        if ($page_data = unserialize(get_post_meta($post_id, '_intelliwidget_data_' . $box_id, true))):
-            if (!empty($page_data['custom_text'])):
-                // base64 encoding saves us from markup serialization heartburn
-                $page_data['custom_text'] = stripslashes(base64_decode($page_data['custom_text']));
-            endif;
-            return $page_data;
-        endif;
-        return false;
-    }
-    
-    /**
-     * Shortcode handler
-     *
-     * @global <object> $intelliwidget
-     * @global <object> $post
-     * @global <array> $this_instance
-     * @param <array> $atts
-     * @return <string>
-     */
-
-    function intelliwidget_shortcode($atts) {
-        global $post;
-        $old_post = $post;
-        // section parameter lets us use page-specific IntelliWidgets in shortcode without all the params
-        if (is_object($post) && !empty($atts['section'])):
-            $atts = $this->get_page_data($post->ID, intval($atts['section']));
-            if (empty($atts)): 
-                return;
-            endif;
-        else:
-            if (!empty($atts['custom_text'])) unset($atts['custom_text']);
-            if (!empty($atts['text_position'])) unset($atts['text_position']);
-            if (!empty($atts['title'])) $atts['title'] = strip_tags($atts['title']);
-            if (!empty($atts['link_text'])) $atts['link_text'] = strip_tags($atts['link_text']);
-            // backwards compatability: if nav_menu has value, add attr 'content=nav_menu' 
-            if (!empty($atts['nav_menu'])) $atts['content'] = 'nav_menu';
-        endif;
-        $atts = $this->defaults($atts);
-        $args = array(
-            'before_title'  => '',
-            'after_title'   => '',
-            'before_widget' => empty($atts['nav_menu']) ? '<div class="widget_intelliwidget">' : '',
-            'after_widget'  => empty($atts['nav_menu']) ? '</div>' : '',
-        );
-        // buffer standard output
-        ob_start();
-        // generate widget from arguments
-        $this->build_widget($args, $atts);
-        // retrieve widget content from buffer
-        $content = ob_get_contents();
-        ob_end_clean();
-        $post = $old_post;
-        // return widget content
-        return $content;
-    }
-    
     /**
      * Trim the content to a set number of words.
      *
@@ -851,173 +976,91 @@ class IntelliWidget {
         return $text;
     }
 
-    function get_words_html($text, $length) {
-        $opentags   = array();
-        $excerpt    = '';
-        $text       = preg_replace('/<(br|hr)[ \/]*>/', "<$1/>", $text);
-        preg_match_all('/(<[^>]+?>)?([^<]*)/', $text, $elements);
-        if (!empty($elements[2])):
-            $count = 0;
-            foreach($elements[2] as $string):
-                $html = array_shift($elements[1]);
-                if (preg_match('/<(\w+)[^\/]*>/', $html, $matches)):
-                    $opentags[] = $matches[1];
-                elseif (preg_match('/<\/(\w+)/', $html, $matches)):
-                    $close = array_pop($opentags);
-                endif;
-                $excerpt .= $html;
-                $words = preg_split('/[\r\n\t ]+/', $string);
-                foreach ($words as $word):
-                    if (empty($word)) continue;
-                    $count++;
-                    if ($count <= $length):
-                        $excerpt .= $word . ' ';
-                    else:
-                        $excerpt .= '...';
-                        break;
-                    endif;
-                endforeach;
-                if ($count > $length) break;
+    function index_query_objects($property, $keyfield, $data) {
+        $indexarray = array();
+        if (isset($data) && count($data)):
+            foreach ($data as $object):
+                $indexarray[$object->{$keyfield}][] = $object;
             endforeach;
-            while (count($opentags)):
-                $close = array_pop($opentags);
-                $excerpt .= '</' . $close . '>';
-            endwhile;
         endif;
-        return $excerpt;
+        $this->{$property} = $indexarray;
+    }
+    
+    function val2array($value) {
+        $value = empty($value) ? 
+            array() : (is_array($value) ?
+                $value : explode(',', $value));
+        sort($value);
+        return $value;
+    }
+    
+    function sort_terms($a, $b) {
+        $c = strcmp($a->taxonomy, $b->taxonomy);
+        if($c != 0) {
+            return $c;
+        }
+        return strcmp($a->name, $b->name);
     }
     
     /**
-     * Stub for plugin activation
+     * Ensure that "post-thumbnails" support is available for those themes that don't register it.
+     * @return  void
      */
-    function intelliwidget_activate() {
-        
+    public function ensure_post_thumbnails_support () {
+        if ( ! current_theme_supports( 'post-thumbnails' ) ) { add_theme_support( 'post-thumbnails' ); }
+    } // End ensure_post_thumbnails_support()
+
+    /**
+     * Widget Defaults
+     * This will utilize an options form in a future release for customization
+     * @param <array> $instance
+     * @return <array> -- merged data
+     */
+    public function defaults($instance = array()) {
+        //if (empty($instance)) $instance = array();
+        $defaults = apply_filters('intelliwidget_defaults', array(
+            // these apply to all intelliwidgets
+            'content'        => 'post_list', // this is the main control, determines hook to use
+            'nav_menu'       => '', // built-in extension, uses wordpress menu instead of post_list
+            'title'          => '',
+            'link_title'     => 0,
+            'classes'        => '',
+            'container_id'   => '',
+            'custom_text'    => '',
+            'text_position'  => '',
+            'filter'         => 0,
+            'hide_if_empty'  => 0,      // applies to site-wide intelliwidgets
+            'replace_widget' => 'none', // applies to post-specific intelliwidgets
+            'nocopy'         => 0,      // applies to post-specific intelliwidgets
+            // these apply to post_list intelliwidgets
+            'post_types'     => array('page', 'post'),
+            'template'       => 'menu',
+            'page'           => array(), // stores any post_type, not just pages
+            'category'       => -1, // stores any taxonomy_terms, not just categories
+            'items'          => 5,
+            'sortby'         => 'title',
+            'sortorder'      => 'ASC',
+            'skip_expired'   => 0,
+            'skip_post'      => 0,
+            'future_only'    => 0,
+            'active_only'    => 0,
+            // these apply to post_list items
+            'length'         => 15,
+            'link_text'      => __('Read More', 'intelliwidget'),
+            'allowed_tags'   => '',
+            'imagealign'     => 'none',
+            'image_size'     => 'none',
+        ));
+        if (empty($instance['content']) && !empty($instance['nav_menu']) && '' != ($instance['nav_menu'])) $instance['content'] = 'nav_menu';
+        // standard WP function for merging argument lists
+        $merged = wp_parse_args($instance, $defaults);
+        // backwards compatibility: add content=nav_menu if nav_menu param set
+        return $merged;
     }
     
-    function filter_custom_text($custom_text, $instance = array()) {
-        if ( !empty( $instance['filter'] ))
-            $custom_text = wpautop( $custom_text );
-        return '<div class="textwidget">' . $custom_text . '</div>';
-    }
-    
-    function filter_before_widget($before_widget, $instance = array()) {
-        if (!empty($instance['container_id'])):
-            $before_widget = preg_replace('/id=".+?"/', 'id="' . $instance['container_id'] . '"', $before_widget);
-        endif;
-        // do not apply classes to widget wrapper, but rather to wordpress menu
-        if (!empty($instance['content']) && $instance['content'] != 'nav_menu'):
-            $before_widget = preg_replace('/class="/', 'class="' . apply_filters('intelliwidget_classes', $instance['classes']) . ' ', $before_widget);
-        endif;
-        return $before_widget;
-    }
-    
-    function filter_classes($classes) {
-        return preg_replace("/[, ;]+/", ' ', $classes);
-    }
-        
-    function filter_title($title, $instance = array()) {
-        if ( !empty( $title ) ) {
-            if ( !empty($instance['link_title']) && 
-                !empty($instance['query']) && 
-                is_object($instance['query']) && 
-                !empty($instance['query']->post_count)) {
-                // @params $post_ID, $text, $category_ID
-                return get_the_intelliwidget_link($instance['query']->posts[0]->ID, apply_filters( 'widget_title', $title), $instance['category']);
-            } else {
-                return apply_filters( 'widget_title', $title );
-            }
-        }
-        return $title;
-    }
-        
-    function filter_menu_classes($classes, $instance = array()) {
-        return $classes . (empty($instance['classes']) ? '' : ' ' . $instance['classes']);
-    }
-        
-    function get_content_menu() {
-        return apply_filters('intelliwidget_content_menu', array(
-            'post_list' => __('List of Posts', 'intelliwidget'),
-            'nav_menu'  => __('WordPress Nav Menu', 'intelliwidget'),
-            )
-        );
-    }
-    
-    function get_replaces_menu() {
-        return apply_filters('intelliwidget_replaces_menu', array(
-            'none'      => __('Unassigned', 'intelliwidget'),
-            'content'   => __('Shortcode (use tab number)', 'intelliwidget'),
-            )
-        );
-    }
-    
-    function get_checkbox_fields() {
-        return apply_filters('intelliwidget_checkbox_fields', array(
-            'skip_expired', 
-            'skip_post', 
-            'link_title', 
-            'hide_if_empty', 
-            'filter', 
-            'future_only', 
-            'active_only', 
-            'nocopy',
-            )
-        );
-    }
-    
-    function get_text_fields() {
-        return apply_filters('intelliwidget_text_fields', array(
-            'custom_text', 
-            'title', 
-            'link_text',
-            )
-        );
-    }
-    
-    function get_custom_fields() {
-        return apply_filters('intelliwidget_custom_fields', array(
-            'event_date',
-            'expire_date',
-            'alt_title',
-            'external_url',
-            'link_classes',
-            'link_target',
-            )
-        );
-    }
-    
-    function action_post_list($instance = array(), $post_ID = NULL) {
-        if (!empty($instance['template'])):
-            if (has_action('intelliwidget_action_' . $instance['template'])):
-                do_action('intelliwidget_action_' . $instance['template'], $instance);
-            elseif ($template = $this->get_template($instance['template'])):
-                $selected = is_object($instance['query']) ? $instance['query'] : new IntelliWidget_Query($instance);
-                include ($template);
-            endif;
-        endif;
-    }
-    
-    function action_nav_menu($instance = array()) {
-        if (!empty($instance['nav_menu'])):
-            if ('-1' == $instance['nav_menu'] ):
-                wp_page_menu( array( 
-                    'show_home' => true, 
-                    'menu_class' => apply_filters('intelliwidget_menu_classes', 'iw-menu', $instance),
-                    )
-                );
-            else:
-                $nav_menu =  wp_get_nav_menu_object( $instance['nav_menu'] );
-                wp_nav_menu( array( 
-                    'fallback_cb'   => '', 
-                    'menu'          => $nav_menu, 
-                    'menu_class'    => apply_filters('intelliwidget_menu_classes', 'iw-menu', $instance),
-                    )
-                );
-            endif;
-        endif;
-    }
 }
 // lazy-load the UI
 if (is_admin()):
-    include_once('class-intelliwidget-form.php');
-    $intelliwidget_form = new IntelliWidgetForm();
+    include_once('class-intelliwidget-metabox.php');
+    $intelliwidget_metabox = new IntelliWidgetMetaBox();
 endif;
