@@ -13,14 +13,14 @@ if ( !defined('ABSPATH')) exit;
 class IntelliWidgetForm {
     function __construct() {
 //        print_r(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS));
-        add_action('intelliwidget_form_nav_menu',   array($this, 'widget_form_nav_menu'), 1, 3);
-        add_action('intelliwidget_form_all_before', array($this, 'widget_form_general_settings'), 2, 3);
-        add_action('intelliwidget_form_post_list',  array($this, 'widget_form_post_selection_settings'), 5, 3);
-        add_action('intelliwidget_form_post_list',  array($this, 'widget_form_appearance_settings'), 10, 3);
-        add_action('intelliwidget_form_all_after',  array($this, 'widget_form_addl_text_settings'), 3, 3);
+        add_action('intelliwidget_form_nav_menu',   array($this, 'nav_menu'), 1, 3);
+        add_action('intelliwidget_form_all_before', array($this, 'general_settings'), 2, 3);
+        add_action('intelliwidget_form_post_list',  array($this, 'post_selection_settings'), 5, 3);
+        add_action('intelliwidget_form_post_list',  array($this, 'appearance_settings'), 10, 3);
+        add_action('intelliwidget_form_all_after',  array($this, 'addl_text_settings'), 3, 3);
     }
 
-    function intelliwidget_form($instance, $widget) {
+    function form($instance, $widget) {
         global $intelliwidget;
         ?>
 
@@ -38,7 +38,7 @@ class IntelliWidgetForm {
         endif;
     }
 
-    function widget_form_general_settings($instance, $widget) { 
+    function general_settings($instance, $widget) { 
         global $intelliwidget; 
         ?>
 <div class="postbox">
@@ -82,38 +82,10 @@ class IntelliWidgetForm {
     </p>
   </div>
 </div>
-<?
+<?php
     }
 
-    function widget_form_nav_menu($instance, $widget) { 
-        global $intelliwidget;
-        ?>
-<p>
-  <label for="<?php echo $widget->get_field_id('nav_menu'); ?>">
-    <?php _e('Menu to display', 'intelliwidget'); ?>
-    : </label>
-  <select id="<?php echo $widget->get_field_id('nav_menu'); ?>" name="<?php echo $widget->get_field_name('nav_menu'); ?>">
-    <option value="" <?php selected($instance['nav_menu'], ""); ?>>
-    <?php _e('None', 'intelliwidget'); ?>
-    </option>
-    <option value="-1" <?php selected($instance['nav_menu'], "-1"); ?>>
-    <?php _e('Automatic Page Menu', 'intelliwidget'); ?>
-    </option>
-    <?php
-            // Get menus
-            foreach ( $intelliwidget->menus as $menu ):
-                echo '<option value="' . $menu->term_id . '"'
-                    . selected( $instance['nav_menu'], $menu->term_id, false )
-                    . '>'. $menu->name . '</option>';
-            endforeach;
-
-        ?>
-  </select>
-</p>
-<?php 
-    }
-
-    function widget_form_addl_text_settings($instance, $widget) { 
+    function addl_text_settings($instance, $widget) { 
         global $intelliwidget; ?>
 <div class="postbox">
   <div class="iw-collapsible" id="<?php echo $widget->get_field_id('customtext'); ?>-panel" title="<?php _e('Click to toggle', 'intelliwidget'); ?>">
@@ -147,10 +119,10 @@ name="<?php echo $widget->get_field_name('custom_text'); ?>">
     </p>
   </div>
 </div>
-<?
+<?php
     }
 
-    function widget_form_appearance_settings($instance, $widget) { 
+    function appearance_settings($instance, $widget) { 
         global $intelliwidget, $_wp_additional_image_sizes;
         ?>
 <div class="postbox">
@@ -243,7 +215,7 @@ name="<?php echo $widget->get_field_name('custom_text'); ?>">
 <?php
     }
 
-    function widget_form_post_selection_settings($instance, $widget) { 
+    function post_selection_settings($instance, $widget) { 
         global $intelliwidget; 
     ?>
 <div class="postbox">
@@ -311,6 +283,34 @@ name="<?php echo $widget->get_field_name('custom_text'); ?>">
   </div>
 </div>
 <?php
+    }
+
+    function nav_menu($instance, $widget) { 
+        global $intelliwidget;
+        ?>
+<p>
+  <label for="<?php echo $widget->get_field_id('nav_menu'); ?>">
+    <?php _e('Menu to display', 'intelliwidget'); ?>
+    : </label>
+  <select id="<?php echo $widget->get_field_id('nav_menu'); ?>" name="<?php echo $widget->get_field_name('nav_menu'); ?>">
+    <option value="" <?php selected($instance['nav_menu'], ""); ?>>
+    <?php _e('None', 'intelliwidget'); ?>
+    </option>
+    <option value="-1" <?php selected($instance['nav_menu'], "-1"); ?>>
+    <?php _e('Automatic Page Menu', 'intelliwidget'); ?>
+    </option>
+    <?php
+            // Get menus
+            foreach ( $intelliwidget->menus as $menu ):
+                echo '<option value="' . $menu->term_id . '"'
+                    . selected( $instance['nav_menu'], $menu->term_id, false )
+                    . '>'. $menu->name . '</option>';
+            endforeach;
+
+        ?>
+  </select>
+</p>
+<?php 
     }
 
 }

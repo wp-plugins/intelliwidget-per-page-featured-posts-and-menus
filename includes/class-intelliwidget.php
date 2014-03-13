@@ -467,7 +467,7 @@ class IntelliWidget {
     function get_metabox($box_id = NULL, $post_id = NULL, $instance = array()) {
         global $intelliwidget_metabox;
         ob_start();
-        $intelliwidget_metabox->intelliwidget_metabox($box_id, $post_id, $instance);
+        $intelliwidget_metabox->metabox($box_id, $post_id, $instance);
         $form = ob_get_contents();
         ob_end_clean();
         return $form;
@@ -662,8 +662,8 @@ class IntelliWidget {
     
     function get_content_menu() {
         return apply_filters('intelliwidget_content_menu', array(
-            'post_list' => __('List of Posts (default)', 'intelliwidget'),
-            'nav_menu'  => __('WordPress Nav Menu', 'intelliwidget'),
+            'post_list' => __('Posts (default)', 'intelliwidget'),
+            'nav_menu'  => __('Nav Menu', 'intelliwidget'),
             )
         );
     }

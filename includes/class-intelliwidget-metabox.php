@@ -12,11 +12,11 @@ if ( !defined('ABSPATH')) exit;
  */
 class IntelliWidgetMetaBox {
     function __construct() {
-        add_action('intelliwidget_metabox_nav_menu',    array($this, 'metabox_nav_menu'), 1, 3);
-        add_action('intelliwidget_metabox_all_before',  array($this, 'metabox_general_settings'), 2, 3);
-        add_action('intelliwidget_metabox_post_list',   array($this, 'metabox_post_selection_settings'), 3, 3);
-        add_action('intelliwidget_metabox_post_list',   array($this, 'metabox_appearance_settings'), 5, 3);
-        add_action('intelliwidget_metabox_all_after',   array($this, 'metabox_addl_text_settings'), 10, 3);
+        add_action('intelliwidget_metabox_nav_menu',    array($this, 'nav_menu'), 1, 3);
+        add_action('intelliwidget_metabox_all_before',  array($this, 'general_settings'), 2, 3);
+        add_action('intelliwidget_metabox_post_list',   array($this, 'post_selection_settings'), 3, 3);
+        add_action('intelliwidget_metabox_post_list',   array($this, 'appearance_settings'), 5, 3);
+        add_action('intelliwidget_metabox_all_after',   array($this, 'addl_text_settings'), 10, 3);
     }
 
     function page_form($post) {
@@ -62,7 +62,7 @@ class IntelliWidgetMetaBox {
     </a> <span id="intelliwidget_event_date_timestamp" class="intelliwidget-timestamp"> <?php echo $fields['intelliwidget_event_date'] ?></span></label>
   <input type="hidden" class="intelliwidget-input" id="intelliwidget_event_date" name="intelliwidget_event_date" value="<?php echo $fields['intelliwidget_event_date'] ?>" />
 <div id="intelliwidget_event_date_div" class="intelliwidget-timestamp-div hide-if-js">
-  <?php $this->intelliwidget_timestamp('intelliwidget_event_date', $fields['intelliwidget_event_date']); ?>
+  <?php $this->timestamp('intelliwidget_event_date', $fields['intelliwidget_event_date']); ?>
 </div>
 </p>
 <p>
@@ -73,7 +73,7 @@ class IntelliWidgetMetaBox {
     </a> <span id="intelliwidget_expire_date_timestamp" class="intelliwidget-timestamp"> <?php echo $fields['intelliwidget_expire_date']; ?></span></label>
   <input type="hidden" class="intelliwidget-input" id="intelliwidget_expire_date" name="intelliwidget_expire_date" value="<?php echo $fields['intelliwidget_expire_date'] ?>" />
 <div id="intelliwidget_expire_date_div" class="intelliwidget-timestamp-div hide-if-js">
-  <?php $this->intelliwidget_timestamp('intelliwidget_expire_date', $fields['intelliwidget_expire_date']); ?>
+  <?php $this->timestamp('intelliwidget_expire_date', $fields['intelliwidget_expire_date']); ?>
 </div>
 </p>
 <p>
@@ -117,7 +117,7 @@ class IntelliWidgetMetaBox {
      * @param <string> $field
      * @param <string> $post_date
      */
-    function intelliwidget_timestamp($field = 'intelliwidget_event_date', $post_date = null) {
+    function timestamp($field = 'intelliwidget_event_date', $post_date = null) {
         global $wp_locale;
 
         $time_adj = current_time('timestamp');
@@ -173,7 +173,7 @@ class IntelliWidgetMetaBox {
 <?php
     }
 
-    function intelliwidget_metabox($box_id, $post_id, $instance) {
+    function metabox($box_id, $post_id, $instance) {
         global $intelliwidget;
         ?>
 <p>
@@ -203,7 +203,7 @@ class IntelliWidgetMetaBox {
 <?php
     }
     
-    function metabox_general_settings($box_id, $post_id, $instance) {
+    function general_settings($box_id, $post_id, $instance) {
         global $intelliwidget;
         ?>
 <div id="iw-generalsettings-<?php echo $box_id; ?>" class="postbox closed">
@@ -253,7 +253,7 @@ class IntelliWidgetMetaBox {
 <?php
     }
     
-    function metabox_addl_text_settings($box_id, $post_id, $instance) {
+    function addl_text_settings($box_id, $post_id, $instance) {
         global $intelliwidget;
         ?>
 <div id="iw-addltext-<?php echo $box_id; ?>" class="postbox closed">
@@ -284,7 +284,7 @@ class IntelliWidgetMetaBox {
 <?php
     }
     
-    function metabox_appearance_settings($box_id, $post_id, $instance) {
+    function appearance_settings($box_id, $post_id, $instance) {
         global $intelliwidget, $_wp_additional_image_sizes;
         ?>
 <div id="iw-appearance-<?php echo $box_id; ?>" class="postbox closed">
@@ -376,7 +376,7 @@ class IntelliWidgetMetaBox {
 <?php
     }
     
-    function metabox_post_selection_settings($box_id, $post_id, $instance) {
+    function post_selection_settings($box_id, $post_id, $instance) {
         global $intelliwidget;
         ?>
 <div id="iw-selection-<?php echo $box_id; ?>" class="postbox closed">
@@ -444,7 +444,7 @@ class IntelliWidgetMetaBox {
 <?php
     }
 
-    function metabox_nav_menu($box_id, $post_id, $instance){
+    function nav_menu($box_id, $post_id, $instance){
         global $intelliwidget;
         ?>
 <p>
