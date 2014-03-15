@@ -13,18 +13,20 @@ if ( !defined('ABSPATH')) exit;
 class IntelliWidget_Widget extends WP_Widget {
 
     var $version     = '1.5.0';
+    var $form;
     /**
      * Constructor
      */
     function __construct() {
-        global $intelliwidget, $intelliwidget_form;
+        global $intelliwidget;
         $widget_ops          = array('description' => __('Menus, Featured Posts, HTML and more, customized per page or site-wide.', 'intelliwidget'));
         $control_ops         = array('width' => 400, 'height' => 350);
         add_action('wp_enqueue_scripts', array(&$this, 'enqueue_styles'));
         if (is_admin()):
+            add_action('load-widgets.php', array(&$intelliwidget, 'admin_init') );
             // lazy load UI
             include_once('class-intelliwidget-form.php');
-            $intelliwidget_form = new IntelliWidgetForm();
+            $this->form = new IntelliWidgetForm();
         endif;
         $this->WP_Widget('intelliwidget', $intelliwidget->pluginName, $widget_ops, $control_ops);
     }
@@ -141,10 +143,10 @@ class IntelliWidget_Widget extends WP_Widget {
      */
     function form($instance) {
         //echo 'BEFORE defaults: ' . "\n" . print_r($instance, true) . "\n\n";
-        global $intelliwidget, $intelliwidget_form;
+        global $intelliwidget;
         $instance = $intelliwidget->defaults($instance);
         //echo 'AFTER defaults: ' . "\n" . print_r($instance, true) . "\n\n";
-        $intelliwidget_form->form($instance, $this);
+        $this->form->form($instance, $this);
     }
     
 

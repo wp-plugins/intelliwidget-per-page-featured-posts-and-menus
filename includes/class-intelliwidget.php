@@ -22,12 +22,14 @@ class IntelliWidget {
     var $templatesURL;
     var $dir;
     var $docsLink;
-    var $form;
+    var $metabox;
     var $menus;
     var $posts;
     var $terms;
     var $post_types;
     var $intelliwidgets;
+    var $lists;
+    var $is_ajax;
     /**
      * Object constructor
      * @param <string> $file
@@ -49,16 +51,15 @@ class IntelliWidget {
         $this->templatesPath = $this->pluginPath . 'templates/';
         $this->templatesURL  = $this->pluginURL . 'templates/';        
 
-        $this->docsLink      = '<a href="http://www.lilaeamedia.com/plugins/intelliwidget/" target="_blank" title="Help" style="float:right">Help</a>';
+        $this->is_ajax = false;
+        $this->docsLink      = '<a href="http://www.lilaeamedia.com/plugins/intelliwidget/" target="_blank" title="' . __('Hover labels for more info or click here to view documentation.', 'intelliwidget') . '" style="float:right">' . __('Help', 'intelliwidget') . '</a>';
         
         add_shortcode('intelliwidget',                  array(&$this, 'intelliwidget_shortcode'));
         register_activation_hook($file,                 array(&$this, 'intelliwidget_activate'));
         if (is_admin()):
             // these actions only apply to admin users
-            add_action('admin_init',                    array(&$this, 'admin_init'));
-            add_action('admin_init',                    array(&$this, 'admin_scripts'));
-            add_action('add_meta_boxes',                array(&$this, 'main_meta_box'));
-            add_action('add_meta_boxes',                array(&$this, 'post_meta_box'));
+            add_action('load-post.php',                 array(&$this, 'admin_init') );
+            add_action('load-post.php',                 array(&$this, 'add_metabox_actions') );
             add_action('save_post',                     array(&$this, 'save_postdata'), 1, 2 );
             add_action('wp_ajax_iw_cdfsave',            array(&$this, 'ajax_save_cdfdata' ));
             add_action('wp_ajax_iw_save',               array(&$this, 'ajax_save_postdata' ));
@@ -86,10 +87,13 @@ class IntelliWidget {
      * Stub for registering scripts in future release.
      */
     function admin_init() {
+            // cache lists and labels
+            include_once( 'class-intelliwidget-list.php' );
+            $this->lists = new IntelliWidgetList();
             // cache post types
             $this->post_types = $this->get_eligible_post_types();
             // cache menus
-            $this->menus = get_terms( 'nav_menu', array( 'hide_empty' => false ) );
+            $this->menus = $this->get_nav_menus();
             // cache templates
             $this->templates  = $this->get_widget_templates();
             // cache all available posts (Lightweight IW objects)
@@ -102,6 +106,7 @@ class IntelliWidget {
             ), array('hide_empty' => FALSE)));
             // cache intelliwidgets
             $this->intelliwidgets = $this->get_intelliwidgets();
+            $this->admin_scripts();
     }
     
     /**
@@ -128,6 +133,8 @@ class IntelliWidget {
      * @return  void
      */
     function main_meta_box() {
+        // set up meta boxes
+        $this->init_metabox();
         global $post;
         foreach ($this->post_types as $type):
             add_meta_box( 
@@ -175,8 +182,7 @@ class IntelliWidget {
      * @return  void
      */
     function main_meta_box_form($post, $metabox) {
-        global $intelliwidget_metabox;
-        $intelliwidget_metabox->page_form($post);
+        $this->metabox->page_form($post);
 
         // box_map contains map of meta boxes to their related widgets
         $box_map = $this->get_box_map($post->ID);
@@ -203,10 +209,18 @@ class IntelliWidget {
      * @return  void
      */
     function post_meta_box_form($post, $metabox) {
-        global $intelliwidget_metabox;
-        $intelliwidget_metabox->post_form($post);
+        $this->metabox->post_form($post);
     }
     
+    function init_metabox() {
+        include_once('class-intelliwidget-metabox.php');
+        $this->metabox = new IntelliWidgetMetaBox();
+    }
+    
+    function add_metabox_actions() {
+        add_action('add_meta_boxes',                array(&$this, 'main_meta_box'));
+        add_action('add_meta_boxes',                array(&$this, 'post_meta_box'));
+    }
     function begin_tab_container() {
         echo apply_filters('intelliwidget_start_tab_container', 
             '<div id="iw_tabbed_sections"><a id="iw_larr">&#171</a><a id="iw_rarr">&#187;</a><ul id="iw_tabs" class="">');
@@ -243,12 +257,15 @@ class IntelliWidget {
          * the actual post record. The parameters passed by the 'save_post' action are for the revision, so 
          * we must use the post_ID passed in the form data, and skip the revision. 
          */
-        if (empty($_POST['iwpage']) || ( defined('DOING_AUTOSAVE') && DOING_AUTOSAVE ) || ( !empty($post) && 'revision' == $post->post_type )) return false;
+        if (empty($_POST['iwpage']) || ( defined('DOING_AUTOSAVE') && DOING_AUTOSAVE ) 
+            || ( !empty($post) && 'revision' == $post->post_type )) return false;
         
         $post_id   = intval($_POST['post_ID']);
         // security checkpoint
-        if ( empty($post_id) || !current_user_can('edit_post', $post_id) || !wp_verify_nonce($_POST['iwpage'],'iwpage_' . $post_id) ) return false;
+        if ( empty($post_id) || !current_user_can('edit_post', $post_id) 
+            || !wp_verify_nonce($_POST['iwpage'],'iwpage_' . $post_id) ) return false;
         // reset the data array
+        if (!isset($this->lists)) $this->admin_init();
         $post_data = array();
         $prefix    = 'intelliwidget_';
         // since we can now save a single meta box via ajax post, 
@@ -318,6 +335,7 @@ class IntelliWidget {
         $post_id   = intval($_POST['post_ID']);
         // security checkpoint
         if ( empty($post_id) || !current_user_can('edit_post', $post_id) || !wp_verify_nonce($_POST['iwpage'],'iwpage_' . $post_id) ) return false;
+        if (!isset($this->lists)) $this->admin_init();
         // reset the data array
         $prefix    = 'intelliwidget_';
         foreach ($this->get_custom_fields() as $cfield):
@@ -366,6 +384,8 @@ class IntelliWidget {
     
     function ajax_save_postdata() {
         if (false === $this->save_postdata()) die('fail');
+        $this->is_ajax = true;
+        $this->init_metabox();
         $post_id = intval($_POST['post_ID']);
         $box_id_key = current(preg_grep("/_box_id$/", array_keys($_POST)));
         $box_id = intval($_POST[$box_id_key]);
@@ -379,6 +399,7 @@ class IntelliWidget {
     }
     
     function ajax_save_cdfdata() {
+        $this->is_ajax = true;
         if (false === $this->save_cdfdata()) die('fail');
         die('success');
     }
@@ -387,6 +408,7 @@ class IntelliWidget {
         if (!array_key_exists('post', $_POST) || !array_key_exists('iwdelete', $_POST) || 
             !array_key_exists('_wpnonce', $_POST)) die('fail');
         // note that the query string version uses "post" instead of "post_ID"
+        $this->is_ajax = true;
         $post_id = intval($_POST['post']);
         $box_id = intval($_POST['iwdelete']);
         $nonce = $_POST['_wpnonce'];
@@ -399,11 +421,14 @@ class IntelliWidget {
         if (!array_key_exists('post', $_POST) || 
             !array_key_exists('_wpnonce', $_POST)) die('fail');
         // note that the query string version uses "post" instead of "post_ID"
+        $this->is_ajax = true;
         $post_id = intval($_POST['post']);
         $nonce = $_POST['_wpnonce'];
         $box_id = $this->add_tabbed_section($post_id, $nonce, 
             $this->get_box_map($post_id));
         if (false === $box_id) die('fail');
+        if (!isset($this->lists)) $this->admin_init();
+        $this->init_metabox();
         $instance = $this->defaults();
 
         $response = array(
@@ -416,6 +441,8 @@ class IntelliWidget {
     function ajax_get_tabbed_section() {
         if (!array_key_exists('post', $_POST) || !array_key_exists('iw_box_id', $_POST) || 
             !array_key_exists('_wpnonce', $_POST) || !wp_verify_nonce($_POST['_wpnonce'])) die('fail');
+        $this->is_ajax = true;
+        if (!isset($this->lists)) $this->admin_init();
         // note that the query string version uses "post" instead of "post_ID"
         $box_id = intval($_POST['iw_box_id']);
         $post_id   = intval($_POST['post_ID']);
@@ -426,6 +453,7 @@ class IntelliWidget {
     function ajax_copy_page() {
         if (!array_key_exists('post_ID', $_POST) || !array_key_exists('iwpage', $_POST))
             die('fail');
+        $this->is_ajax = true;
         $post_id   = intval($_POST['post_ID']);
         if (!current_user_can('edit_post', $post_id) || !wp_verify_nonce($_POST['iwpage'],'iwpage_' . $post_id)) die('fail');
         if (false === $this->save_copy_page($_POST['post_ID'])) die('fail');
@@ -465,9 +493,8 @@ class IntelliWidget {
     }
 
     function get_metabox($box_id = NULL, $post_id = NULL, $instance = array()) {
-        global $intelliwidget_metabox;
         ob_start();
-        $intelliwidget_metabox->metabox($box_id, $post_id, $instance);
+        $this->metabox->metabox($box_id, $post_id, $instance);
         $form = ob_get_contents();
         ob_end_clean();
         return $form;
@@ -661,109 +688,64 @@ class IntelliWidget {
     }
     
     function get_content_menu() {
-        return apply_filters('intelliwidget_content_menu', array(
-            'post_list' => __('Posts (default)', 'intelliwidget'),
-            'nav_menu'  => __('Nav Menu', 'intelliwidget'),
-            )
-        );
+        return $this->lists->get_menu('content');
     }
     
     function get_replaces_menu() {
-        return apply_filters('intelliwidget_replaces_menu', array(
-            'none'      => __('Unassigned', 'intelliwidget'),
-            'content'   => __('Shortcode (use tab number)', 'intelliwidget'),
-            )
-        );
+        return $this->lists->get_menu('replaces');
     }
     
     function get_text_position_menu() {
-        return apply_filters('intelliwidget_text_position_menu', array(
-            ''          => __('None', 'intelliwidget'),
-            'above'     => __('Above Posts', 'intelliwidget'),
-            'below'     => __('Below Posts', 'intelliwidget'),
-            'only'      => __('This text only (no posts)', 'intelliwidget'),
-            )
-        );
+        return $this->lists->get_menu('text_position');
     }
 
     function get_sortby_menu() {
-        return apply_filters('intelliwidget_sortby_menu', array(
-            'date'          => __('Post Date', 'intelliwidget'),
-            'event_date'    => __('Start Date', 'intelliwidget'),
-            'menu_order'    => __('Menu Order', 'intelliwidget'),
-            'title'         => __('Title', 'intelliwidget'),
-            'rand'          => __('Random', 'intelliwidget'),
-            )
-        );
+        return $this->lists->get_menu('sortby');
     }
 
     function get_image_size_menu() {
-        return apply_filters('intelliwidget_image_size_menu', array(
-            'none'      => __('No Image', 'intelliwidget'),
-            'thumbnail' => __('Thumbnail', 'intelliwidget'),
-            'medium'    => __('Medium', 'intelliwidget'),
-            'large'     => __('Large', 'intelliwidget'),
-            'full'      => __('Full', 'intelliwidget'),
-            )
-        );
+        return $this->lists->get_menu('image_size');
     }
 
     function get_imagealign_menu() {
-        return apply_filters('intelliwidget_imagealign_menu', array(
-            'none'      => __('Auto', 'intelliwidget'),
-            'left'      => __('Left', 'intelliwidget'),
-            'center'    => __('Center', 'intelliwidget'),
-            'right'     => __('Right', 'intelliwidget'),
-            )
-        );
+        return $this->lists->get_menu('imagealign');
     }
 
     function get_link_target_menu() {
-        return apply_filters('intelliwidget_link_target_menu', array(
-            ''          => __('None', 'intelliwidget'),
-            '_new'      => '_new',
-            '_blank'    => '_blank',
-            '_self'     => '_self',
-            '_top'      => '_top',
-            )
-        );
+        return $this->lists->get_menu('link_target');
     }
 
     function get_checkbox_fields() {
-        return apply_filters('intelliwidget_checkbox_fields', array(
-            'skip_expired', 
-            'skip_post', 
-            'link_title', 
-            'hide_if_empty', 
-            'filter', 
-            'future_only', 
-            'active_only', 
-            'nocopy',
-            )
-        );
+        return $this->lists->get_fields('checkbox');
     }
     
     function get_text_fields() {
-        return apply_filters('intelliwidget_text_fields', array(
-            'custom_text', 
-            'title', 
-            'link_text',
-            )
-        );
+        return $this->lists->get_fields('text');
     }
     
     function get_custom_fields() {
-        return apply_filters('intelliwidget_custom_fields', array(
-            'event_date',
-            'expire_date',
-            'alt_title',
-            'external_url',
-            'link_classes',
-            'link_target',
-            )
-        );
+        return $this->lists->get_fields('custom');
     }
     
+    function get_nav_menu() {
+        $defaults = $this->lists->get_menu('default_nav');
+        return array_merge($this->lists->get_menu('default_nav'), $this->menus);
+    }
+    
+    function get_nav_menus() {
+        $nav_menus = array();
+        $menus = get_terms( 'nav_menu', array( 'hide_empty' => false ) );
+        foreach ($menus as $menu)
+            $nav_menus[$menu->term_id] = $menu->name;
+        return $nav_menus;
+    }
+    
+    function get_label($key = '') {
+        return $this->lists->get_label($key);
+    }
+    function get_tip($key = '') {
+        return $this->lists->get_tip($key);
+    }
     /**
      * Stub for data validation
      * @param <string> $unclean - data to parse
@@ -849,6 +831,17 @@ class IntelliWidget {
         endif;
     }
 
+    function translate_category_to_tax($category) {
+        $catarr = $this->val2array($category);
+        return array_map(array($this, 'lookup_term'), $catarr, 'category');
+    }
+    
+    function lookup_term($id, $tax) {
+        foreach($this->terms as $term_tax_id => $term):
+            if ($term->term_id == $id && $term->taxonomy == $tax) return $term->term_taxonomy_id;
+        endforeach;
+        return -1;
+    }
     /**
      * Shortcode handler
      *
@@ -1059,8 +1052,3 @@ class IntelliWidget {
     }
     
 }
-// lazy-load the UI
-if (is_admin()):
-    include_once('class-intelliwidget-metabox.php');
-    $intelliwidget_metabox = new IntelliWidgetMetaBox();
-endif;
