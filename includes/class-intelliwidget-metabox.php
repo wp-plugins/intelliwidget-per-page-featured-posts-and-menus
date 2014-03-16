@@ -100,7 +100,7 @@ class IntelliWidgetMetaBox {
     :</label>
   <select class="intelliwidget-input" id="intelliwidget_link_target" name="intelliwidget_link_target">
     <?php foreach ($intelliwidget->get_link_target_menu() as $value => $label): ?>
-    <option value="<?php echo $value; ?>" <?php selected($instance['link_target'], $value); ?>><?php echo $label; ?></option>
+    <option value="<?php echo $value; ?>" <?php selected($fields['intelliwidget_link_target'], $value); ?>><?php echo $label; ?></option>
     <?php endforeach; ?>
   </select>
 </p>
@@ -176,6 +176,9 @@ class IntelliWidgetMetaBox {
     function metabox($box_id, $post_id, $instance) {
         global $intelliwidget;
         ?>
+        <p>
+  <input type="hidden" id="<?php echo 'intelliwidget_' . $box_id . '_category'; ?>" name="<?php echo 'intelliwidget_' . $box_id . '_category'; ?>" value="-1" />Original Categories: <?php echo implode(',', $intelliwidget->val2array($instance['category'])); ?>
+        </p>
 <p>
   <input type="hidden" id="<?php echo 'intelliwidget_' . $box_id . '_box_id'; ?>" name="<?php echo 'intelliwidget_' . $box_id . '_box_id'; ?>" value="<?php echo $box_id; ?>" />
   <label title="<?php echo $intelliwidget->get_tip('replace_widget'); ?>" for="<?php echo 'intelliwidget_' . $box_id . '_replace_widget'; ?>">
@@ -206,7 +209,7 @@ class IntelliWidgetMetaBox {
     function general_settings($box_id, $post_id, $instance) {
         global $intelliwidget;
         ?>
-<div id="iw-generalsettings-<?php echo $box_id; ?>" class="postbox closed">
+<div id="iw-generalsettings-<?php echo $box_id; ?>" class="postbox closed panel-general">
   <div class="handlediv" title="<?php _e('Click to toggle', 'intelliwidget'); ?>"></div>
   <h3 title="<?php echo $intelliwidget->get_tip('generalsettings'); ?>"><span>
     <?php echo $intelliwidget->get_label('generalsettings'); ?>
@@ -256,7 +259,7 @@ class IntelliWidgetMetaBox {
     function addl_text_settings($box_id, $post_id, $instance) {
         global $intelliwidget;
         ?>
-<div id="iw-addltext-<?php echo $box_id; ?>" class="postbox closed">
+<div id="iw-addltext-<?php echo $box_id; ?>" class="postbox closed panel-addltext">
   <div class="handlediv" title="<?php _e('Click to toggle', 'intelliwidget'); ?>"></div>
   <h3 title="<?php echo $intelliwidget->get_tip('addltext'); ?>"><span>
     <?php echo $intelliwidget->get_label('addltext'); ?>
@@ -287,7 +290,7 @@ class IntelliWidgetMetaBox {
     function appearance_settings($box_id, $post_id, $instance) {
         global $intelliwidget, $_wp_additional_image_sizes;
         ?>
-<div id="iw-appearance-<?php echo $box_id; ?>" class="postbox closed">
+<div id="iw-appearance-<?php echo $box_id; ?>" class="postbox closed panel-appearance">
   <div class="handlediv" title="<?php _e('Click to toggle', 'intelliwidget'); ?>"></div>
   <h3 title="<?php echo $intelliwidget->get_tip('appearance'); ?>"><span>
     <?php echo $intelliwidget->get_label('appearance'); ?>
@@ -377,7 +380,7 @@ class IntelliWidgetMetaBox {
     function post_selection_settings($box_id, $post_id, $instance) {
         global $intelliwidget;
         ?>
-<div id="iw-selection-<?php echo $box_id; ?>" class="postbox closed">
+<div id="iw-selection-<?php echo $box_id; ?>" class="postbox closed panel-selection">
   <div class="handlediv" title="<?php _e('Click to toggle', 'intelliwidget'); ?>"></div>
   <h3 title="<?php echo $intelliwidget->get_tip('selection'); ?>"><span>
     <?php echo $intelliwidget->get_label('selection'); ?>
@@ -393,22 +396,15 @@ class IntelliWidgetMetaBox {
         <?php echo ucfirst($type); ?></label>
       <?php endforeach; ?>
     </p>
-    <p>
-      <label title="<?php echo $intelliwidget->get_tip('category'); ?>">
-        <?php echo $intelliwidget->get_label('category'); ?>
-        :</label>
-      <select class="widefat intelliwidget-multiselect" name="<?php echo 'intelliwidget_' . $box_id . '_category'; ?>[]" size="1" multiple="multiple" id="<?php echo 'intelliwidget_' . $box_id . '_category'; ?>">
-        <?php echo $intelliwidget->get_relevant_terms($instance); ?>
-      </select>
-    </p>
-    <p>
-      <label title="<?php echo $intelliwidget->get_tip('page'); ?>">
-        <?php echo $intelliwidget->get_label('page'); ?>
-        :</label>
-      <select class="widefat intelliwidget-multiselect" name="<?php echo 'intelliwidget_' . $box_id . '_page'; ?>[]" size="1" multiple="multiple" id="<?php echo 'intelliwidget_' . $box_id . '_page'; ?>">
-        <?php echo $intelliwidget->get_posts_list($instance); ?>
-      </select>
-    </p>
+    <div id="<?php echo 'intelliwidget_' . $box_id . '_menus'; ?>">
+<?php  
+        /*
+         * this has been moved to its own method: post_selection_menus()
+         */
+         
+         do_action('intelliwidget_post_selection_menus', $box_id, $post_id, $instance);
+?>
+    </div>
     <p>
       <label title="<?php echo $intelliwidget->get_tip('skip_post'); ?>" for="<?php echo 'intelliwidget_' . $box_id . '_skip_post'; ?>">
         <input id="<?php echo 'intelliwidget_' . $box_id . '_skip_post'; ?>" name="<?php echo 'intelliwidget_' . $box_id . '_skip_post'; ?>" type="checkbox" <?php checked($instance['skip_post'], 1); ?> value="1" />
@@ -442,6 +438,29 @@ class IntelliWidgetMetaBox {
 <?php
     }
 
+    function post_selection_menus($box_id, $post_id, $instance) {
+        global $intelliwidget;
+?>
+    <p>
+      <label title="<?php echo $intelliwidget->get_tip('taxonomies'); ?>">
+        <?php echo $intelliwidget->get_label('taxonomies'); ?>
+        :</label>
+      <select class="widefat intelliwidget-multiselect" name="<?php echo 'intelliwidget_' . $box_id . '_taxonomies'; ?>[]" size="1" multiple="multiple" id="<?php echo 'intelliwidget_' . $box_id . '_taxonomies'; ?>">
+        <?php echo $intelliwidget->get_relevant_terms($instance); ?>
+      </select>
+    </p>
+    <p>
+      <label title="<?php echo $intelliwidget->get_tip('page'); ?>">
+        <?php echo $intelliwidget->get_label('page'); ?>
+        :</label>
+      <select class="widefat intelliwidget-multiselect" name="<?php echo 'intelliwidget_' . $box_id . '_page'; ?>[]" size="1" multiple="multiple" id="<?php echo 'intelliwidget_' . $box_id . '_page'; ?>">
+        <?php echo $intelliwidget->get_posts_list($instance); ?>
+      </select>
+    </p>
+
+<?php
+    }
+    
     function nav_menu($box_id, $post_id, $instance){
         global $intelliwidget;
         ?>

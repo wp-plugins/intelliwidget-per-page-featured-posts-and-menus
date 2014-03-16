@@ -68,6 +68,11 @@ select.intelliwidget-multiselect {
     max-width:100%;
     margin-bottom:10px;
 }
+
+.iw-collapsible .inside, .iw-collapsible h4 {
+     padding:8px !important;
+     margin:0 !important;
+}
 /* tabs and tab sections */
 
 #iw_tabbed_sections {
@@ -95,6 +100,7 @@ li.iw-tab {
 
 .iw-add {
     font-weight: bold;
+    margin-bottom:10px;
 }
 
 .iw-tab a {

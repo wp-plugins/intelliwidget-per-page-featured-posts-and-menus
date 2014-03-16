@@ -66,7 +66,8 @@ class IntelliWidget {
             add_action('wp_ajax_iw_copy',               array(&$this, 'ajax_copy_page' ));
             add_action('wp_ajax_iw_delete',             array(&$this, 'ajax_delete_tabbed_section' ));
             add_action('wp_ajax_iw_add',                array(&$this, 'ajax_add_tabbed_section' ));
-            add_action('wp_ajax_iw_get',                array(&$this, 'ajax_get_tabbed_section' ));
+            add_action('wp_ajax_iw_get',                array(&$this, 'ajax_get_post_select_menus' ));
+            add_action('wp_ajax_iw_widget_get',         array(&$this, 'ajax_get_widget_post_select_menus' ));
             add_filter('intelliwidget_sanitize_input',  array(&$this, 'filter_sanitize_input'));
         else:
             // default content filters
@@ -386,10 +387,11 @@ class IntelliWidget {
         if (false === $this->save_postdata()) die('fail');
         $this->is_ajax = true;
         $this->init_metabox();
+        add_action('intelliwidget_post_selection_menus', array($this->metabox, 'post_selection_menus'), 10, 4);
         $post_id = intval($_POST['post_ID']);
         $box_id_key = current(preg_grep("/_box_id$/", array_keys($_POST)));
         $box_id = intval($_POST[$box_id_key]);
-        $instance = $this->get_page_data($box_id, $post_id);
+        $instance = $this->defaults($this->get_page_data($box_id, $post_id));
         
         $response = array(
             'tab'   => $this->get_tab($box_id, $instance['replace_widget']),
@@ -418,8 +420,11 @@ class IntelliWidget {
     }
 
     function ajax_add_tabbed_section() {
-        if (!array_key_exists('post', $_POST) || 
-            !array_key_exists('_wpnonce', $_POST)) die('fail');
+        if (!array_key_exists('post', $_POST) 
+            || !array_key_exists('_wpnonce', $_POST) 
+            || !current_user_can('edit_post', $_POST['post']) 
+            || !wp_verify_nonce($_POST['iwpage'],'iwpage_' . $_POST['post'])            
+            ) die('fail');
         // note that the query string version uses "post" instead of "post_ID"
         $this->is_ajax = true;
         $post_id = intval($_POST['post']);
@@ -438,18 +443,61 @@ class IntelliWidget {
         die(json_encode($response));
     }
     
-    function ajax_get_tabbed_section() {
-        if (!array_key_exists('post', $_POST) || !array_key_exists('iw_box_id', $_POST) || 
-            !array_key_exists('_wpnonce', $_POST) || !wp_verify_nonce($_POST['_wpnonce'])) die('fail');
+    /*
+     * ajax_get_hierarchical_menus
+     * This is an important improvement to the application for performance.
+     * We now dynamically load all walker-generated menus when the panel is opened
+     * and reuse the same DOM element to render them on the page. Since only one panel
+     * is ever in use at a time, we remove them from any panels not currently in use
+     * and reload them when they are focus()ed again. The reused DOM element also prevents
+     * memory leakage from multiple xhr refreshes of multiple copies of the same huge lists.
+     */
+    function ajax_get_post_select_menus() {
+        $post_id = intval($_POST['post_ID']);
+        $box_id_key = current(preg_grep("/_box_id$/", array_keys($_POST)));
+        $box_id = intval($_POST[$box_id_key]);
+        if ( empty($post_id) || empty($box_id) || !current_user_can('edit_post', $post_id) 
+            || !wp_verify_nonce($_POST['iwpage'],'iwpage_' . $post_id) ) return false;
         $this->is_ajax = true;
         if (!isset($this->lists)) $this->admin_init();
-        // note that the query string version uses "post" instead of "post_ID"
-        $box_id = intval($_POST['iw_box_id']);
-        $post_id   = intval($_POST['post_ID']);
-        list($tab, $form) = $this->get_section($box_id, $post_id); // , $sidebar_widget_id
+        $this->init_metabox();
+        $instance = $this->defaults($this->get_page_data($box_id, $post_id));
+        ob_start();
+        $this->metabox->post_selection_menus($box_id, $post_id, $instance);
+        $form = ob_get_contents();
+        ob_end_clean();
         die($form);
     }
-    
+  
+    function ajax_get_widget_post_select_menus() {
+        $widget_id = sanitize_text_field($_POST['widget-id']);
+        $nonce = sanitize_text_field($_POST['_wpnonce_widgets']);
+        if ( empty($widget_id) || empty($nonce) 
+            || !current_user_can('edit_theme_options') 
+            || !wp_verify_nonce($nonce, 'save-sidebar-widgets' ) 
+            ) return false;
+        $this->is_ajax = true;
+        global $wp_registered_widgets;
+        if (isset($wp_registered_widgets[$widget_id])):
+            if (isset($wp_registered_widgets[$widget_id]['callback'])):
+                if (count($wp_registered_widgets[$widget_id]['callback'])):
+                    $widget = $wp_registered_widgets[$widget_id]['callback'][0];
+                    $settings = $widget->get_settings($widget_id);
+                    $instance = $settings[$widget->number];
+                    if (!isset($this->lists)) $this->admin_init();
+                    include_once('class-intelliwidget-form.php');
+                    $form = new IntelliWidgetForm();
+                    ob_start();
+                    $form->post_selection_menus($instance, $widget);
+                    $form = ob_get_contents();
+                    ob_end_clean();
+                    die($form);
+                endif;
+            endif;
+        endif;
+        die('fail');
+    }
+  
     function ajax_copy_page() {
         if (!array_key_exists('post_ID', $_POST) || !array_key_exists('iwpage', $_POST))
             die('fail');
@@ -533,7 +581,7 @@ class IntelliWidget {
     function get_relevant_terms($instance = NULL) {
     	$output = '';
         $post_types = $this->val2array($instance['post_types']);
-        $instance['category']   = $this->val2array($instance['category']);
+        $instance['taxonomies']   = $this->val2array($instance['taxonomies']);
         $terms = array();
         foreach ($this->val2array(preg_grep('/post_format/', get_object_taxonomies($post_types), PREG_GREP_INVERT)) as $tax):
             if (isset($this->terms[$tax]))
@@ -831,14 +879,15 @@ class IntelliWidget {
         endif;
     }
 
-    function translate_category_to_tax($category) {
+    function map_category_to_tax($category) {
         $catarr = $this->val2array($category);
-        return array_map(array($this, 'lookup_term'), $catarr, 'category');
+        $tax = array('category');
+        return array_map(array($this, 'lookup_term'), $catarr, $tax);
     }
     
     function lookup_term($id, $tax) {
-        foreach($this->terms as $term_tax_id => $term):
-            if ($term->term_id == $id && $term->taxonomy == $tax) return $term->term_taxonomy_id;
+        foreach($this->terms[$tax] as $term):
+            if ($term->term_id == $id) return $term->term_taxonomy_id;
         endforeach;
         return -1;
     }
@@ -1029,7 +1078,8 @@ class IntelliWidget {
             'post_types'     => array('page', 'post'),
             'template'       => 'menu',
             'page'           => array(), // stores any post_type, not just pages
-            'category'       => -1, // stores any taxonomy_terms, not just categories
+            'category'       => -1, // legacy value, convert to tax_id
+            'taxonomies'     => -1,
             'items'          => 5,
             'sortby'         => 'title',
             'sortorder'      => 'ASC',
@@ -1044,7 +1094,11 @@ class IntelliWidget {
             'imagealign'     => 'none',
             'image_size'     => 'none',
         ));
-        if (empty($instance['content']) && !empty($instance['nav_menu']) && '' != ($instance['nav_menu'])) $instance['content'] = 'nav_menu';
+        // convert legacy values
+        if (empty($instance['content']) && !empty($instance['nav_menu']) && '' != ($instance['nav_menu'])) 
+            $instance['content'] = 'nav_menu';
+        if (empty($instance['taxonomies']) && isset($instance['category']) && '-1' != $instance['category'])
+            $instance['taxonomies'] = $this->map_category_to_tax($instance['category']);
         // standard WP function for merging argument lists
         $merged = wp_parse_args($instance, $defaults);
         // backwards compatibility: add content=nav_menu if nav_menu param set

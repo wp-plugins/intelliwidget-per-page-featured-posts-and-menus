@@ -50,7 +50,7 @@ class IntelliWidgetList {
 
             'post_types'        => __('Select from these Post Types', 'intelliwidget'),
 
-            'category'          => __('Select by Category, Tag, etc.', 'intelliwidget'),
+            'taxonomies'        => __('Select by Category, Tag, etc.', 'intelliwidget'),
 
             'page'              => __('Select specific posts', 'intelliwidget'),
 
@@ -100,7 +100,7 @@ class IntelliWidgetList {
 
             'classes'           => __("Enter additional CSS class names if you wish to customize this section's styles.", 'intelliwidget'),
 
-            'addltext'        => __('These settings allow you to add additional text to display above or below the IntelliWidget output. If your user account has HTML editing capabilities, you can enter HTML as well.', 'intelliwidget'),
+            'addltext'          => __('These settings allow you to add additional text to display above or below the IntelliWidget output. If your user account has HTML editing capabilities, you can enter HTML as well.', 'intelliwidget'),
 
             'text_position'     => __('This menu controls the position of the custom text. You can also choose to display custom text only, skipping the post list entirely.', 'intelliwidget'),
 
@@ -128,9 +128,9 @@ class IntelliWidgetList {
 
             'post_types'        => __('These checkboxes restrict the selection to specific Post Types, post and page by default. At least one must be checked.', 'intelliwidget'),
 
-            'category'          => __('Restrict the output to specific categories, tags or other taxonomies by selecting them from the menu below. Only taxonomies related to the selected post types will appear here as options. Hold down the CTRL key (command on Mac) to select multiple options.', 'intelliwidget'),
+            'taxonomies'        => __('Restrict the output to specific categories, tags or other taxonomies by selecting them from the menu below. Only taxonomies related to the selected post types will appear here as options. Hold down the CTRL key (command on Mac) to select multiple options.', 'intelliwidget'),
 
-            'page'              => __('Restrict the output to specific posts by selecting them from the menu below. Only posts of type selected above will appear as options. The specific posts must also meet any other selection you choose here. Hold down the CTRL key (command on Mac) to select multiple options.', 'intelliwidget'),
+            'page'              => __('Restrict the output to specific posts by selecting them from the menu below. Only posts of the types selected above will appear as options. The specific posts must also meet any other selection you choose here. Hold down the CTRL key (command on Mac) to select multiple options.', 'intelliwidget'),
 
             'skip_post'         => __('Check this box if you wish to exclude the post currently being viewed in the main content from the selection list.', 'intelliwidget'),
 
@@ -157,6 +157,8 @@ class IntelliWidgetList {
             
             'link_target'       => __("Select a target attribute if you wish for the title link to open in a new window or tab.", 'intelliwidget'),
             
+            'replace_widget'    => __("This menu determines the IntelliWidget instance to replace with these settings. Options are labeled by Sidebar Name followed by the nth IntelliWidget in that sidebar. Even if there are other Widgets in the Sidebar, the number represents only the IntelliWidgets in the Sidebar. If you reorder the Widgets in the Sidebar, the number will reflect the change. To use these settings for a shortcode on the post, select 'Shortcode' and use the format [intelliwidget section=tab#], where 'tab#' corresponds to the number of the tab (above) containing the settings you wish to use.", 'intelliwidget'),
+
             'nocopy'            => __("Even if you are using IntelliWidget settings from another post, you can still customize this section by checking this box.", 'intelliwidget'),
             
 );
@@ -171,7 +173,7 @@ class IntelliWidgetList {
             'replaces' => apply_filters('intelliwidget_replaces_menu', 
                 array(
                     'none'      => __('Unassigned', 'intelliwidget'),
-                    'content'   => __('Shortcode (use tab number)', 'intelliwidget'),
+                    'content'   => __('Shortcode [intelliwidget section=tab#]', 'intelliwidget'),
                     )
                 ),
             'text_position' => apply_filters('intelliwidget_text_position_menu', 

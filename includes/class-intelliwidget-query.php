@@ -112,14 +112,14 @@ LEFT JOIN {$wpdb->postmeta} pm2 ON pm2.post_id = p1.ID
         // taxonomies
         $prepargs = array();
         // backward compatibility: support category term ids
-        if (-1 != $instance['category']):
+        if (isset($instance['category']) && '' != $instance['category'] && -1 != $instance['category']):
             $clauses[] = '( tx2.term_id IN ('. $this->prep_array($instance['category'], $prepargs, 'd') . ') )';
             $joins[] = "INNER JOIN {$wpdb->term_relationships} tx1 ON p1.ID = tx1.object_id " . 
                 "INNER JOIN {$wpdb->term_taxonomy} tx2 ON tx2.term_taxonomy_id = tx1.term_taxonomy_id 
                     AND tx2.taxonomy = 'category'";
-        // otherwise use new tax_id instead
-        elseif (-1 != $instance['tax_id']):
-            $clauses[] = '( tx1.term_taxonomy_id IN ('. $this->prep_array($instance['tax_id'], $prepargs, 'd') . ') )';
+        // otherwise use new taxonomies instead
+        elseif (isset($instance['taxonomies']) && '' != $instance['taxonomies'] && -1 != $instance['taxonomies']):
+            $clauses[] = '( tx1.term_taxonomy_id IN ('. $this->prep_array($instance['taxonomies'], $prepargs, 'd') . ') )';
             $joins[] = "INNER JOIN {$wpdb->term_relationships} tx1 ON p1.ID = tx1.object_id ";
         endif;
         

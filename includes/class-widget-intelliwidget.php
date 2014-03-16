@@ -24,11 +24,15 @@ class IntelliWidget_Widget extends WP_Widget {
         add_action('wp_enqueue_scripts', array(&$this, 'enqueue_styles'));
         if (is_admin()):
             add_action('load-widgets.php', array(&$intelliwidget, 'admin_init') );
-            // lazy load UI
-            include_once('class-intelliwidget-form.php');
-            $this->form = new IntelliWidgetForm();
+            add_action('load-widgets.php', array(&$this, 'load_form') );
         endif;
         $this->WP_Widget('intelliwidget', $intelliwidget->pluginName, $widget_ops, $control_ops);
+    }
+    
+    function load_form(){
+        // lazy load UI
+        include_once('class-intelliwidget-form.php');
+        $this->form = new IntelliWidgetForm();
     }
     /**
      * Stub for front-end css
