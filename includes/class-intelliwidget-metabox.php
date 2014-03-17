@@ -440,12 +440,14 @@ class IntelliWidgetMetaBox {
 
     function post_selection_menus($box_id, $post_id, $instance) {
         global $intelliwidget;
+        if (empty($instance['terms']) && isset($instance['category']) && '-1' != $instance['category'])
+            $instance['terms'] = $intelliwidget->map_category_to_tax($instance['category']);
 ?>
     <p>
-      <label title="<?php echo $intelliwidget->get_tip('taxonomies'); ?>">
-        <?php echo $intelliwidget->get_label('taxonomies'); ?>
+      <label title="<?php echo $intelliwidget->get_tip('terms'); ?>">
+        <?php echo $intelliwidget->get_label('terms'); ?>
         :</label>
-      <select class="widefat intelliwidget-multiselect" name="<?php echo 'intelliwidget_' . $box_id . '_taxonomies'; ?>[]" size="1" multiple="multiple" id="<?php echo 'intelliwidget_' . $box_id . '_taxonomies'; ?>">
+      <select class="widefat intelliwidget-multiselect" name="<?php echo 'intelliwidget_' . $box_id . '_terms'; ?>[]" size="1" multiple="multiple" id="<?php echo 'intelliwidget_' . $box_id . '_terms'; ?>">
         <?php echo $intelliwidget->get_relevant_terms($instance); ?>
       </select>
     </p>

@@ -170,14 +170,15 @@ if ( !function_exists('get_the_intelliwidget_link') ) {
      * @param <integer> $category_id (optional) - return category permalink
      * @return <string>
      */
-    function get_the_intelliwidget_link($post_id = NULL, $link_text = NULL) {
+    function get_the_intelliwidget_link($post_id = NULL, $link_text = NULL, $category_id = NULL) {
         global $post;
         $post_id =  intval($post_id) ? $post_id : (is_object($post) ? $post->ID : NULL);
+        if (isset($category_id) && -1 != $category_id) $url = get_category_link($category_id);
+        $url     = isset($url) ? $url : get_the_intelliwidget_url($post_id);
         if (empty( $link_text )):
             $link_text = get_the_intelliwidget_title($post_id);
         endif;
         $title_text = esc_attr(strip_tags($link_text));
-        $url     = get_the_intelliwidget_url($post_id);
         $classes = empty($post->link_classes) ? '' :  ' class="' . $post->link_classes . '"';
         $target  = empty($post->link_target) ? '' : ' target="' . $post->link_target . '"';
         $content = '<a title="' . $title_text . '" href="' . $url . '"' . $classes . $target . '>' . $link_text .  '</a>';
@@ -216,8 +217,8 @@ if ( !function_exists('get_the_intelliwidget_url')) {
 if ( !function_exists('get_the_intelliwidget_taxonomy_link')) {
 
     function get_the_intelliwidget_taxonomy_link($title, $instance) {
-        if (isset($instance['taxonomies'])):
-            $term = $instance['query']->terms_query($instance['taxonomies']);
+        if (isset($instance['terms']) && '-1' != $instance['terms']):
+            $term = $instance['query']->terms_query($instance['terms']);
             if ($term):
                 $url = get_term_link($term);
                 $title_text = esc_attr(strip_tags($title));
@@ -227,7 +228,7 @@ if ( !function_exists('get_the_intelliwidget_taxonomy_link')) {
         $post_id = NULL;
         if (count($instance['query']->posts))
             $post_id = $instance['query']->posts[0]->ID;
-        return get_the_intelliwidget_link($post_id, $title);
+        return get_the_intelliwidget_link($post_id, $title, (isset($instance['category']) ? $instance['category'] : NULL));
     }
 }
 

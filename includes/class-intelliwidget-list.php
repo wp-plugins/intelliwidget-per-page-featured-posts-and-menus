@@ -50,7 +50,7 @@ class IntelliWidgetList {
 
             'post_types'        => __('Select from these Post Types', 'intelliwidget'),
 
-            'taxonomies'        => __('Select by Category, Tag, etc.', 'intelliwidget'),
+            'terms'             => __('Select by Category, Tag, etc.', 'intelliwidget'),
 
             'page'              => __('Select specific posts', 'intelliwidget'),
 
@@ -128,7 +128,7 @@ class IntelliWidgetList {
 
             'post_types'        => __('These checkboxes restrict the selection to specific Post Types, post and page by default. At least one must be checked.', 'intelliwidget'),
 
-            'taxonomies'        => __('Restrict the output to specific categories, tags or other taxonomies by selecting them from the menu below. Only taxonomies related to the selected post types will appear here as options. Hold down the CTRL key (command on Mac) to select multiple options.', 'intelliwidget'),
+            'terms'             => __('Restrict the output to specific categories, tags or other taxonomies by selecting them from the menu below. Only taxonomies related to the selected post types will appear here as options. Hold down the CTRL key (command on Mac) to select multiple options.', 'intelliwidget'),
 
             'page'              => __('Restrict the output to specific posts by selecting them from the menu below. Only posts of the types selected above will appear as options. The specific posts must also meet any other selection you choose here. Hold down the CTRL key (command on Mac) to select multiple options.', 'intelliwidget'),
 

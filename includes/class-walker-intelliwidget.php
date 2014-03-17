@@ -72,7 +72,7 @@ class Walker_IntelliWidget_Terms extends Walker {
 		$pad = str_repeat('-&nbsp;', $depth);
         // fast index for iw query
         $matchval = (int)$term->term_taxonomy_id;
-        $matcharr = $args['taxonomies'];
+        $matcharr = $args['terms'];
 		$output .= "\t<option class=\"level-$depth\" value=\"$matchval\"";
 		if (in_array( $matchval, $matcharr))
 			$output .= ' selected';

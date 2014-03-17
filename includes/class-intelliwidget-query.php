@@ -117,9 +117,9 @@ LEFT JOIN {$wpdb->postmeta} pm2 ON pm2.post_id = p1.ID
             $joins[] = "INNER JOIN {$wpdb->term_relationships} tx1 ON p1.ID = tx1.object_id " . 
                 "INNER JOIN {$wpdb->term_taxonomy} tx2 ON tx2.term_taxonomy_id = tx1.term_taxonomy_id 
                     AND tx2.taxonomy = 'category'";
-        // otherwise use new taxonomies instead
-        elseif (isset($instance['taxonomies']) && '' != $instance['taxonomies'] && -1 != $instance['taxonomies']):
-            $clauses[] = '( tx1.term_taxonomy_id IN ('. $this->prep_array($instance['taxonomies'], $prepargs, 'd') . ') )';
+        // otherwise use new terms instead
+        elseif (isset($instance['terms']) && '' != $instance['terms'] && -1 != $instance['terms']):
+            $clauses[] = '( tx1.term_taxonomy_id IN ('. $this->prep_array($instance['terms'], $prepargs, 'd') . ') )';
             $joins[] = "INNER JOIN {$wpdb->term_relationships} tx1 ON p1.ID = tx1.object_id ";
         endif;
         
@@ -190,13 +190,14 @@ LEFT JOIN {$wpdb->postmeta} pm2 ON pm2.post_id = p1.ID
         $query = $select . implode(' ', $joins) . ' WHERE ' . implode("\n AND ", $clauses) . $orderby . $limit;
         //echo 'query: ' . "\n" . $query . " \n";
         $res      = $wpdb->get_results($wpdb->prepare($query, $prepargs));
-        $clauses = $prepargs = $ids = array();
-        foreach ($res as $obj)
-            $ids[] = $obj->ID;
-        $clauses[] = '(p1.ID IN ('. $this->prep_array($ids, $prepargs, 'd') . ') )';
+        if (count($res)):
+            $clauses = $prepargs = $ids = array();
+            foreach ($res as $obj)
+                $ids[] = $obj->ID;
+            $clauses[] = '(p1.ID IN ('. $this->prep_array($ids, $prepargs, 'd') . ') )';
 
-        // now flesh out objects
-        $select = "
+            // now flesh out objects
+            $select = "
 SELECT DISTINCT
     p1.ID,
     p1.post_content, 
@@ -214,7 +215,7 @@ SELECT DISTINCT
     pm7.meta_value AS thumbnail_id
 FROM {$wpdb->posts} p1
 ";
-    $joins = array("
+            $joins = array("
 LEFT JOIN {$wpdb->postmeta} pm1 ON pm1.post_id = p1.ID
     AND pm1.meta_key = 'intelliwidget_expire_date'
             ", "
@@ -236,10 +237,12 @@ LEFT JOIN {$wpdb->postmeta} pm6 ON pm6.post_id = p1.ID
 LEFT JOIN {$wpdb->postmeta} pm7 ON pm7.post_id = p1.ID
     AND pm7.meta_key = '_thumbnail_id'
             ");
-        $query = $select . implode(' ', $joins) . ' WHERE ' . implode("\n AND ", $clauses) . $orderby;
-        //echo 'query: ' . "\n" . $query . " \n";
-        $this->posts      = $wpdb->get_results($wpdb->prepare($query, $prepargs), OBJECT);
-        $this->post_count = count($this->posts);
+            $query = $select . implode(' ', $joins) . ' WHERE ' . implode("\n AND ", $clauses) . $orderby;
+            //echo 'query: ' . "\n" . $query . " \n";
+            $res      = $wpdb->get_results($wpdb->prepare($query, $prepargs), OBJECT);
+        endif;
+        $this->posts = $res;
+        $this->post_count = count($res);
     }
 
     function prep_array($value, &$args, $type = 's') {

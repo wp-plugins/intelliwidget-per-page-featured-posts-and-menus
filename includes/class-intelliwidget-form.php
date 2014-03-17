@@ -269,12 +269,16 @@ name="<?php echo $widget->get_field_name('custom_text'); ?>">
 
     function post_selection_menus($instance, $widget) {
         global $intelliwidget; 
+        // convert legacy category to taxonomies
+        if (empty($instance['terms']) && isset($instance['category']) && '-1' != $instance['category'])
+            $instance['terms'] = $intelliwidget->map_category_to_tax($instance['category']);
+       
 ?>
     <p>
-      <label title="<?php echo $intelliwidget->get_tip('taxonomies');?>">
-        <?php echo $intelliwidget->get_label('taxonomies');?>
+      <label title="<?php echo $intelliwidget->get_tip('terms');?>">
+        <?php echo $intelliwidget->get_label('terms');?>
         :</label>
-      <select class="widefat intelliwidget-multiselect" name="<?php echo $widget->get_field_name('taxonomies'); ?>[]" size="1" multiple="multiple" id="<?php echo $widget->get_field_id('taxonomies'); ?>">
+      <select class="widefat intelliwidget-multiselect" name="<?php echo $widget->get_field_name('terms'); ?>[]" size="1" multiple="multiple" id="<?php echo $widget->get_field_id('terms'); ?>">
         <?php echo $intelliwidget->get_relevant_terms($instance); ?>
       </select>
     </p>

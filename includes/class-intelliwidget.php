@@ -118,7 +118,7 @@ class IntelliWidget {
     function admin_scripts() {
         wp_enqueue_style('intelliwidget-js', $this->pluginURL . 'templates/intelliwidget-admin.css');
         wp_enqueue_script('jquery-ui-tabs');
-        wp_enqueue_script('intelliwidget-js', $this->pluginURL . 'js/intelliwidget.js', array('jquery'), '1.5.0', false);
+        wp_enqueue_script('intelliwidget-js', $this->pluginURL . 'js/intelliwidget.min.js', array('jquery'), '1.5.0', false);
         wp_localize_script( 'intelliwidget-js', 'IWAjax', array(
             'ajaxurl' => admin_url( 'admin-ajax.php' )
         ));
@@ -583,7 +583,7 @@ class IntelliWidget {
     function get_relevant_terms($instance = NULL) {
     	$output = '';
         $post_types = $this->val2array($instance['post_types']);
-        $instance['taxonomies']   = $this->val2array($instance['taxonomies']);
+        $instance['terms']   = $this->val2array($instance['terms']);
         $terms = array();
         foreach ($this->val2array(preg_grep('/post_format/', get_object_taxonomies($post_types), PREG_GREP_INVERT)) as $tax):
             if (isset($this->terms[$tax]))
@@ -894,6 +894,7 @@ class IntelliWidget {
     }
 
     function map_category_to_tax($category) {
+        // echo '<textarea>' .   print_r(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS), true) . '</textarea>';
         $catarr = $this->val2array($category);
         $tax = array('category');
         return array_map(array($this, 'lookup_term'), $catarr, $tax);
@@ -1073,43 +1074,41 @@ class IntelliWidget {
         //if (empty($instance)) $instance = array();
         $defaults = apply_filters('intelliwidget_defaults', array(
             // these apply to all intelliwidgets
-            'content'        => 'post_list', // this is the main control, determines hook to use
-            'nav_menu'       => '', // built-in extension, uses wordpress menu instead of post_list
-            'title'          => '',
-            'link_title'     => 0,
-            'classes'        => '',
-            'container_id'   => '',
-            'custom_text'    => '',
-            'text_position'  => '',
-            'filter'         => 0,
-            'hide_if_empty'  => 0,      // applies to site-wide intelliwidgets
-            'replace_widget' => 'none', // applies to post-specific intelliwidgets
-            'nocopy'         => 0,      // applies to post-specific intelliwidgets
+            'content'           => 'post_list', // this is the main control, determines hook to use
+            'nav_menu'          => '', // built-in extension, uses wordpress menu instead of post_list
+            'title'             => '',
+            'link_title'        => 0,
+            'classes'           => '',
+            'container_id'      => '',
+            'custom_text'       => '',
+            'text_position'     => '',
+            'filter'            => 0,
+            'hide_if_empty'     => 0,      // applies to site-wide intelliwidgets
+            'replace_widget'    => 'none', // applies to post-specific intelliwidgets
+            'nocopy'            => 0,      // applies to post-specific intelliwidgets
             // these apply to post_list intelliwidgets
-            'post_types'     => array('page', 'post'),
-            'template'       => 'menu',
-            'page'           => array(), // stores any post_type, not just pages
-            'category'       => -1, // legacy value, convert to tax_id
-            'taxonomies'     => -1,
-            'items'          => 5,
-            'sortby'         => 'title',
-            'sortorder'      => 'ASC',
-            'skip_expired'   => 0,
-            'skip_post'      => 0,
-            'future_only'    => 0,
-            'active_only'    => 0,
+            'post_types'        => array('page', 'post'),
+            'template'          => 'menu',
+            'page'              => array(), // stores any post_type, not just pages
+            'category'          => -1, // legacy value, convert to tax_id
+            'terms'             => -1,
+            'items'             => 5,
+            'sortby'            => 'title',
+            'sortorder'         => 'ASC',
+            'skip_expired'      => 0,
+            'skip_post'         => 0,
+            'future_only'       => 0,
+            'active_only'       => 0,
             // these apply to post_list items
-            'length'         => 15,
-            'link_text'      => __('Read More', 'intelliwidget'),
-            'allowed_tags'   => '',
-            'imagealign'     => 'none',
-            'image_size'     => 'none',
+            'length'            => 15,
+            'link_text'         => __('Read More', 'intelliwidget'),
+            'allowed_tags'      => '',
+            'imagealign'        => 'none',
+            'image_size'        => 'none',
         ));
         // convert legacy values
         if (empty($instance['content']) && !empty($instance['nav_menu']) && '' != ($instance['nav_menu'])) 
             $instance['content'] = 'nav_menu';
-        if (empty($instance['taxonomies']) && isset($instance['category']) && '-1' != $instance['category'])
-            $instance['taxonomies'] = $this->map_category_to_tax($instance['category']);
         // standard WP function for merging argument lists
         $merged = wp_parse_args($instance, $defaults);
         // backwards compatibility: add content=nav_menu if nav_menu param set
