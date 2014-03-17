@@ -170,14 +170,14 @@ if ( !function_exists('get_the_intelliwidget_link') ) {
      * @param <integer> $category_id (optional) - return category permalink
      * @return <string>
      */
-    function get_the_intelliwidget_link($post_id = NULL, $link_text = NULL, $category_id = NULL) {
+    function get_the_intelliwidget_link($post_id = NULL, $link_text = NULL) {
         global $post;
-        $post_id =  intval($post_id) ? $post_id : $post->ID;
+        $post_id =  intval($post_id) ? $post_id : (is_object($post) ? $post->ID : NULL);
         if (empty( $link_text )):
             $link_text = get_the_intelliwidget_title($post_id);
         endif;
         $title_text = esc_attr(strip_tags($link_text));
-        $url     = get_the_intelliwidget_url($post_id, $category_id);
+        $url     = get_the_intelliwidget_url($post_id);
         $classes = empty($post->link_classes) ? '' :  ' class="' . $post->link_classes . '"';
         $target  = empty($post->link_target) ? '' : ' target="' . $post->link_target . '"';
         $content = '<a title="' . $title_text . '" href="' . $url . '"' . $classes . $target . '>' . $link_text .  '</a>';
@@ -193,8 +193,8 @@ if ( !function_exists('the_intelliwidget_link') ) {
      * @param <strong> $link_text (optional) - text inside area tag
      * @param <integer> $category_id (optional) - return category permalink
      */
-    function the_intelliwidget_link($post_id = NULL, $title = NULL, $category_id = NULL) {
-        echo get_the_intelliwidget_link($post_id, $title, $category_id);
+    function the_intelliwidget_link($post_id = NULL, $title = NULL) {
+        echo get_the_intelliwidget_link($post_id, $title);
     }
 }
 
@@ -207,14 +207,27 @@ if ( !function_exists('get_the_intelliwidget_url')) {
      * @param <integer> $category_id (optional) - return category url
      * @return <string>
      */
-    function get_the_intelliwidget_url($post_id = NULL, $category_id = NULL) {
+    function get_the_intelliwidget_url($post_id = NULL) {
         global $post;
         $post_id = intval($post_id) ? $post_id : $post->ID;
-        if (intval($category_id) && $category_id != -1):
-            return get_category_link($category_id);
-        else:
-            return empty($post->external_url) ? get_permalink($post_id) : $post->external_url;
+        return empty($post->external_url) ? get_permalink($post_id) : $post->external_url;
+    }
+}
+if ( !function_exists('get_the_intelliwidget_taxonomy_link')) {
+
+    function get_the_intelliwidget_taxonomy_link($title, $instance) {
+        if (isset($instance['taxonomies'])):
+            $term = $instance['query']->terms_query($instance['taxonomies']);
+            if ($term):
+                $url = get_term_link($term);
+                $title_text = esc_attr(strip_tags($title));
+                return '<a title="' . $title_text . '" href="' . $url . '">' . apply_filters( 'widget_title', $title ) .  '</a>';
+            endif;
         endif;
+        $post_id = NULL;
+        if (count($instance['query']->posts))
+            $post_id = $instance['query']->posts[0]->ID;
+        return get_the_intelliwidget_link($post_id, $title);
     }
 }
 

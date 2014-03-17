@@ -71,13 +71,15 @@ class IntelliWidget {
             add_filter('intelliwidget_sanitize_input',  array(&$this, 'filter_sanitize_input'));
         else:
             // default content filters
-            add_filter('intelliwidget_before_widget',   array(&$this, 'filter_before_widget'),  10, 2);
-            add_filter('intelliwidget_title',           array(&$this, 'filter_title'),          10, 2);
-            add_filter('intelliwidget_custom_text',     array(&$this, 'filter_custom_text'),    10, 2);
-            add_filter('intelliwidget_classes',         array(&$this, 'filter_classes'),        10, 2);
-            add_filter('intelliwidget_menu_classes',    array(&$this, 'filter_menu_classes'),   10, 2);
+            add_filter('intelliwidget_before_widget',   array(&$this, 'filter_before_widget'),  10, 3);
+            add_filter('intelliwidget_title',           array(&$this, 'filter_title'),          10, 3);
+            add_filter('intelliwidget_custom_text',     array(&$this, 'filter_custom_text'),    10, 3);
+            add_filter('intelliwidget_classes',         array(&$this, 'filter_classes'),        10, 3);
+            add_filter('intelliwidget_menu_classes',    array(&$this, 'filter_menu_classes'),   10, 3);
             // default content actions
+            add_action('intelliwidget_above_content',   array(&$this, 'action_addltext_above'), 10, 3);
             add_action('intelliwidget_post_list',       array(&$this, 'action_post_list'),      10, 3);
+            add_action('intelliwidget_below_content',   array(&$this, 'action_addltext_below'), 10, 3);
             add_action('intelliwidget_nav_menu',        array(&$this, 'action_nav_menu'),       10, 2);
         endif;
         // thanks to woothemes for this
@@ -808,13 +810,13 @@ class IntelliWidget {
         endif;
     }
     
-    function filter_custom_text($custom_text, $instance = array()) {
+    function filter_custom_text($custom_text, $instance = array(), $args = array()) {
         if ( !empty( $instance['filter'] ))
             $custom_text = wpautop( $custom_text );
         return '<div class="textwidget">' . $custom_text . '</div>';
     }
     
-    function filter_before_widget($before_widget, $instance = array()) {
+    function filter_before_widget($before_widget, $instance = array(), $args = array()) {
         if (!empty($instance['container_id'])):
             $before_widget = preg_replace('/id=".+?"/', 'id="' . $instance['container_id'] . '"', $before_widget);
         endif;
@@ -829,14 +831,14 @@ class IntelliWidget {
         return preg_replace("/[, ;]+/", ' ', $classes);
     }
         
-    function filter_title($title, $instance = array()) {
+    function filter_title($title, $instance = array(), $args = array()) {
         if ( !empty( $title ) ) {
-            if ( !empty($instance['link_title']) && 
+            if ( !empty($instance['link_title']) &&
                 !empty($instance['query']) && 
                 is_object($instance['query']) && 
                 !empty($instance['query']->post_count)) {
                 // @params $post_id, $text, $category_ID
-                return get_the_intelliwidget_link($instance['query']->posts[0]->ID, apply_filters( 'widget_title', $title), $instance['category']);
+                return get_the_intelliwidget_taxonomy_link($title, $instance);
             } else {
                 return apply_filters( 'widget_title', $title );
             }
@@ -847,7 +849,13 @@ class IntelliWidget {
     function filter_menu_classes($classes, $instance = array()) {
         return $classes . (empty($instance['classes']) ? '' : ' ' . $instance['classes']);
     }
-        
+    
+    function action_addltext_above($instance, $args) {
+        if (('above' == $instance['text_position'] || 'only' == $instance['text_position'] )):
+            echo apply_filters('intelliwidget_custom_text', $instance['custom_text'], $instance, $args);
+        endif;
+    }
+    
     function action_post_list($instance = array(), $post_id = NULL) {
         if (!empty($instance['template'])):
             if (has_action('intelliwidget_action_' . $instance['template'])):
@@ -856,6 +864,12 @@ class IntelliWidget {
                 $selected = is_object($instance['query']) ? $instance['query'] : new IntelliWidget_Query($instance);
                 include ($template);
             endif;
+        endif;
+    }
+    
+    function action_addltext_below($instance, $args) {
+        if ('below' == $instance['text_position']):
+            echo apply_filters('intelliwidget_custom_text', $instance['custom_text'], $instance, $args);
         endif;
     }
     
@@ -956,32 +970,25 @@ class IntelliWidget {
             $instance['query']->iw_query($instance);
         endif;
         // render before widget argument
-        echo apply_filters('intelliwidget_before_widget', $before_widget, $instance);
+        echo apply_filters('intelliwidget_before_widget', $before_widget, $instance, $args);
         // handle title
         if (!empty($instance['title'])):
-            echo apply_filters('intelliwidget_before_title', $before_title, $instance);
-            echo apply_filters('intelliwidget_title', $instance['title'], $instance);
-            echo apply_filters('intelliwidget_after_title', $after_title, $instance);
+            echo apply_filters('intelliwidget_before_title', $before_title, $instance, $args);
+            echo apply_filters('intelliwidget_title', $instance['title'], $instance, $args);
+            echo apply_filters('intelliwidget_after_title', $after_title, $instance, $args);
         endif;
         // handle custom text above content
-        if (('above' == $instance['text_position'] || 'only' == $instance['text_position'] )):
-            echo apply_filters('intelliwidget_custom_text', $instance['custom_text'], $instance);
-        endif;
+        do_action('intelliwidget_above_content', $instance, $args);
         // skip to after widget content if this is custom text only
-        if ('only' == $instance['text_position']):
-            echo apply_filters('intelliwidget_after_widget', $after_widget, $instance);
-            return;
+        if ('only' != $instance['text_position']):
+            // use action hook to render content
+            if ( has_action('intelliwidget_' . $instance['content']))
+                do_action('intelliwidget_' . $instance['content'], $instance, $post_id);
         endif;
-        
-        // use action hook to render content
-        if ( has_action('intelliwidget_' . $instance['content']))
-            do_action('intelliwidget_' . $instance['content'], $instance, $post_id);
         // handle custom text below content
-        if ('below' == $instance['text_position']):
-            echo apply_filters('intelliwidget_custom_text', $instance['custom_text'], $instance);
-        endif;
+        do_action('intelliwidget_below_content', $instance, $args);
         // render after widget argument
-        echo apply_filters('intelliwidget_after_widget', $after_widget, $instance);
+        echo apply_filters('intelliwidget_after_widget', $after_widget, $instance, $args);
     }
     
     /**
@@ -1026,6 +1033,10 @@ class IntelliWidget {
             endforeach;
         endif;
         $this->{$property} = $indexarray;
+    }
+    
+    function arrchk($arr, $ndx) {
+        return is_array($arr) ? (empty($arr[$ndx]) ? '' : $arr[$ndx]) : '';
     }
     
     function val2array($value) {

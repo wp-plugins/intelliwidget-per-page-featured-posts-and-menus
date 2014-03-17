@@ -506,16 +506,6 @@ jQuery(document).ready(function($) {
         // only load once
         if (menucontainer.has('select').length) return false;
         // find inputs for this section
-        console.log('widget-id: ' + thisID);
-        /*
-        $('input[name=post_ID],input[name=iwpage],input[type=hidden][id^=' + pre + ']').each(
-            function(index, element) {
-            // get field id
-            fieldID = $(this).attr('id');
-            // add to post data
-            postData[fieldID] = $(this).val();
-        });
-        */
         postData['widget-id'] = thisID;
         postData['_wpnonce_widgets'] = nonce;
         // add wp ajax action to array

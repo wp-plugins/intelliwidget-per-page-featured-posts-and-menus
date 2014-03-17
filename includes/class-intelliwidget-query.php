@@ -273,4 +273,18 @@ LEFT JOIN {$wpdb->postmeta} pm7 ON pm7.post_id = p1.ID
         // echo 'query: ' . "\n" . $query . " \n";
         return $wpdb->get_results($wpdb->prepare($query, $args), OBJECT);
     }
+    
+    function terms_query($term_ids = array()) {
+        global $wpdb;
+        $args = array();
+        $query = "
+        SELECT t.*, tt.* 
+        FROM $wpdb->terms AS t 
+            INNER JOIN $wpdb->term_taxonomy AS tt ON t.term_id = tt.term_id 
+        WHERE term_taxonomy_id IN (" . $this->prep_array($term_ids, $args, 'd') . ")
+        ORDER BY tt.count DESC
+        LIMIT 1
+        ";
+        return $wpdb->get_row($wpdb->prepare($query, $args), OBJECT);
+    }
 }
