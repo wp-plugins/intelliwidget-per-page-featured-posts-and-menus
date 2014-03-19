@@ -7,8 +7,8 @@ if ( !defined('ABSPATH')) exit;
  *
  * @package IntelliWidget
  * @subpackage includes
- * @author Jason C Fleming
- * @copyright 2014 Lilaea Media LLC
+ * @author Lilaea Media
+ * @copyright 2013
  * @access public
  */
 class IntelliWidget_Query {

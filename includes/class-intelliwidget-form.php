@@ -6,25 +6,25 @@ if ( !defined('ABSPATH')) exit;
  *
  * @package IntelliWidget
  * @subpackage includes
- * @author Jason C Fleming
- * @copyright 2014 Lilaea Media LLC
+ * @author Lilaea Media
+ * @copyright 2013
  * @access public
  */
 class IntelliWidgetForm {
     function __construct() {
 //        print_r(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS));
         add_action('intelliwidget_form_nav_menu',   array($this, 'nav_menu'), 1, 3);
+        add_action('intelliwidget_form_all_before', array($this, 'general_settings'), 2, 3);
         add_action('intelliwidget_form_post_list',  array($this, 'post_selection_settings'), 10, 3);
         add_action('intelliwidget_form_post_list',  array($this, 'appearance_settings'), 5, 3);
-        add_action('intelliwidget_form_all_after',  array($this, 'addl_text_settings'), 5, 3);
-        add_action('intelliwidget_form_all_after',  array($this, 'general_settings'), 10, 3);
+        add_action('intelliwidget_form_all_after',  array($this, 'addl_text_settings'), 3, 3);
         if (isset($_POST['widget-id'])) add_action('intelliwidget_post_selection_menus', array($this, 'post_selection_menus'), 10, 3);
     }
 
     function form($instance, $widget) {
         global $intelliwidget;
         ?>
-<p>  <input type="hidden" id="<?php echo $widget->get_field_id('category'); ?>" name="<?php echo $widget->get_field_name('category'); ?>" value="-1" /><?php /* Original Categories: <?php echo implode(',', $intelliwidget->val2array($instance['category'])); */ ?>
+<p>  <input type="hidden" id="<?php echo $widget->get_field_id('category'); ?>" name="<?php echo $widget->get_field_name('category'); ?>" value="-1" />Original Categories: <?php echo implode(',', $intelliwidget->val2array($instance['category'])); ?>
 </p>
 <p> <?php echo $intelliwidget->docsLink; ?>
   <label title="<?php echo $intelliwidget->get_tip('hide_if_empty'); ?>">

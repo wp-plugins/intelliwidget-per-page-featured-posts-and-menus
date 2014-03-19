@@ -6,18 +6,17 @@ if ( !defined('ABSPATH')) exit;
  *
  * @package IntelliWidget
  * @subpackage includes
- * @author Jason C Fleming
- * @copyright 2014 Lilaea Media LLC
+ * @author Lilaea Media
+ * @copyright 2013
  * @access public
  */
- 
 class IntelliWidgetMetaBox {
     function __construct() {
         add_action('intelliwidget_metabox_nav_menu',    array($this, 'nav_menu'), 1, 3);
+        add_action('intelliwidget_metabox_all_before',  array($this, 'general_settings'), 2, 3);
         add_action('intelliwidget_metabox_post_list',   array($this, 'post_selection_settings'), 10, 3);
         add_action('intelliwidget_metabox_post_list',   array($this, 'appearance_settings'), 5, 3);
-        add_action('intelliwidget_metabox_all_after',   array($this, 'addl_text_settings'), 5, 3);
-        add_action('intelliwidget_metabox_all_after',   array($this, 'general_settings'), 10, 3);
+        add_action('intelliwidget_metabox_all_after',   array($this, 'addl_text_settings'), 10, 3);
     }
 
     function page_form($post) {
@@ -61,7 +60,7 @@ class IntelliWidgetMetaBox {
     : <a href="#edit_timestamp" id="intelliwidget_event_date-edit" class="intelliwidget-edit-timestamp hide-if-no-js">
     <?php _e('Edit', 'intelliwidget') ?>
     </a> <span id="intelliwidget_event_date_timestamp" class="intelliwidget-timestamp"> <?php echo $fields['intelliwidget_event_date'] ?></span></label>
-  <input type="hidden" class="intelliwidget-input" id="intelliwidget_event_date" name="intelliwidget_event_date" value="<?php echo $fields['intelliwidget_event_date'] ?>" autocomplete="off" />
+  <input type="hidden" class="intelliwidget-input" id="intelliwidget_event_date" name="intelliwidget_event_date" value="<?php echo $fields['intelliwidget_event_date'] ?>" />
 <div id="intelliwidget_event_date_div" class="intelliwidget-timestamp-div hide-if-js">
   <?php $this->timestamp('intelliwidget_event_date', $fields['intelliwidget_event_date']); ?>
 </div>
@@ -72,7 +71,7 @@ class IntelliWidgetMetaBox {
     : <a href="#edit_timestamp" id="intelliwidget_expire_date-edit" class="intelliwidget-edit-timestamp hide-if-no-js">
     <?php _e('Edit', 'intelliwidget') ?>
     </a> <span id="intelliwidget_expire_date_timestamp" class="intelliwidget-timestamp"> <?php echo $fields['intelliwidget_expire_date']; ?></span></label>
-  <input type="hidden" class="intelliwidget-input" id="intelliwidget_expire_date" name="intelliwidget_expire_date" value="<?php echo $fields['intelliwidget_expire_date'] ?>" autocomplete="off" />
+  <input type="hidden" class="intelliwidget-input" id="intelliwidget_expire_date" name="intelliwidget_expire_date" value="<?php echo $fields['intelliwidget_expire_date'] ?>" />
 <div id="intelliwidget_expire_date_div" class="intelliwidget-timestamp-div hide-if-js">
   <?php $this->timestamp('intelliwidget_expire_date', $fields['intelliwidget_expire_date']); ?>
 </div>
@@ -81,25 +80,25 @@ class IntelliWidgetMetaBox {
   <label title="<?php echo $intelliwidget->get_tip('alt_title');?>" for="intelliwidget_alt_title">
     <?php echo $intelliwidget->get_label('alt_title');?>
     :</label>
-  <input class="intelliwidget-input" type="text" id="intelliwidget_alt_title" name="intelliwidget_alt_title" value="<?php echo $fields['intelliwidget_alt_title'] ?>" autocomplete="off" />
+  <input class="intelliwidget-input" type="text" id="intelliwidget_alt_title" name="intelliwidget_alt_title" value="<?php echo $fields['intelliwidget_alt_title'] ?>" />
 </p>
 <p>
   <label title="<?php echo $intelliwidget->get_tip('external_url');?>" for="intelliwidget_external_url">
     <?php echo $intelliwidget->get_label('external_url');?>
     :</label>
-  <input class="intelliwidget-input" type="text" id="intelliwidget_external_url" name="intelliwidget_external_url" value="<?php echo $fields['intelliwidget_external_url'] ?>" autocomplete="off" />
+  <input class="intelliwidget-input" type="text" id="intelliwidget_external_url" name="intelliwidget_external_url" value="<?php echo $fields['intelliwidget_external_url'] ?>" />
 </p>
 <p>
   <label title="<?php echo $intelliwidget->get_tip('link_classes');?>" for="intelliwidget_link_classes">
     <?php echo $intelliwidget->get_label('link_classes');?>
     :</label>
-  <input class="intelliwidget-input" type="text" id="intelliwidget_link_classes" name="intelliwidget_link_classes" value="<?php echo $fields['intelliwidget_link_classes'] ?>" autocomplete="off" />
+  <input class="intelliwidget-input" type="text" id="intelliwidget_link_classes" name="intelliwidget_link_classes" value="<?php echo $fields['intelliwidget_link_classes'] ?>" />
 </p>
 <p>
   <label title="<?php echo $intelliwidget->get_tip('link_target');?>" for="intelliwidget_link_target">
     <?php echo $intelliwidget->get_label('link_target');?>
     :</label>
-  <select class="intelliwidget-input" id="intelliwidget_link_target" name="intelliwidget_link_target" autocomplete="off" >
+  <select class="intelliwidget-input" id="intelliwidget_link_target" name="intelliwidget_link_target">
     <?php foreach ($intelliwidget->get_link_target_menu() as $value => $label): ?>
     <option value="<?php echo $value; ?>" <?php selected($fields['intelliwidget_link_target'], $value); ?>><?php echo $label; ?></option>
     <?php endforeach; ?>
@@ -174,11 +173,11 @@ class IntelliWidgetMetaBox {
 <?php
     }
 
-    function metabox($id, $box_id, $instance) {
+    function metabox($box_id, $post_id, $instance) {
         global $intelliwidget;
         ?>
         <p>
-  <input type="hidden" id="<?php echo 'intelliwidget_' . $box_id . '_category'; ?>" name="<?php echo 'intelliwidget_' . $box_id . '_category'; ?>" value="-1" /><?php /* Original Categories: <?php echo implode(',', $intelliwidget->val2array($instance['category'])); */ ?>
+  <input type="hidden" id="<?php echo 'intelliwidget_' . $box_id . '_category'; ?>" name="<?php echo 'intelliwidget_' . $box_id . '_category'; ?>" value="-1" />Original Categories: <?php echo implode(',', $intelliwidget->val2array($instance['category'])); ?>
         </p>
 <p>
   <input type="hidden" id="<?php echo 'intelliwidget_' . $box_id . '_box_id'; ?>" name="<?php echo 'intelliwidget_' . $box_id . '_box_id'; ?>" value="<?php echo $box_id; ?>" />
@@ -193,21 +192,21 @@ class IntelliWidgetMetaBox {
 </p>
 <?php
     // execute custom action hook for content value if it exists
-    do_action('intelliwidget_metabox_all_before', $id, $box_id, $instance);
-    do_action('intelliwidget_metabox_' . $instance['content'], $id, $box_id, $instance);
-    do_action('intelliwidget_metabox_all_after', $id, $box_id, $instance); 
+    do_action('intelliwidget_metabox_all_before', $box_id, $post_id, $instance);
+    do_action('intelliwidget_metabox_' . $instance['content'], $box_id, $post_id, $instance);
+    do_action('intelliwidget_metabox_all_after', $box_id, $post_id, $instance); 
 ?>
 <div class="iw-save-container">
   <input name="save" class="button button-large iw-save" id="<?php echo 'intelliwidget_' . $box_id . '_save'; ?>" value="<?php _e('Save Settings', 'intelliwidget'); ?>" type="button" style="float:right" autocomplete="off" />
   <span class="spinner <?php echo 'intelliwidget_' . $box_id . '_spinner'; ?>"></span> </div>
-<a style="float:left;" href="<?php echo wp_nonce_url(admin_url('post.php?action=edit&iwdelete='.$box_id.'&post=' . $id), 'iwdelete'); ?>" id="iw_delete_<?php echo $box_id; ?>" class="iw-delete">
+<a style="float:left;" href="<?php echo wp_nonce_url(admin_url('post.php?action=edit&iwdelete='.$box_id.'&post=' . $post_id), 'iwdelete'); ?>" id="iw_delete_<?php echo $box_id; ?>" class="iw-delete">
 <?php _e('Delete', 'intelliwidget'); ?>
 </a>
 <div style="clear:both"></div>
 <?php
     }
     
-    function general_settings($id, $box_id, $instance) {
+    function general_settings($box_id, $post_id, $instance) {
         global $intelliwidget;
         ?>
 <div id="iw-generalsettings-<?php echo $box_id; ?>" class="postbox closed panel-general">
@@ -257,7 +256,7 @@ class IntelliWidgetMetaBox {
 <?php
     }
     
-    function addl_text_settings($id, $box_id, $instance) {
+    function addl_text_settings($box_id, $post_id, $instance) {
         global $intelliwidget;
         ?>
 <div id="iw-addltext-<?php echo $box_id; ?>" class="postbox closed panel-addltext">
@@ -288,7 +287,7 @@ class IntelliWidgetMetaBox {
 <?php
     }
     
-    function appearance_settings($id, $box_id, $instance) {
+    function appearance_settings($box_id, $post_id, $instance) {
         global $intelliwidget, $_wp_additional_image_sizes;
         ?>
 <div id="iw-appearance-<?php echo $box_id; ?>" class="postbox closed panel-appearance">
@@ -378,7 +377,7 @@ class IntelliWidgetMetaBox {
 <?php
     }
     
-    function post_selection_settings($id, $box_id, $instance) {
+    function post_selection_settings($box_id, $post_id, $instance) {
         global $intelliwidget;
         ?>
 <div id="iw-selection-<?php echo $box_id; ?>" class="postbox closed panel-selection">
@@ -403,7 +402,7 @@ class IntelliWidgetMetaBox {
          * this has been moved to its own method: post_selection_menus()
          */
          
-         do_action('intelliwidget_post_selection_menus', $id, $box_id, $instance);
+         do_action('intelliwidget_post_selection_menus', $box_id, $post_id, $instance);
 ?>
     </div>
     <p>
@@ -439,9 +438,8 @@ class IntelliWidgetMetaBox {
 <?php
     }
 
-    function post_selection_menus($id, $box_id, $instance) {
+    function post_selection_menus($box_id, $post_id, $instance) {
         global $intelliwidget;
-        // backwards compatibility with original category value
         if (empty($instance['terms']) && isset($instance['category']) && '-1' != $instance['category'])
             $instance['terms'] = $intelliwidget->map_category_to_tax($instance['category']);
 ?>
@@ -465,7 +463,7 @@ class IntelliWidgetMetaBox {
 <?php
     }
     
-    function nav_menu($id, $box_id, $instance){
+    function nav_menu($box_id, $post_id, $instance){
         global $intelliwidget;
         ?>
 <p>

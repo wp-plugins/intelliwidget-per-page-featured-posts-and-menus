@@ -3,8 +3,8 @@
  *
  * @package IntelliWidget
  * @subpackage js
- * @author Jason C Fleming
- * @copyright 2013 Lilaea Media LLC
+ * @author Lilaea Media
+ * @copyright 2013
  * @access public
  *
  */
@@ -149,7 +149,6 @@ jQuery(document).ready(function($) {
             postData,
             //on success function  
             function(response){
-                console.log(response);
                 // release button
                 $('#iw_cdfsave').prop('disabled', false);
                 // hide spinner
@@ -219,7 +218,6 @@ jQuery(document).ready(function($) {
             postData,
             //on success function  
             function(response){
-                console.log(response);
                 if ('fail' == response) {
                     // show red X
                     $(savecontainer).addClass('failure');
@@ -281,7 +279,6 @@ jQuery(document).ready(function($) {
             postData,
             //on success function  
             function(response){
-                console.log(response);
                 // release button
                 $('#iw_copy').prop('disabled', false);
                 // hide spinner
@@ -334,7 +331,6 @@ jQuery(document).ready(function($) {
             postData,
             //on success function  
             function(response){
-                console.log(response);
                 $(sel).removeClass('disabled');
                 $('#intelliwidget_spinner').hide();
                 if ('fail' == response) {
@@ -388,7 +384,7 @@ jQuery(document).ready(function($) {
             // get box id 
             pre      = postData['iwdelete'];
         // show spinner
-        $('.intelliwidget_' + pre + '_spinner').show();
+        $('#intelliwidget_' + pre + '_spinner').show();
         // add wp ajax action to array
         postData['action'] = 'iw_delete';
         // send to wp
@@ -399,7 +395,6 @@ jQuery(document).ready(function($) {
             postData,
             //on success function  
             function(response){
-                console.log(response);
                 $(sel).removeClass('disabled');
                 $('#intelliwidget_' + pre + '_spinner').hide();
                 if ('success' == response ) {
@@ -466,7 +461,6 @@ jQuery(document).ready(function($) {
             postData,
             //on success function  
             function(response){
-                console.log(response);
                 if ('fail' == response) {
                     // show red X
                     $(savecontainer).addClass('failure');
