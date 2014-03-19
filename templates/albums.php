@@ -8,8 +8,8 @@ if ( !defined('ABSPATH')) exit;
  *
  * @package IntelliWidget
  * @subpackage templates
- * @author Lilaea Media
- * @copyright 2013
+ * @author Jason C Fleming
+ * @copyright 2014 Lilaea Media LLC
  * @access public
  */
 ?>

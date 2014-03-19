@@ -6,8 +6,8 @@ if ( !defined('ABSPATH')) exit;
  *
  * @package IntelliWidget
  * @subpackage includes
- * @author Lilaea Media
- * @copyright 2013
+ * @author Jason C Fleming
+ * @copyright 2014 Lilaea Media LLC
  * @access public
  */
 if ( !function_exists('get_the_intelliwidget_ID') ) {
@@ -217,6 +217,10 @@ if ( !function_exists('get_the_intelliwidget_url')) {
 if ( !function_exists('get_the_intelliwidget_taxonomy_link')) {
 
     function get_the_intelliwidget_taxonomy_link($title, $instance) {
+        if (!isset($instance['query'])):
+            global $intelliwidget;
+            $intelliwidget->get_query($instance);
+        endif;
         if (isset($instance['terms']) && '-1' != $instance['terms']):
             $term = $instance['query']->terms_query($instance['terms']);
             if ($term):
@@ -225,10 +229,9 @@ if ( !function_exists('get_the_intelliwidget_taxonomy_link')) {
                 return '<a title="' . $title_text . '" href="' . $url . '">' . apply_filters( 'widget_title', $title ) .  '</a>';
             endif;
         endif;
-        $post_id = NULL;
-        if (count($instance['query']->posts))
-            $post_id = $instance['query']->posts[0]->ID;
-        return get_the_intelliwidget_link($post_id, $title, (isset($instance['category']) ? $instance['category'] : NULL));
+        $post_id        = count($instance['query']->posts) ? $instance['query']->posts[0]->ID : NULL;
+        $category_id    = isset($instance['category']) ? $instance['category'] : NULL;
+        return get_the_intelliwidget_link($post_id, $title, $category_id);
     }
 }
 

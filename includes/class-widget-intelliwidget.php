@@ -6,8 +6,8 @@ if ( !defined('ABSPATH')) exit;
  *
  * @package IntelliWidget
  * @subpackage includes
- * @author Lilaea Media
- * @copyright 2013
+ * @author Jason C Fleming
+ * @copyright 2014 Lilaea Media LLC
  * @access public
  */
 class IntelliWidget_Widget extends WP_Widget {
@@ -53,38 +53,42 @@ class IntelliWidget_Widget extends WP_Widget {
      * @return false
      */
     function widget($args, $instance) {
-        global $post, $intelliwidget;
-        // save global post object for later
-        $old_post = $post;
-        $post_id = is_object($post) ? $post->ID : null;
-        if ($post_id):    
-            // if there are page-specific settings for this widget, use them
-            if ($page_data = $this->get_page_data($args['widget_id'], $post_id)):
-                // check for no-copy override
-                if (empty($page_data['nocopy'])):
-                    // if this page is using another page's settings and they exist for this widget, use them
-                    if ($other_page_id = get_post_meta($post_id, '_intelliwidget_widget_page_id', true)) :
-                        $page_data = $this->get_page_data($args['widget_id'], $other_page_id);
+        if (has_action('intelliwidget_extension')):
+            do_action('intelliwidget_extension', $args, $instance);
+        else: 
+            global $post, $intelliwidget;
+            // save global post object for later
+            $old_post = $post;
+            $post_id = is_object($post) ? $post->ID : null;
+            if ($post_id):    
+                // if there are page-specific settings for this widget, use them
+                if ($page_data = $this->get_settings_data($post_id, $args['widget_id'])):
+                    // check for no-copy override
+                    if (empty($page_data['nocopy'])):
+                        // if this page is using another page's settings and they exist for this widget, use them
+                        if ($other_page_id = get_post_meta($post_id, '_intelliwidget_widget_page_id', true)) :
+                            $page_data = $this->get_settings_data($other_page_id, $args['widget_id']);
+                        endif;
+                    endif;
+                    if (is_singular() && !empty($page_data)):
+                        $intelliwidget->build_widget($args, $page_data, $post_id);
+                        // done -- restore original post object and return
+                        $post = $old_post;
+                        return;
                     endif;
                 endif;
-                if (is_singular() && !empty($page_data)):
-                    $intelliwidget->build_widget($args, $page_data, $post_id);
+                // no page-specific settings, should we hide?
+                if (!empty($instance['hide_if_empty'])):
                     // done -- restore original post object and return
                     $post = $old_post;
                     return;
                 endif;
+                // if we get here, there are no page settings and no hide setting, so use the primary widget settings
+                $intelliwidget->build_widget($args, $instance, $post_id);
+            // done -- restore original post object and return
             endif;
-            // no page-specific settings, should we hide?
-            if (!empty($instance['hide_if_empty'])):
-                // done -- restore original post object and return
-                $post = $old_post;
-                return;
-            endif;
-            // if we get here, there are no page settings and no hide setting, so use the primary widget settings
-            $intelliwidget->build_widget($args, $instance, $post_id);
-        // done -- restore original post object and return
+            $post = $old_post;
         endif;
-        $post = $old_post;
     }
     
     /**
@@ -95,17 +99,17 @@ class IntelliWidget_Widget extends WP_Widget {
      * @param <string> $widget_id
      * @return <array> if exists or false if empty
      */
-    function get_page_data($widget_id, $post_id) {
+    function get_settings_data($post_id, $widget_id) {
         global $intelliwidget;
         // the box map stores meta box => widget id relations in page meta data
-        $box_map = unserialize(get_post_meta($post_id, '_intelliwidget_map', true));
+        $box_map = $intelliwidget->get_box_map($post_id, 'post_meta');
         if (is_array($box_map)):
             $widget_map = array_flip($box_map);
             // if two boxes point to the same widget, the second gets clobbered here
             if (array_key_exists($widget_id, $widget_map)):
                 $box_id = $widget_map[$widget_id];
                 // are there settings for this widget?
-                if ($page_data = $intelliwidget->get_page_data($box_id, $post_id)):
+                if ($page_data = $intelliwidget->get_settings_data($post_id, $box_id, 'post_meta')):
                     return $page_data;
                 endif;
             endif;
@@ -122,23 +126,29 @@ class IntelliWidget_Widget extends WP_Widget {
      * @return <array>
      */
     function update($new_instance, $old_instance) {
-        $instance = $new_instance;
         global $intelliwidget;
-        foreach($intelliwidget->get_text_fields() as $field):
-            // handle custom text
-            if ( current_user_can('unfiltered_html') ):
-                $instance[$field] =  $new_instance[$field];
-            else:
-                // raw html parser/cleaner-upper: see WP docs re: KSES
-                $instance[$field] = stripslashes( 
-                    wp_filter_post_kses( addslashes($new_instance[$field]) ) ); 
-            endif;
+        $textfields = $intelliwidget->get_text_fields();
+        foreach ($new_instance as $name => $value):
+            // special handling for text inputs
+                if (in_array($name, $textfields)):
+                    if ( current_user_can('unfiltered_html') ):
+                        $old_instance[$field] =  $new_instance[$field];
+                    else:
+                        // raw html parser/cleaner-upper: see WP docs re: KSES
+                        $old_instance[$field] = stripslashes( 
+                            wp_filter_post_kses( addslashes($new_instance[$field]) ) ); 
+                    endif;
+                else:
+                    $old_instance[$name] = $intelliwidget->filter_sanitize_input($new_instance[$name]);
+                endif;
+                if ('post_types' == $name && empty($value))
+                    $old_instance[$name] = array('post');
         endforeach;
-        // special handling for checkboxes:  
-        foreach($intelliwidget->get_checkbox_fields() as $cb):
-            $instance[$cb] = isset($new_instance[$cb]);
+        // special handling for checkboxes:
+        foreach (  $intelliwidget->get_checkbox_fields() as $name) :
+            $old_instance[$name] = isset($new_instance[$name]);
         endforeach;
-        return $instance;
+        return $old_instance;
     }
     /**
      * Output Widget form

@@ -1,5 +1,15 @@
 <?php 
-
+// Exit if accessed directly
+if ( !defined('ABSPATH')) exit;
+/**
+ * class-intelliwidget-list.php - arrays for UI output
+ *
+ * @package IntelliWidget
+ * @subpackage includes
+ * @author Jason C Fleming
+ * @copyright 2014 Lilaea Media LLC
+ * @access public
+ */
 class IntelliWidgetList {
     var $labels;
     var $tips;

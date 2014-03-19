@@ -3,7 +3,7 @@ Contributors: lilaeamedia
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=DE4W9KW7HQJNA
 Tags: featured posts, events, page menu, plugin, textwidget, widget, custom post types, custom sidebar
 Requires at least: 3.5
-Tested up to: 3.8
+Tested up to: 3.8.1
 Stable tag: 1.5.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -112,12 +112,13 @@ Change the 'supports' parameter in the register_post_type function to include 'c
 = 1.5.0 =
 * IMPORTANT: This release includes substantial changes to the User Interface. Please see the updated documentation.
 * Overhauled most of the code to simplify logic flow and enable filter and action hooks for extensibility
-* Extended 'Categories' to include any taxonomies associated with selected post types
+* Replaced 'Categories' with 'Terms' to include any taxonomies associated with selected post types
 * Reorganized User Interface to be more intuitive
 * Added new 'content' option to allow action hooks to replace default content
+* Added autoloading to reduce memory footprint
 
 = 1.4.6 =
-* Added Spanish Translation by jelena kovacevic
+* Added Spanish Translation by Jelena Kovacevic
 * Changed page-specific widget to run only if is_singular (excluding search, archive and date queries)
 
 = 1.4.5 =
@@ -244,43 +245,7 @@ Change the 'supports' parameter in the register_post_type function to include 'c
 == Upgrade Notice ==
 
 = 1.5.0 =
-IMPORTANT: This release includes substantial changes to the User Interface. Please see the updated documentation.
-
-= 1.4.5 =
-IMPORTANT: Definitions of "Future" and "Active" posts (events) have changed to simplify use. See Additional Notes.
-
-= 1.4.3 =
-This release fixes some very obscure bugs that have been reported.
-
-= 1.4.2 =
-Fixed a number of UI bugs that were causing problems. See changelog.
-
-= 1.4.0 =
-Added a number of enhancements and refactored some logic flow for better performance. See changelog for details.
-
-= 1.3.8 =
-This release fixes some minor issues and adds support up to WP 3.7
-
-= 1.3.6 =
-This release adds post-specific IntelliWidgets to all post types, not just 'pages.'
-
-= 1.3.4 =
-Fixed incorrect global (fatal error) in release 1.3.3. This release adds the ability to use on-page IW Sections as the settings for shortcodes.
-
-= 1.3.0 =
-New Features! We added the long-needed intelliwidget-current-menu-item style, a generic "events" template, and the ability to keep some page sections and copy the rest using "Override Copied Settings."
-
-= 1.2.4 =
-This upgrade fixes an issue in the query class that incorrectly joined posts and taxonomy terms.
-
-= 1.2.3 =
-This upgrade fixes an issue in the query class that caused multiple rows to be returned for posts with duplicate thumbnail rows in the postmeta table. It also fixes a problem with the excerpts template showing debug output.
-
-= 1.2.0 =
-IntelliWidget now uses its own query class instead of WP_Query so it can get postmeta data in a single database call. Event Date and Expire Date fields have been added which replace using "future" post status for upcoming events. PLEASE READ http://www.lilaeamedia.com/plugins/intelliwidget/ and report any issues on the WP Forum.
-
-= 1.1.0 =
-Ajax submits and collapsible form areas greatly improve useability
+* IMPORTANT: This release includes substantial changes to the User Interface. Please see the changelog and updated documentation.
 
 == Getting Started ==
 

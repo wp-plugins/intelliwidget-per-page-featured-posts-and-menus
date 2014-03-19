@@ -8,8 +8,8 @@ if ( !defined('ABSPATH')) exit;
  *
  * @package IntelliWidget
  * @subpackage templates
- * @author Lilaea Media
- * @copyright 2013
+ * @author Jason C Fleming
+ * @copyright 2014 Lilaea Media LLC
  * @access public
  */
 if ( $selected->have_posts() ) : while ($selected->have_posts()) : $selected->the_post();

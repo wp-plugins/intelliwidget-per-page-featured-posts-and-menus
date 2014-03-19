@@ -7,16 +7,17 @@ if ( !defined('ABSPATH')) exit;
     Plugin URI: http://www.lilaeamedia.com/plugins/intelliwidget
     Description: Display featured posts, custom menus, html content and more within a single dynamic sidebar that can be customized on a per-page or site-wide basis.
     Version: 1.5.0
-    Author: Lilaea Media
+    Author: Jason C Fleming
     Author URI: http://www.lilaeamedia.com/
     Text Domain: intelliwidget
     Domain Path: /lang
     License: GPLv2
     * *************************************************************************
-    Copyright (C) 2013 Lilaea Media
+    Copyright (C) 2014 Lilaea Media LLC
     Portions adapted from Featured Page Widget 
     Copyright (C) 2009-2011 GrandSlambert http://grandslambert.com/
 */
+define('INTELLIWIDGET_VERSION', '1.5.0');
 
 require_once( 'includes/class-intelliwidget.php' );
 require_once( 'includes/class-widget-intelliwidget.php' );

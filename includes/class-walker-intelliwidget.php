@@ -7,8 +7,8 @@ if ( !defined('ABSPATH')) exit;
  *
  * @package IntelliWidget
  * @subpackage includes
- * @author Lilaea Media
- * @copyright 2013
+ * @author Jason C Fleming
+ * @copyright 2014 Lilaea Media LLC
  * @access public
  */
 class Walker_IntelliWidget extends Walker {
@@ -77,7 +77,7 @@ class Walker_IntelliWidget_Terms extends Walker {
 		if (in_array( $matchval, $matcharr))
 			$output .= ' selected';
 		$output .= '>';
-		$title = substr($pad . $term->name, 0, 60) . ' (' . ucwords(str_replace('_', ' ', $term->taxonomy)) . ') ' . $term->term_id . ' ' . $term->term_taxonomy_id;
+		$title = substr($pad . $term->name, 0, 60) . ' (' . ucwords(str_replace('_', ' ', $term->taxonomy)) . ')';
 		$output .= esc_html( $title );
 		$output .= "</option>\n";
 	}
