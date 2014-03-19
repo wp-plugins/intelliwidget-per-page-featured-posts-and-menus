@@ -1,0 +1,282 @@
+=== IntelliWidget Per Page Featured Posts and Menus ===
+Contributors: lilaeamedia
+Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=DE4W9KW7HQJNA
+Tags: featured posts, events, page menu, plugin, textwidget, widget, custom post types, custom sidebar
+Requires at least: 3.5
+Tested up to: 3.8.1
+Stable tag: 1.5.0
+License: GPLv2 or later
+License URI: http://www.gnu.org/licenses/gpl-2.0.html
+
+Display featured posts, custom menus, html content and more within a single dynamic sidebar that can be customized on a per-page or site-wide basis.
+
+== Description ==
+
+Why use IntelliWidget as your Featured Post plugin?
+
+* Powerful and extensible, does the work of multiple plugins
+* No new sidebars necessary–uses the sidebars you already have
+* Displays custom page settings if they exist, main widget if they don’t
+* Supports Custom Post Types and Custom Nav Menus
+* Doubles as a Text Widget–customizable to any page
+* Use as many different instances on a single page as you wish
+* Saves hours setting up and maintaining your WordPress site
+* Supports shortcodes so you can put the power of Intelliwidget anywhere in your site
+* Set up one page and reuse settings on other pages
+* No new database tables
+* Clean uninstall
+* Lets you keep using all your other widgets
+* Shows or hides content by date and time
+* Improves performance by retrieving Post data using a single query instead of multiple meta data function calls.
+
+IntelliWidget eliminates the need for multiple sidebars to accommodate page-specific content. Instead, you use one set of dynamic sidebars, load a few IntelliWidgets and then customize on a per-page basis. If you don’t customize a page, the default widget (the one you configured on the widgets page) displays instead.
+
+IntelliWidgets can include but are not limited to: custom page menus, featured posts, slider lists, arbitrary text/html (textwidgets), calendars, testimonials, categories and more.
+
+IntelliWidget now supports Wordpress Custom Menus! Use the Nav Menu template option and select any Nav Menu to use on specific pages. Standard IntelliWidget Menus continue to work as before.
+
+Expire posts on a specific date/time using the new date features. Also, you can combine active posts and expired posts to show only events going on currently.
+
+Because the lists are generated using active titles and permalinks, your site is always current with the latest versions of your content.
+
+Combine with custom post types to create unlimited CMS-style content blocks. Combine with your favorite jQuery Slider plugin to display animated slideshows. You can even use the settings from an existing page. Now you don't have to add a gazillion sidebars to your widgets admin to have unlimited page-specific content.
+
+IntelliWidget is flexible and versatile. Please read the documentation to see more ideas how to use it to its full potential.
+ 
+== Installation ==
+
+1. Download the IntelliWidget plugin archive and unzip it.
+
+2. Upload the 'intelliwidget-per-page-featured-posts-and-menus' directory to `/wp-content/plugins/` directory
+
+3. Activate the plugin through the 'Plugins' menu in WordPress
+
+== Frequently Asked Questions ==
+
+= Is there a quick tutorial? =
+
+See the "Getting Started" section or watch the Quick Start Tutorial:
+
+http://www.youtube.com/watch?v=XwESsBRK9hg
+
+= Where can I find full documentation? =
+
+Docs can be found at http://www.lilaeamedia.com/plugins/intelliwidget/
+
+= Where do I put custom templates/stylesheets? =
+
+Here are the steps:
+
+1. Add a directory in your theme named "intelliwidget".
+2. Create a copy of "intelliwidget.css" (located in the "templates" directory of the plugin) and drop it into this directory.
+3. Adjust the styles as necessary.
+4. Review the documentation for more information:
+    * Templates: http://www.lilaeamedia.com/plugins/intelliwidget/#templates
+    * Stylesheet: http://www.lilaeamedia.com/plugins/intelliwidget/#stylesheet
+
+= Why isn't IntelliWidget displaying the featured image? =
+
+By default, IntelliWidget does not display the featured image. To enable the featured image,
+choose an image size under Advanced Settings > Image Size in the IntelliWidget settings.
+
+= Why are posts showing and hiding several hours before or after the time I entered? =
+
+Dates are calculated using the WordPress current_time() function. Make sure you have set the correct
+timezone under Settings > General in the WordPress admin.
+
+= Why isn't my Custom Post Type appearing as an option? =
+
+Custom Post Types must support custom fields (post meta data) for IntelliWidget to recognize them. 
+Change the 'supports' parameter in the register_post_type function to include 'custom-fields', e.g.,
+
+    'supports' => array( 
+      'title', 
+      'editor', 
+      'excerpt', 
+      'thumbnail', 
+      'author', 
+      'custom-fields', 
+      'revisions', 
+    ),
+
+== Screenshots ==
+
+1. Example of the Widgets Admin Panel.
+2. Example of the Page Admin Panel.
+3. Example of the Main Settings Panel.
+4. Example of the Advanced Settings Panel.
+5. Example of the Custom Data Fields Panel.
+
+== Changelog ==
+
+= 1.5.0 =
+* IMPORTANT: This release includes substantial changes to the User Interface. Please see the updated documentation.
+* Overhauled most of the code to simplify logic flow and enable filter and action hooks for extensibility
+* Replaced 'Categories' with 'Terms' to include any taxonomies associated with selected post types
+* Reorganized User Interface to be more intuitive
+* Added new 'content' option to allow action hooks to replace default content
+* Added autoloading to reduce memory footprint
+
+= 1.4.6 =
+* Added Spanish Translation by Jelena Kovacevic
+* Changed page-specific widget to run only if is_singular (excluding search, archive and date queries)
+
+= 1.4.5 =
+* Optimized left joins to avoid max_join_size error
+* Simplified date range options and behavior - see Additional Notes.
+
+= 1.4.4 =
+* rolled back array_walk_recursive function in prep_array() due to incompatibility with 5.4
+* fixed regression bug in widget admin text inputs
+
+= 1.4.3 =
+* Added kses filter for all text inputs
+* Modified id of post_types checkboxes to eliminate odd checking/unchecking behavior
+* Added esc_attr filter to title tags on links
+* Refactored prep_array function to flatten multi-dimensional arrays before passing values to trim()
+
+= 1.4.2 =
+* Fixed the inner postboxes so they cannot be dragged outside of the IntelliWidget options panel.
+* Fixed the query class to account for empty post_type, category and specific post selections
+* Added the section id to the inner postbox handles
+* Moved the event delegation outside of the XHR response so that events are correctly bound to newly injected meta boxes
+
+= 1.4.1 =
+* Fixed bug in sql class that broke shortcodes in 1.4.0 (thanks cfuller)
+
+= 1.4.0 =
+* Secured SQL in query class via prepare()
+* Added allowed_tags parameter to advanced widget options so that html attributes can be preserved in excerpts
+* Now loading custom stylesheet as well as and default stylesheet so that only override and new styles need to be added
+* Added get_the_intelliwidget_author_meta function to template tags to retrieve author info
+* Reorganized get_template to check child theme, then parent theme, then plugin templates directory for files
+
+= 1.3.9 =
+* Fixed input field names intelliwidget_link_classes and intelliwidget_link_target so that they save correctly
+* Modified query class to retreive expire_date for all queries
+* Added new "multi-date" template to display start and end dates for multi-date events
+
+= 1.3.8 =
+* Fixed case where IntelliWidgets are orphaned after theme change. 
+* Updated to support WP 3.7
+* Tweaked img class to set height:auto
+* Added new "albums" template
+
+= 1.3.6 =
+* Update to metabox for pages
+
+= 1.3.5 =
+* Added metaboxes (settings panels) for all eligible post types, not just pages.
+* Fixed "Show All" in the query class (it was showing the default 5 instead of "all")
+
+= 1.3.4 =
+* Fixed missing global scope on intelliwidget object. Added "widget_intelliwidget" class to shortcode widget wrappers.
+
+= 1.3.3 =
+* Added Page Content option to shortcode. Now you can specify an IntelliWidget Section to get the parameters instead of passing them as args.
+
+= 1.3.2 =
+* Test if $post is object before attempted to get ID attribute to prevent error notice.
+
+= 1.3.1 =
+* Changed method signature of Walker_IntelliWidget::start_el() to match Walker::start_el() to avoid Strict Standards notice in WP 3.6
+
+= 1.3.0 =
+* Added intelliwidget-current-menu-item style for items linked to current page
+* Added "Override copied settings" feature. You can now keep some or all of the settings sections from a page and copy the rest
+* Added "events" template and corresponding styles to intelliwidget.css
+
+= 1.2.6 =
+* Fixed bug in "skip current post" (thanks Markus)
+* Section Settings Specific Posts Menu now refreshes on save
+
+= 1.2.5 =
+* Fixed random sort order bug (thanks Joshua)
+* Strip tags from title attribute text on links
+* Fixed conditional in skip_expired query
+
+= 1.2.4 =
+* Fixed SQL bug that incorrectly joined taxonomies. (thanks AMoy)
+* Cleaned up _get_the_intelliwidget_excerpt to strip all but text.
+
+= 1.2.3 =
+* Fixed SQL bug that caused duplicate results in the post data. (thanks MNolte)
+* Cleaned up i18l functions and created new .pot file.
+
+= 1.2.2 =
+* Fixed bug that created invalid path to the admin JavaScript include on Windows
+* Thanks to Spokesrider on Wordpress.org for finding this!
+* Added Page Menu as option for Nav Menu (to automatically generate menu from pages)
+* Added ID field option to override default 'intelliwidget' id
+
+= 1.2.1 =
+* Fixed bug that horked the query generator when no specific posts are selected
+* Renamed the url to array function to prevent JS namespace collisions
+
+= 1.2.0 =
+* Supports Custom Nav Menus as well as IntelliWidget menus
+* Support for IntelliWidget Shortcode
+* Support for Event Date and Expire Date on posts
+* Hierarchical Select Menus
+* Hide Expired post option
+* Show only active posts option
+* Changed the way IW treats event dates (now separate custom data field)
+* Added Query Class separate from The Loop to retrieve all data in a single database call
+* Reduced the number of database queries per widget instance
+* Changed custom data field names so they don't conflict with existing data fields
+* Refactored template tags to be more efficient
+* Added Custom Data Fields meta box for easy editing of postmeta fields (especially dates)
+
+= 1.1.0 =
+* Improved the overall interface.
+* Fixed bug in the way IW saves per-page widgets 
+
+= 1.0.2 =
+* Ajax submits on Edit Page
+* Commented out &raquo; on read more link
+
+= 1.0.1 =
+* Form areas collapsible to save space
+
+= 1.0.0 =
+* Combined favorite functionality from different widgets into a single IntelliWidget.
+* Packaged for public consumption
+
+== Upgrade Notice ==
+
+= 1.5.0 =
+* IMPORTANT: This release includes substantial changes to the User Interface. Please see the changelog and updated documentation.
+
+== Getting Started ==
+
+Here is a very simple example of how to use an IntelliWidget titled "My First IntelliWidget."
+
+1. From Appearance > Widgets admin, drag the IntelliWidget over to one of your existing sidebars. 
+
+2. Enter "My First IntelliWidget" in the Title input. Leave the "Link to Archive" box unchecked for now. Save the Widget.
+
+3. Load a page from your site in a browser that uses the sidebar you just modified. You will see a menu of up to five links with the Title, "My First IntelliWidget." This is the default behavior: a menu of page links sorted by title. This is not very useful but it serves to understand the power of IntelliWidgets.
+
+4. In the WordPress Admin, go to Pages and click to edit the page you just viewed. You will now see a new meta box labeled "IntelliWidget." Leave the "Use settings from" alone and click "Add new section."
+
+5. When the page refreshes, you will see a new meta box with settings almost exactly like the ones in the Widgets Admin. Click the "Replaces" dropdown menu and you will see an option for the sidebar where you added the IntelliWidget. Select this option.
+
+6. Give the section a title in the "Section Title" input. Type some text in the "Custom Text/HTML" textarea and select "Text Only-No Posts" option in the dropdown menu. Click "Save."
+
+7. Now load the page you just edited in your browser. Instead of the menu from before, you now see the new title and the custom text you typed. If you go to any other page that uses the same sidebar, you will see the menu from before.
+
+8. The point of this exercise is to demonstrate that any page can override the default widget with it's own custom section.
+
+9. Lastly, you can select this page in the "Use Settings From..." menu from any other page to re-use these settings. This is useful if you have a sub-set of pages that need to re-use the same sidebar content. This feature alone can save hours of repetition wasted on many other "custom sidebar" plugins.
+
+IMPORTANT: As of 1.4.5 the definition of "Future" posts (formerly "events") has been modified to simplify use and to make the interface more intuitive. This may require adjustments to date-dependent IntelliWidgets and Post date fields.
+
+Checking "Only Future Posts" excludes posts with a Start Date < current date/time, regardless of Expire Date. (Formerly "Only Future Events.")
+Checking "Exclude Future Posts" hides posts with a Start Date > current date/time, regardless of Expire Date. (Formerly "Only Active Events.")  
+The "Exclude Expired Posts" behavior has not changed.
+
+== Documentation ==
+
+Can be found at http://www.lilaeamedia.com/plugins/intelliwidget/
+
+Interested in translating? Contact us at http://www.lilaeamedia.com/about/contact/

@@ -1,0 +1,324 @@
+# Copyright (C) 2014 
+# This file is distributed under the same license as the  package.
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: http://wordpress.org/tag/intelliwidget-per-page-"
+"featured-posts-and-menus\n"
+"POT-Creation-Date: 2014-02-06 11:37:06+00:00\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"PO-Revision-Date: 2014-02-10 10:40+0100\n"
+"Last-Translator: jelena kovacevic <jecajeca260@gmail.com>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"X-Generator: Poedit 1.5.5\n"
+
+#: includes/class-intelliwidget.php:37 includes/class-intelliwidget.php:172
+msgid "IntelliWidget"
+msgstr "IntelliWidget"
+
+#: includes/class-intelliwidget.php:151
+msgid "IntelliWidget Section "
+msgstr "Sección IntelliWidget"
+
+#: includes/class-intelliwidget.php:190
+msgid "IntelliWidget Custom Fields"
+msgstr "Campos personalizados IntelliWidget"
+
+#: includes/class-intelliwidget.php:588
+msgid "Read More"
+msgstr "Leer más"
+
+#: includes/class-widget-intelliwidget.php:22
+msgid "Menus, Featured Posts, HTML and more, customized per page or site-wide."
+msgstr ""
+"Menús, mensajes destacados, HTML y más, personalizados por página o todo el "
+"sitio."
+
+#: includes/page-form.php:19
+msgid "Use settings from"
+msgstr "Utilice los ajustes de"
+
+#: includes/page-form.php:22
+msgid "This %s"
+msgstr "Este %s"
+
+#: includes/page-form.php:28 includes/post-form.php:126
+#: includes/section-form.php:278
+msgid "Save"
+msgstr "Guardar"
+
+#: includes/page-form.php:31
+msgid "Add New Section"
+msgstr "Crear Nueva Sección"
+
+#: includes/post-form.php:94 includes/section-form.php:144
+#: includes/widget-form.php:135
+msgid "Start Date"
+msgstr "Fecha de Inicio:"
+
+#: includes/post-form.php:95 includes/post-form.php:101
+msgid "Edit"
+msgstr "Editar"
+
+#: includes/post-form.php:100
+msgid "Expire Date"
+msgstr "Fecha de vencimiento"
+
+#: includes/post-form.php:107
+msgid "Alt Title"
+msgstr "Título Alt"
+
+#: includes/post-form.php:110
+msgid "External URL"
+msgstr "URL externa"
+
+#: includes/post-form.php:113
+msgid "Link Classes"
+msgstr "Clases Enlace"
+
+#: includes/post-form.php:116
+msgid "Link Target"
+msgstr "Enlace Objetivo"
+
+#. translators: 1: month input, 2: day input, 3: year input, 4: hour input, 5:
+#. minute input
+#: includes/post-form.php:173
+msgid "%1$s%2$s, %3$s @ %4$s : %5$s"
+msgstr "%1$s%2$s, %3$s @ %4$s : %5$s"
+
+#: includes/post-form.php:186
+msgid "OK"
+msgstr "Aceptar"
+
+#: includes/post-form.php:187
+msgid "Clear"
+msgstr "Borrar"
+
+#: includes/post-form.php:188
+msgid "Cancel"
+msgstr "Cancelar"
+
+#: includes/section-form.php:19
+msgid "Override Copied Settings"
+msgstr "Suprimir Configuración Copiada"
+
+#: includes/section-form.php:24
+msgid "Replaces"
+msgstr "Reemplaza"
+
+#: includes/section-form.php:27
+msgid "No Widget Selected"
+msgstr "Ningún Widget Seleccionado"
+
+#: includes/section-form.php:30
+msgid "Use in Page Content"
+msgstr "Usar en la página de contenido"
+
+#: includes/section-form.php:44
+msgid "Section"
+msgstr "Sección"
+
+#: includes/section-form.php:44 includes/section-form.php:150
+#: includes/widget-form.php:24 includes/widget-form.php:141
+msgid "Title"
+msgstr "Título"
+
+#: includes/section-form.php:44 includes/widget-form.php:24
+msgid "(Leave blank to omit)"
+msgstr "(Dejar en blanco para omitir)"
+
+#: includes/section-form.php:48 includes/widget-form.php:29
+msgid "Link to Archive"
+msgstr "Enlace a Archivo"
+
+#: includes/section-form.php:53 includes/widget-form.php:34
+msgid "Template"
+msgstr "Plantilla"
+
+#: includes/section-form.php:62 includes/widget-form.php:41
+msgid "Category"
+msgstr "Categoría"
+
+#: includes/section-form.php:63 includes/section-form.php:84
+#: includes/section-form.php:119 includes/widget-form.php:42
+#: includes/widget-form.php:71 includes/widget-form.php:111
+msgid "None"
+msgstr "Ninguno"
+
+#: includes/section-form.php:66 includes/section-form.php:77
+#: includes/section-form.php:108 includes/widget-form.php:45
+#: includes/widget-form.php:46 includes/widget-form.php:59
+#: includes/widget-form.php:60 includes/widget-form.php:99
+#: includes/widget-form.php:100
+msgid "Click to toggle"
+msgstr "Clic para alternar"
+
+#: includes/section-form.php:68 includes/widget-form.php:48
+msgid "Specific Posts"
+msgstr "Mensajes específicos"
+
+#: includes/section-form.php:79 includes/widget-form.php:62
+msgid "Custom Text/HTML"
+msgstr "Texto/HTML personalizado"
+
+#: includes/section-form.php:87 includes/widget-form.php:74
+msgid "Above Posts"
+msgstr "Encima de Mensajes"
+
+#: includes/section-form.php:90 includes/widget-form.php:77
+msgid "Below Posts"
+msgstr "Debajo de Mensajes"
+
+#: includes/section-form.php:93 includes/widget-form.php:80
+msgid "Text Only-No Posts"
+msgstr "Sólo texto-No Mensajes"
+
+#: includes/section-form.php:102 includes/widget-form.php:93
+msgid "Auto-format Custom Text"
+msgstr "Autoto-formato de texto personalizado"
+
+#: includes/section-form.php:110 includes/widget-form.php:102
+msgid "Advanced Settings"
+msgstr "Configuración avanzada"
+
+#: includes/section-form.php:115 includes/widget-form.php:108
+msgid "WP Nav Menu"
+msgstr "Menu WP Nav"
+
+#: includes/section-form.php:122 includes/widget-form.php:114
+msgid "Page Menu"
+msgstr "Menú de Página"
+
+#: includes/section-form.php:137 includes/widget-form.php:129
+msgid "Sort by"
+msgstr "Clasificar por"
+
+#: includes/section-form.php:141 includes/widget-form.php:132
+msgid "Post Date"
+msgstr "Fecha de Publicación"
+
+#: includes/section-form.php:147 includes/widget-form.php:138
+msgid "Menu Order"
+msgstr "Orden de Menú"
+
+#: includes/section-form.php:153 includes/widget-form.php:144
+msgid "Random"
+msgstr "Aleatorio"
+
+#: includes/section-form.php:158 includes/widget-form.php:149
+msgid "ASC"
+msgstr "ASC"
+
+#: includes/section-form.php:161 includes/widget-form.php:152
+msgid "DESC"
+msgstr "DESC"
+
+#: includes/section-form.php:167 includes/widget-form.php:158
+msgid "Max posts"
+msgstr "Max publicaciones"
+
+#: includes/section-form.php:172 includes/widget-form.php:163
+msgid "Max words per post"
+msgstr "Max palabras por mensaje"
+
+#: includes/section-form.php:179 includes/widget-form.php:170
+msgid "Exclude current post"
+msgstr "Excluir publicación actual"
+
+#: includes/section-form.php:186 includes/widget-form.php:177
+msgid "Only future posts"
+msgstr "Solamente futuras publicaciones"
+
+#: includes/section-form.php:193 includes/widget-form.php:184
+msgid "Exclude future posts"
+msgstr "Excluir futuras publicaciones"
+
+#: includes/section-form.php:200 includes/widget-form.php:191
+msgid "Exclude expired posts"
+msgstr "Excluir mensajes caducados"
+
+#: includes/section-form.php:205 includes/widget-form.php:196
+msgid "Allowed Tags"
+msgstr "Etiquetas permitidas"
+
+#: includes/section-form.php:210 includes/widget-form.php:201
+msgid "Link Text"
+msgstr "Texto del enlace"
+
+#: includes/section-form.php:215 includes/widget-form.php:206
+msgid "ID"
+msgstr "ID"
+
+#: includes/section-form.php:220 includes/widget-form.php:212
+msgid "Classes"
+msgstr "Clases"
+
+#: includes/section-form.php:225 includes/widget-form.php:217
+msgid "Image Align"
+msgstr "Alineación Imagen"
+
+#: includes/section-form.php:229 includes/widget-form.php:220
+msgid "Auto"
+msgstr "Auto"
+
+#: includes/section-form.php:232 includes/widget-form.php:223
+msgid "Left"
+msgstr "Izquierda"
+
+#: includes/section-form.php:235 includes/widget-form.php:226
+msgid "Center"
+msgstr "Centro"
+
+#: includes/section-form.php:238 includes/widget-form.php:229
+msgid "Right"
+msgstr "Derecha"
+
+#: includes/section-form.php:244 includes/widget-form.php:235
+msgid "Image Size"
+msgstr "Tamaño de imagen"
+
+#: includes/section-form.php:247 includes/widget-form.php:238
+msgid "No Image"
+msgstr "Sin imagen"
+
+#: includes/section-form.php:250 includes/widget-form.php:241
+msgid "Thumbnail"
+msgstr "Vista Miniatura"
+
+#: includes/section-form.php:253 includes/widget-form.php:244
+msgid "Medium"
+msgstr "Mediano"
+
+#: includes/section-form.php:256 includes/widget-form.php:247
+msgid "Large"
+msgstr "Grande"
+
+#: includes/section-form.php:259 includes/widget-form.php:250
+msgid "Full"
+msgstr "Completa"
+
+#: includes/section-form.php:267 includes/widget-form.php:258
+msgid "Post Types"
+msgstr "Tipos Mensaje"
+
+#: includes/section-form.php:281
+msgid "Delete"
+msgstr "Eliminar"
+
+#: includes/widget-form.php:20
+msgid "Hide if no Page Data is available"
+msgstr "Ocultar si no hay Página de datos disponible"
+
+#: includes/widget-form.php:24
+msgid "Widget"
+msgstr "Widget"
+
+#: includes/widget-form.php:68
+msgid "Display"
+msgstr "Mostrar"
+
+#: templates/events.php:25
+msgid "%1$s %2$s, %3$s"
+msgstr "%1$s %2$s, %3$s"

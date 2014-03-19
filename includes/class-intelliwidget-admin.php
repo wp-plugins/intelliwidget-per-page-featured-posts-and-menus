@@ -1,0 +1,538 @@
+<?php
+// Exit if accessed directly
+if ( !defined('ABSPATH')) exit;
+/**
+ * class-intelliwidget-admin.php - Administration class
+ *
+ * @package IntelliWidget
+ * @subpackage includes
+ * @author Jason C Fleming
+ * @copyright 2014 Lilaea Media LLC
+ * @access public
+ */
+class IntelliWidgetAdmin {
+
+    var $docsLink;
+    var $metabox;
+    var $menus;
+    var $posts;
+    var $terms;
+    var $post_types;
+    var $intelliwidgets;
+    var $lists;
+    var $is_ajax;
+    /**
+     * Object constructor
+     * @param <string> $file
+     * @return void
+     */
+    function __construct($file) {
+
+        $this->is_ajax = false;
+        $this->docsLink      = '<a href="http://www.lilaeamedia.com/plugins/intelliwidget/" target="_blank" title="' . __('Hover labels for more info or click here to view documentation.', 'intelliwidget') . '" style="float:right">' . __('Help', 'intelliwidget') . '</a>';
+        
+    }
+
+    /**
+     * Stub for registering scripts in future release.
+     */
+    function admin_init() {
+            // cache lists and labels
+            include_once( 'class-intelliwidget-list.php' );
+            include_once( 'class-walker-intelliwidget.php' );
+            $this->lists = new IntelliWidgetList();
+            // cache post types
+            $this->post_types = $this->get_eligible_post_types();
+            // cache menus
+            $this->menus = $this->get_nav_menus();
+            // cache templates
+            $this->templates  = $this->get_widget_templates();
+            // cache intelliwidgets
+            $this->intelliwidgets = $this->get_intelliwidgets();
+            $this->admin_scripts();
+    }
+    
+    
+    /**
+     * Stub for printing the scripts needed for the admin.
+     */
+    function admin_scripts() {
+        wp_enqueue_style('intelliwidget-js', $this->pluginURL . 'templates/intelliwidget-admin.css');
+        wp_enqueue_script('jquery-ui-tabs');
+        wp_enqueue_script('intelliwidget-js', $this->pluginURL . 'js/intelliwidget.js', array('jquery'), '1.5.0', false);
+        wp_localize_script( 'intelliwidget-js', 'IWAjax', array(
+            'ajaxurl' => admin_url( 'admin-ajax.php' )
+        ));
+    }
+     
+    function init_metabox() {
+        include_once('class-intelliwidget-metabox.php');
+        $this->metabox = new IntelliWidgetMetaBox();
+    }
+    
+    function begin_tab_container() {
+        echo apply_filters('intelliwidget_start_tab_container', 
+            '<div id="iw_tabbed_sections"><a id="iw_larr">&#171</a><a id="iw_rarr">&#187;</a><ul id="iw_tabs" class="">');
+    }
+    
+    function end_tab_container() {
+        echo apply_filters('intelliwidget_end_tab_container', '</ul>');
+    }
+    
+    function begin_section_container() {
+        echo apply_filters('intelliwidget_start_section_container', '');
+    }
+    
+    function end_section_container() {
+        echo apply_filters('intelliwidget_end_section_container', '</div>');
+    }
+    
+    function begin_section($box_id) {
+        return apply_filters('intelliwidget_begin_section', '<div id="iw_tabbed_section_' . $box_id . '" class="iw-tabbed-section">');
+    }
+    
+    function end_section() {
+        return apply_filters('intelliwidget_end_section', '</div>');
+    }
+    
+    function save_data($id, $optiontype) {
+        global $intelliwidget;
+        if (!isset($this->lists)) $this->admin_init();
+        // reset the data array
+        $post_data = array();
+        $prefix    = 'intelliwidget_';
+        // since we can now save a single meta box via ajax post, 
+        // we need to manipulate the existing boxmap
+        $box_map = $this->get_box_map($id, $optiontype);
+        // allow customization of input fields
+        $checkbox_fields = $this->get_checkbox_fields();
+        $text_fields = $this->get_text_fields();
+        /***
+         * Here is some perlesque string handling. Using grep gives us a subset of relevant data fields
+         * quickly. We then iterate through the fields, parsing out the actual data field name and the 
+         * box_id from the input key.
+         */
+        foreach(preg_grep('#^' . $prefix . '#', array_keys($_POST)) as $iw_key):
+            // find the box id and field name in the post key with a perl regex
+            preg_match('#^' . $prefix . '(\d+)_([\w\-]+)$#', $iw_key, $matches);
+            if (count($matches)):
+                if (!$box_id = $matches[1]) continue;
+                $iw_field      = $matches[2];
+            else: 
+                continue;
+            endif;
+            // organize this into a 2-dimensional array for later
+            // raw html parser/cleaner-upper: see WP docs re: KSES
+            if (in_array($iw_field, $text_fields)):
+                if ( !current_user_can('unfiltered_html') ):
+                    $post_data[$box_id][$iw_field] = stripslashes( wp_filter_post_kses( addslashes($_POST[$iw_key]) ) );
+                else:
+                    $post_data[$box_id][$iw_field] = $_POST[$iw_key];
+                endif;
+            else:
+                $post_data[$box_id][$iw_field] = $this->filter_sanitize_input($_POST[$iw_key]);
+            endif;
+        endforeach;
+        // track meta boxes updated
+        $boxcounter = 0;
+        // additional processing for each box data segment
+        foreach ($post_data as $box_id => $new_instance):
+            // get current values
+            $old_instance = $intelliwidget->get_settings_data($id, $box_id, $optiontype);
+            foreach ($new_instance as $name => $value):
+                $old_instance[$name] = $value;
+                // make sure at least one post type exists
+                if ('post_types' == $name && empty($value))
+                    $old_instance[$name] = array('post');
+                if ('replace_widget' == $name) $box_map[$box_id] = $value;
+            endforeach;
+            // special handling for checkboxes:
+            foreach($checkbox_fields as $cb)
+                $old_instance[$cb] = isset($new_instance[$box_id][$cb]);
+            $old_instance['custom_text'] = base64_encode($old_instance['custom_text']);
+
+            // save new data
+            $this->update_meta($id, '_intelliwidget_data_' . $box_id, $optiontype, $old_instance);
+            // increment box counter
+            $boxcounter++;
+        endforeach;
+        if ($boxcounter)
+            // if we have updates, save new map
+            $this->update_meta($id, '_intelliwidget_map', $optiontype, $box_map);
+    }
+
+    function save_copy_post($id, $optiontype) {
+        if (!isset($this->lists)) $this->admin_init();
+        $copy_id = isset($_POST['intelliwidget_widget_page_id']) ? intval($_POST['intelliwidget_widget_page_id']) : NULL;
+        if (empty($copy_id)) return false;
+        $this->update_meta($id, '_intelliwidget_widget_page_id', $optiontype, $copy_id);
+    }
+    
+    function validate_post($action, $noncefield, $capability, $post_id = NULL) {
+        
+        return ('POST' == $_SERVER['REQUEST_METHOD'] 
+            && ($this->is_ajax ? check_ajax_referer( $action, $noncefield, false ) : check_admin_referer($action, $noncefield, false ))
+            && current_user_can($capability, $post_id)
+            );
+    }
+    
+    function delete_tabbed_section($id, $box_id, $optiontype) {
+        $box_map = $this->get_box_map($id, $optiontype);
+        $this->delete_meta($id, '_intelliwidget_data_' . $box_id, $optiontype);
+        unset($box_map[$box_id]);
+        $this->update_meta($id, '_intelliwidget_map', $optiontype, $box_map);
+    }
+
+    function add_tabbed_section($id, $optiontype) {
+        global $intelliwidget;
+        $box_map = $intelliwidget->get_box_map($id, $optiontype);
+
+        if (count($box_map)): 
+            $newkey = max(array_keys($box_map)) + 1;
+        else: 
+            $newkey = 1;
+        endif;
+        $box_map[$newkey] = '';
+        if ($this->update_meta($id, '_intelliwidget_map', $optiontype, $box_map))
+            return $newkey;
+        return false;
+    }
+    
+    // use this for all saves
+    function ajax_save_data($id, $box_id, $optiontype) {
+        global $intelliwidget;
+        if (false === $this->save_data($id, $optiontype)) die('fail'); // $box_id, 
+        $this->init_metabox();
+        add_action('intelliwidget_post_selection_menus', array($this->metabox, 'post_selection_menus'), 10, 4);
+        $instance = $this->defaults($intelliwidget->get_settings_data($id, $box_id, $optiontype));
+        
+        $response = array(
+            'tab'   => $this->get_tab($box_id, $instance['replace_widget']),
+            'form'  => $this->get_metabox($id, $box_id, $instance),
+        );
+        die(json_encode($response));
+    }
+    
+    // use this for all adds
+    function ajax_add_tabbed_section($id, $optiontype) {
+        global $intelliwidget;
+        if (!($box_id = $this->add_tabbed_section($id, $optiontype))) die('fail');
+        if (!isset($this->lists)) $this->admin_init();
+        $this->init_metabox();
+        $instance = $intelliwidget->defaults();
+
+        $response = array(
+            'tab'   => $this->get_tab($box_id, $instance['replace_widget']),
+            'form'  => $this->begin_section($box_id) . $this->get_metabox($id, $box_id, $instance) . $this->end_section(),
+        );
+        die(json_encode($response));
+    }
+    /*
+     * ajax_get_hierarchical_menus
+     * This is an important improvement to the application for performance.
+     * We now dynamically load all walker-generated menus when the panel is opened
+     * and reuse the same DOM element to render them on the page. Since only one panel
+     * is ever in use at a time, we remove them from any panels not currently in use
+     * and reload them when they are focus()ed again. The reused DOM element also prevents
+     * memory leakage from multiple xhr refreshes of multiple copies of the same huge lists.
+     */
+
+    // use this for all gets
+    function ajax_get_post_select_menus($id, $box_id, $optiontype) {
+        global $intelliwidget;
+        if (!isset($this->lists)) $this->admin_init();
+        $this->init_metabox();
+        $instance = $intelliwidget->defaults($intelliwidget->get_settings_data($id, $box_id, $optiontype));
+        ob_start();
+        $this->metabox->post_selection_menus($id, $box_id, $instance);
+        $form = ob_get_contents();
+        ob_end_clean();
+        die($form);
+    }
+    
+    
+    function get_intelliwidgets() {
+        global $wp_registered_sidebars;
+        $widgets = array();
+        foreach ($this->get_replaces_menu() as $value => $label):
+            $widgets[$value] = $label;
+        endforeach;
+        foreach(wp_get_sidebars_widgets() as $sidebar_id => $sidebar_widgets): 
+            if (false === strpos($sidebar_id, 'wp_inactive') && false === strpos($sidebar_id, 'orphaned')):
+                $count = 0;
+                foreach ($sidebar_widgets as $sidebar_widget_id):
+                    if (false !== strpos($sidebar_widget_id, 'intelliwidget') ):
+                        $widgets[$sidebar_widget_id] = $wp_registered_sidebars[$sidebar_id]['name'] . ' [' . ++$count . ']';
+                    endif; 
+                endforeach; 
+            endif; 
+        endforeach;
+        return $widgets;
+    }
+
+    function get_tab($box_id, $replace_widget = '') {
+        $title = (empty($this->intelliwidgets[$replace_widget]) ? $this->intelliwidgets['none'] : $this->intelliwidgets[$replace_widget]);
+        return apply_filters('intelliwidget_tab', '<li id="iw_tab_' . $box_id . '" class="iw-tab">
+        <a href="#iw_tabbed_section_' . $box_id . '" title="' . $title . '">' . $box_id . '</a></li>', $box_id);
+    }
+    
+    function get_section($id, $box_id, $optiontype) {
+        $instance   = $this->defaults($this->get_settings_data($id, $box_id, $optiontype));
+        $tab        = $this->get_tab($box_id, $instance['replace_widget']);
+        $section    = $this->begin_section($box_id) . $this->get_metabox($id, $box_id, $instance) . $this->end_section();
+        return array($tab, $section);
+    }
+
+    function get_metabox($id, $box_id, $instance = array()) {
+        ob_start();
+        $this->metabox->metabox($id, $box_id, $instance);
+        $form = ob_get_contents();
+        ob_end_clean();
+        return $form;
+    }
+    
+    /**
+     * Get list of posts as select options. Selects all posts of the type(s) specified in the instance data
+     * and returns them as a multi-select menu
+     *
+     * @param <array> $instance
+     * @return <string> 
+     */
+    function get_posts_list($instance = NULL) {
+        $instance['page'] = $this->val2array(isset($instance['page']) ? $instance['page'] : '');
+        $posts = array();
+        if (!isset($this->posts)) $this->load_posts();
+        foreach ($this->val2array($instance['post_types']) as $post_type):
+            if (isset($this->posts[$post_type]))
+                $posts = array_merge($posts, $this->posts[$post_type]);
+        endforeach;
+    	$output = '';
+	    if ( ! empty($posts) ) {
+            $args = array($posts, 0, $instance);
+            $walker = new Walker_IntelliWidget(); 
+	        $output .= call_user_func_array(array($walker, 'walk'), $args);
+	    }
+
+	    return $output;
+    }
+    
+    function get_relevant_terms($instance = NULL) {
+        if (!isset($this->terms)) $this->load_terms();
+    	$output = '';
+        $post_types = $this->val2array(isset($instance['post_types']) ? $instance['post_types'] : '');
+        $instance['terms']   = $this->val2array(isset($instance['terms']) ? $instance['terms'] : '');
+        $terms = array();
+        foreach ($this->val2array(preg_grep('/post_format/', get_object_taxonomies($post_types), PREG_GREP_INVERT)) as $tax):
+            if (isset($this->terms[$tax]))
+                $terms = array_merge($terms, $this->terms[$tax]);
+        endforeach;
+	    if ( ! empty($terms) ) {
+            $args = array($terms, 0, $instance);
+            $walker = new Walker_IntelliWidget_Terms(); 
+            
+	        $output .= call_user_func_array(array($walker, 'walk'), $args);
+	    }
+	    return $output;
+    }
+    
+    /**
+     * Return a list of template files in the theme folder(s) and plugin folder.
+     * Templates actually render the output to the widget based on instance settings
+     *
+     * @return <array>
+     */
+    function get_widget_templates() {
+        $templates  = array();
+        $paths      = array();
+        $parentPath = get_template_directory() . '/intelliwidget';
+        $themePath  = get_stylesheet_directory() . '/intelliwidget';
+        $paths[] = $this->templatesPath;
+        $paths[] = $parentPath;
+        if ($parentPath != $themePath) $paths[] = $themePath;
+        foreach ($paths as $path):
+            if (file_exists($path) && ($handle = opendir($path)) ):
+                while (false !== ($file = readdir($handle))):
+                    if ( ! preg_match("/^\./", $file) && preg_match('/\.php$/', $file) ):
+                        $file = str_replace('.php', '', $file);
+                        $name = str_replace('-', ' ', $file);
+                        $templates[$file] = ucfirst($name);
+                    endif;
+                endwhile;
+                closedir($handle);
+            endif;
+        endforeach;
+        asort($templates);
+        // hook custom actions into templates menu
+        return apply_filters('intelliwidget_templates', $templates);
+    }
+    
+
+    function get_eligible_post_types() {
+        $eligible = array();
+        if ( function_exists('get_post_types') ):
+            $args = array('public' => true);
+            $types = get_post_types($args);
+        else:
+            $types = array('post', 'page');
+        endif;
+        foreach($types as $type):
+            if (post_type_supports($type, 'custom-fields')):
+                $eligible[] = $type;
+            endif;
+        endforeach;
+        return apply_filters('intelliwidget_post_types', $eligible);
+    }
+    
+    function delete_meta($id, $optionname, $optiontype) {
+        if (!empty($id) && !empty($optionname) && !empty($optiontype)):
+            switch($optiontype):
+                case 'post_meta':
+                    return delete_post_meta($id, $optionname);
+                default:
+                    $optionname .= '_' . $optiontype . '_' . $id;
+                    return delete_option($optionname);
+            endswitch;
+        endif;
+    }
+    
+    function update_meta($id, $optionname, $optiontype, $data) {
+        if (empty($id) || empty($optionname) || empty($optiontype)) return false;
+        $serialized = maybe_serialize($data);
+        switch($optiontype):
+            case 'post_meta':
+                return update_post_meta($id, $optionname, $serialized);
+                break;
+            default:
+                $optionname .= '_' . $optiontype . '_' . $id;
+                return update_option($optionname, $serialized);
+        endswitch;
+    }
+    
+    
+    function get_content_menu() {
+        return $this->lists->get_menu('content');
+    }
+    
+    function get_replaces_menu() {
+        return $this->lists->get_menu('replaces');
+    }
+    
+    function get_text_position_menu() {
+        return $this->lists->get_menu('text_position');
+    }
+
+    function get_sortby_menu() {
+        return $this->lists->get_menu('sortby');
+    }
+
+    function get_image_size_menu() {
+        return $this->lists->get_menu('image_size');
+    }
+
+    function get_imagealign_menu() {
+        return $this->lists->get_menu('imagealign');
+    }
+
+    function get_link_target_menu() {
+        return $this->lists->get_menu('link_target');
+    }
+
+    function get_checkbox_fields() {
+        return $this->lists->get_fields('checkbox');
+    }
+    
+    function get_text_fields() {
+        return $this->lists->get_fields('text');
+    }
+    
+    function get_custom_fields() {
+        return $this->lists->get_fields('custom');
+    }
+    
+    function get_nav_menu() {
+        $defaults = $this->lists->get_menu('default_nav');
+        return array_merge($this->lists->get_menu('default_nav'), $this->menus);
+    }
+    
+    function get_nav_menus() {
+        $nav_menus = array();
+        $menus = get_terms( 'nav_menu', array( 'hide_empty' => false ) );
+        foreach ($menus as $menu)
+            $nav_menus[$menu->term_id] = $menu->name;
+        return $nav_menus;
+    }
+    
+    function get_label($key = '') {
+        return $this->lists->get_label($key);
+    }
+    function get_tip($key = '') {
+        return $this->lists->get_tip($key);
+    }
+    /**
+     * Stub for data validation
+     * @param <string> $unclean - data to parse
+     * @param <array> $rules
+     * @return <string> $clean - sanitized data
+     */
+    function filter_sanitize_input($unclean = NULL) {
+        if (is_array($unclean)):
+            return array_map(array($this, __FUNCTION__), $unclean);
+        else:
+            return sanitize_text_field($unclean);
+        endif;
+    }
+    
+
+    function map_category_to_tax($category) {
+        // echo '<textarea>' .   print_r(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS), true) . '</textarea>';
+        $catarr = $this->val2array($category);
+        $tax = array('category');
+        if (!isset($this->terms)) $this->load_terms();
+        return array_map(array($this, 'lookup_term'), $catarr, $tax);
+    }
+    
+    function lookup_term($id, $tax) {
+        foreach($this->terms[$tax] as $term):
+            if ($term->term_id == $id) return $term->term_taxonomy_id;
+        endforeach;
+        return -1;
+    }
+    
+
+    function load_posts() {
+        // cache all available posts (Lightweight IW objects)
+        $iwq = new IntelliWidget_Query();
+        $this->index_query_objects('posts', 'post_type', $iwq->post_list_query($this->post_types));
+    }
+    
+    function load_terms() {
+        // cache all available posts (Lightweight IW objects)
+        $iwq = new IntelliWidget_Query();
+        $this->index_query_objects('terms', 'taxonomy', get_terms(array_intersect(
+            preg_grep('/post_format/', get_object_taxonomies($this->post_types), PREG_GREP_INVERT), 
+                get_taxonomies(array('public' => TRUE, 'query_var' => TRUE))
+            ), array('hide_empty' => FALSE)));
+    }
+    
+    function index_query_objects($property, $keyfield, $data) {
+        $indexarray = array();
+        if (isset($data) && count($data)):
+            foreach ($data as $object):
+                $indexarray[$object->{$keyfield}][] = $object;
+            endforeach;
+        endif;
+        $this->{$property} = $indexarray;
+    }
+    
+    
+    function sort_terms($a, $b) {
+        $c = strcmp($a->taxonomy, $b->taxonomy);
+        if($c != 0) {
+            return $c;
+        }
+        return strcmp($a->name, $b->name);
+    }
+    
+}
+global $intelliwidget_admin;
+$intelliwidget_admin = new IntelliWidgetAdmin();
