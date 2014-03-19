@@ -77,13 +77,12 @@ class IntelliWidget_Query {
 	 * @uses $intelliwidget_post
 	 */
 	function the_post() {
-		global $intelliwidget_post;
 		$this->in_the_loop = true;
 
 		if ( -1 == $this->current_post ){ // loop has just started
             // stub for future functionality
         }
-        
+		global $intelliwidget_post;
 		$intelliwidget_post = $this->next_post();
 	}
     /* Intelliwidget has a lot of internal logic that can't be done efficiently using the standard

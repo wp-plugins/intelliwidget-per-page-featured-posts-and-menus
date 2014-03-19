@@ -26,7 +26,7 @@ class IntelliWidgetAdmin {
      * @param <string> $file
      * @return void
      */
-    function __construct($file) {
+    function __construct() {
 
         $this->is_ajax = false;
         $this->docsLink      = '<a href="http://www.lilaeamedia.com/plugins/intelliwidget/" target="_blank" title="' . __('Hover labels for more info or click here to view documentation.', 'intelliwidget') . '" style="float:right">' . __('Help', 'intelliwidget') . '</a>';
@@ -57,9 +57,10 @@ class IntelliWidgetAdmin {
      * Stub for printing the scripts needed for the admin.
      */
     function admin_scripts() {
-        wp_enqueue_style('intelliwidget-js', $this->pluginURL . 'templates/intelliwidget-admin.css');
+        global $intelliwidget;
+        wp_enqueue_style('intelliwidget-js', $intelliwidget->pluginURL . 'templates/intelliwidget-admin.css');
         wp_enqueue_script('jquery-ui-tabs');
-        wp_enqueue_script('intelliwidget-js', $this->pluginURL . 'js/intelliwidget.js', array('jquery'), '1.5.0', false);
+        wp_enqueue_script('intelliwidget-js', $intelliwidget->pluginURL . 'js/intelliwidget.js', array('jquery'), '1.5.0', false);
         wp_localize_script( 'intelliwidget-js', 'IWAjax', array(
             'ajaxurl' => admin_url( 'admin-ajax.php' )
         ));
@@ -103,7 +104,7 @@ class IntelliWidgetAdmin {
         $prefix    = 'intelliwidget_';
         // since we can now save a single meta box via ajax post, 
         // we need to manipulate the existing boxmap
-        $box_map = $this->get_box_map($id, $optiontype);
+        $box_map = $intelliwidget->get_box_map($id, $optiontype);
         // allow customization of input fields
         $checkbox_fields = $this->get_checkbox_fields();
         $text_fields = $this->get_text_fields();
@@ -112,25 +113,25 @@ class IntelliWidgetAdmin {
          * quickly. We then iterate through the fields, parsing out the actual data field name and the 
          * box_id from the input key.
          */
-        foreach(preg_grep('#^' . $prefix . '#', array_keys($_POST)) as $iw_key):
+        foreach(preg_grep('#^' . $prefix . '#', array_keys($_POST)) as $field):
             // find the box id and field name in the post key with a perl regex
-            preg_match('#^' . $prefix . '(\d+)_([\w\-]+)$#', $iw_key, $matches);
+            preg_match('#^' . $prefix . '(\d+)_([\w\-]+)$#', $field, $matches);
             if (count($matches)):
                 if (!$box_id = $matches[1]) continue;
-                $iw_field      = $matches[2];
+                $name      = $matches[2];
             else: 
                 continue;
             endif;
             // organize this into a 2-dimensional array for later
             // raw html parser/cleaner-upper: see WP docs re: KSES
-            if (in_array($iw_field, $text_fields)):
+            if (in_array($name, $text_fields)):
                 if ( !current_user_can('unfiltered_html') ):
-                    $post_data[$box_id][$iw_field] = stripslashes( wp_filter_post_kses( addslashes($_POST[$iw_key]) ) );
+                    $post_data[$box_id][$name] = stripslashes( wp_filter_post_kses( addslashes($_POST[$field]) ) );
                 else:
-                    $post_data[$box_id][$iw_field] = $_POST[$iw_key];
+                    $post_data[$box_id][$name] = $_POST[$field];
                 endif;
             else:
-                $post_data[$box_id][$iw_field] = $this->filter_sanitize_input($_POST[$iw_key]);
+                $post_data[$box_id][$name] = $this->filter_sanitize_input($_POST[$field]);
             endif;
         endforeach;
         // track meta boxes updated
@@ -138,7 +139,7 @@ class IntelliWidgetAdmin {
         // additional processing for each box data segment
         foreach ($post_data as $box_id => $new_instance):
             // get current values
-            $old_instance = $intelliwidget->get_settings_data($id, $box_id, $optiontype);
+            $old_instance = $intelliwidget->get_meta($id, $box_id, $optiontype);
             foreach ($new_instance as $name => $value):
                 $old_instance[$name] = $value;
                 // make sure at least one post type exists
@@ -147,10 +148,9 @@ class IntelliWidgetAdmin {
                 if ('replace_widget' == $name) $box_map[$box_id] = $value;
             endforeach;
             // special handling for checkboxes:
-            foreach($checkbox_fields as $cb)
-                $old_instance[$cb] = isset($new_instance[$box_id][$cb]);
+            foreach($checkbox_fields as $name)
+                $old_instance[$name] = isset($new_instance[$name]);
             $old_instance['custom_text'] = base64_encode($old_instance['custom_text']);
-
             // save new data
             $this->update_meta($id, '_intelliwidget_data_' . $box_id, $optiontype, $old_instance);
             // increment box counter
@@ -177,7 +177,8 @@ class IntelliWidgetAdmin {
     }
     
     function delete_tabbed_section($id, $box_id, $optiontype) {
-        $box_map = $this->get_box_map($id, $optiontype);
+        global $intelliwidget;
+        $box_map = $intelliwidget->get_box_map($id, $optiontype);
         $this->delete_meta($id, '_intelliwidget_data_' . $box_id, $optiontype);
         unset($box_map[$box_id]);
         $this->update_meta($id, '_intelliwidget_map', $optiontype, $box_map);
@@ -193,38 +194,35 @@ class IntelliWidgetAdmin {
             $newkey = 1;
         endif;
         $box_map[$newkey] = '';
-        if ($this->update_meta($id, '_intelliwidget_map', $optiontype, $box_map))
-            return $newkey;
-        return false;
+        $this->update_meta($id, '_intelliwidget_map', $optiontype, $box_map);
+        return $newkey;
+        //return false;
     }
     
     // use this for all saves
     function ajax_save_data($id, $box_id, $optiontype) {
+        if (false === $this->save_data($id, $optiontype)) die('fail'); 
         global $intelliwidget;
-        if (false === $this->save_data($id, $optiontype)) die('fail'); // $box_id, 
         $this->init_metabox();
         add_action('intelliwidget_post_selection_menus', array($this->metabox, 'post_selection_menus'), 10, 4);
-        $instance = $this->defaults($intelliwidget->get_settings_data($id, $box_id, $optiontype));
-        
-        $response = array(
+        $instance = $intelliwidget->defaults($intelliwidget->get_meta($id, $box_id, $optiontype));
+        die(json_encode(array(
             'tab'   => $this->get_tab($box_id, $instance['replace_widget']),
             'form'  => $this->get_metabox($id, $box_id, $instance),
-        );
-        die(json_encode($response));
+        )));
     }
     
     // use this for all adds
     function ajax_add_tabbed_section($id, $optiontype) {
-        global $intelliwidget;
         if (!($box_id = $this->add_tabbed_section($id, $optiontype))) die('fail');
         if (!isset($this->lists)) $this->admin_init();
+        global $intelliwidget;
         $this->init_metabox();
         $instance = $intelliwidget->defaults();
-
         $response = array(
-            'tab'   => $this->get_tab($box_id, $instance['replace_widget']),
-            'form'  => $this->begin_section($box_id) . $this->get_metabox($id, $box_id, $instance) . $this->end_section(),
-        );
+                'tab'   => $this->get_tab($box_id, $instance['replace_widget']),
+                'form'  => $this->begin_section($box_id) . $this->get_metabox($id, $box_id, $instance) . $this->end_section(),
+            );
         die(json_encode($response));
     }
     /*
@@ -242,7 +240,7 @@ class IntelliWidgetAdmin {
         global $intelliwidget;
         if (!isset($this->lists)) $this->admin_init();
         $this->init_metabox();
-        $instance = $intelliwidget->defaults($intelliwidget->get_settings_data($id, $box_id, $optiontype));
+        $instance = $intelliwidget->defaults($intelliwidget->get_meta($id, $box_id, $optiontype));
         ob_start();
         $this->metabox->post_selection_menus($id, $box_id, $instance);
         $form = ob_get_contents();
@@ -277,7 +275,8 @@ class IntelliWidgetAdmin {
     }
     
     function get_section($id, $box_id, $optiontype) {
-        $instance   = $this->defaults($this->get_settings_data($id, $box_id, $optiontype));
+        global $intelliwidget;
+        $instance   = $intelliwidget->defaults($intelliwidget->get_meta($id, $box_id, $optiontype));
         $tab        = $this->get_tab($box_id, $instance['replace_widget']);
         $section    = $this->begin_section($box_id) . $this->get_metabox($id, $box_id, $instance) . $this->end_section();
         return array($tab, $section);
@@ -316,7 +315,7 @@ class IntelliWidgetAdmin {
 	    return $output;
     }
     
-    function get_relevant_terms($instance = NULL) {
+    function get_terms_list($instance = NULL) {
         if (!isset($this->terms)) $this->load_terms();
     	$output = '';
         $post_types = $this->val2array(isset($instance['post_types']) ? $instance['post_types'] : '');
@@ -342,11 +341,12 @@ class IntelliWidgetAdmin {
      * @return <array>
      */
     function get_widget_templates() {
+        global $intelliwidget;
         $templates  = array();
         $paths      = array();
         $parentPath = get_template_directory() . '/intelliwidget';
         $themePath  = get_stylesheet_directory() . '/intelliwidget';
-        $paths[] = $this->templatesPath;
+        $paths[] = $intelliwidget->templatesPath;
         $paths[] = $parentPath;
         if ($parentPath != $themePath) $paths[] = $themePath;
         foreach ($paths as $path):
@@ -386,7 +386,7 @@ class IntelliWidgetAdmin {
     function delete_meta($id, $optionname, $optiontype) {
         if (!empty($id) && !empty($optionname) && !empty($optiontype)):
             switch($optiontype):
-                case 'post_meta':
+                case 'post':
                     return delete_post_meta($id, $optionname);
                 default:
                     $optionname .= '_' . $optiontype . '_' . $id;
@@ -399,12 +399,12 @@ class IntelliWidgetAdmin {
         if (empty($id) || empty($optionname) || empty($optiontype)) return false;
         $serialized = maybe_serialize($data);
         switch($optiontype):
-            case 'post_meta':
-                return update_post_meta($id, $optionname, $serialized);
+            case 'post':
+                update_post_meta($id, $optionname, $serialized);
                 break;
             default:
                 $optionname .= '_' . $optiontype . '_' . $id;
-                return update_option($optionname, $serialized);
+                update_option($optionname, $serialized);
         endswitch;
     }
     
@@ -531,6 +531,14 @@ class IntelliWidgetAdmin {
             return $c;
         }
         return strcmp($a->name, $b->name);
+    }
+    
+    function val2array($value) {
+        $value = empty($value) ? 
+            array() : (is_array($value) ?
+                $value : explode(',', $value));
+        sort($value);
+        return $value;
     }
     
 }

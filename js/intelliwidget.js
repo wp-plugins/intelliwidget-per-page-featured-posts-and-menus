@@ -149,7 +149,7 @@ jQuery(document).ready(function($) {
             postData,
             //on success function  
             function(response){
-                console.log(response);
+                //console.log(response);
                 // release button
                 $('#iw_cdfsave').prop('disabled', false);
                 // hide spinner
@@ -183,6 +183,8 @@ jQuery(document).ready(function($) {
             savebutton      = $(sectionform).find('.iw-save'),
             // parse id to get section number
             pre             = 'intelliwidget_' + thisID.split('_')[1],
+            // get option type
+            otype           = $('#otype').val(),
             // build post data array
             postData        = {};
         // disable the button until ajax returns
@@ -210,7 +212,7 @@ jQuery(document).ready(function($) {
             }
         });
         // add wp ajax action to array
-        postData['action'] = 'iw_save';
+        postData['action'] = 'iw_' + otype + '_save';
         // send to wp
         $.post(  
             // get ajax url from localized object
@@ -219,7 +221,7 @@ jQuery(document).ready(function($) {
             postData,
             //on success function  
             function(response){
-                console.log(response);
+                //console.log(response);
                 if ('fail' == response) {
                     // show red X
                     $(savecontainer).addClass('failure');
@@ -264,7 +266,9 @@ jQuery(document).ready(function($) {
         // show spinner
         $('#intelliwidget_spinner').show();
         // build post data array
-        var postData = {};
+        var postData = {}
+            // get option type
+            otype           = $('#otype').val();
         // find inputs for this section
         $('input[name=post_ID],input[name=iwpage],select[id=intelliwidget_widget_page_id]').each(function(index, element) {
             // get field id
@@ -272,7 +276,7 @@ jQuery(document).ready(function($) {
             postData[fieldID] = $(this).val();
         });
         // add wp ajax action to array
-        postData['action'] = 'iw_copy';
+        postData['action'] = 'iw_' + otype + '_copy';
         // send to wp
         $.post(  
             // get ajax url from localized object
@@ -320,13 +324,16 @@ jQuery(document).ready(function($) {
             sel      = '#' + thisID,
             // get href from link
             href     = $(this).attr('href'),
+            // get option type
+            otype           = $('#otype').val(),
             // build post data array from query string
             postData = url_to_array(href);
         // show spinner
         $('#intelliwidget_spinner').show();
         // add wp ajax action to array
-        postData['action'] = 'iw_add';
+        postData['action'] = 'iw_' + otype + '_add';
         // send to wp
+        //console.log(postData);
         $.post(  
             // get ajax url from localized object
             IWAjax.ajaxurl,  
@@ -334,7 +341,7 @@ jQuery(document).ready(function($) {
             postData,
             //on success function  
             function(response){
-                console.log(response);
+                //console.log(response);
                 $(sel).removeClass('disabled');
                 $('#intelliwidget_spinner').hide();
                 if ('fail' == response) {
@@ -383,6 +390,8 @@ jQuery(document).ready(function($) {
             sel      = '#' + thisID,
             // get href from link
             href     = $(this).attr('href'),
+            // get option type
+            otype           = $('#otype').val(),
             // build post data array from query string
             postData = url_to_array(href),
             // get box id 
@@ -390,7 +399,7 @@ jQuery(document).ready(function($) {
         // show spinner
         $('.intelliwidget_' + pre + '_spinner').show();
         // add wp ajax action to array
-        postData['action'] = 'iw_delete';
+        postData['action'] = 'iw_' + otype + '_delete';
         // send to wp
         $.post(  
         // get ajax url from localized object
@@ -399,7 +408,7 @@ jQuery(document).ready(function($) {
             postData,
             //on success function  
             function(response){
-                console.log(response);
+                //console.log(response);
                 $(sel).removeClass('disabled');
                 $('#intelliwidget_' + pre + '_spinner').hide();
                 if ('success' == response ) {
@@ -439,6 +448,8 @@ jQuery(document).ready(function($) {
             savecontainer   = $(sectionform).find('.iw-save-container'),
             // get button selector
             savebutton      = $(sectionform).find('.iw-save'),
+            // get option type
+            otype           = $('#otype').val(),
             // build post data array
             postData        = {};
         // only load once
@@ -457,7 +468,7 @@ jQuery(document).ready(function($) {
             postData[fieldID] = $(this).val();
         });
         // add wp ajax action to array
-        postData['action'] = 'iw_get';
+        postData['action'] = 'iw_' + otype + '_menus';
         // send to wp
         $.post(  
             // get ajax url from localized object
@@ -466,7 +477,7 @@ jQuery(document).ready(function($) {
             postData,
             //on success function  
             function(response){
-                console.log(response);
+                //console.log(response);
                 if ('fail' == response) {
                     // show red X
                     $(savecontainer).addClass('failure');
@@ -515,7 +526,7 @@ jQuery(document).ready(function($) {
         postData['widget-id'] = thisID;
         postData['_wpnonce_widgets'] = nonce;
         // add wp ajax action to array
-        postData['action'] = 'iw_widget_get';
+        postData['action'] = 'iw_widget_menus';
         // send to wp
         $.post(  
             // get ajax url from localized object

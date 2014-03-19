@@ -22,29 +22,25 @@ class IntelliWidget_Widget extends WP_Widget {
         $widget_ops          = array('description' => __('Menus, Featured Posts, HTML and more, customized per page or site-wide.', 'intelliwidget'));
         $control_ops         = array('width' => 400, 'height' => 350);
         if (is_admin()):
-            global $intelliwidget_admin;
-            add_action('load-widgets.php', array(&$intelliwidget_admin, 'admin_init') );
-            add_action('load-widgets.php', array(&$this, 'load_widget_form') );
-            add_action('wp_ajax_', array($this, 'ajax_get_widget_post_select_menus'));
+            add_action('load-widgets.php',                  array(&$this, 'load_widget_form') );
+            add_action('wp_ajax_iw_widget_menus',             array(&$this, 'ajax_get_widget_post_select_menus'));
         else:
-            add_action('intelliwidget_action_post_list',       array(&$this, 'action_post_list'),      10, 3);
-            add_action('intelliwidget_action_nav_menu',        array(&$this, 'action_nav_menu'),       10, 3);
-            add_filter('intelliwidget_before_widget',   array(&$this, 'filter_before_widget'),  10, 3);
-            add_filter('intelliwidget_title',           array(&$this, 'filter_title'),          10, 3);
-            add_filter('intelliwidget_custom_text',     array(&$this, 'filter_custom_text'),    10, 3);
-            add_filter('intelliwidget_classes',         array(&$this, 'filter_classes'),        10, 3);
-            add_filter('intelliwidget_menu_classes',    array(&$this, 'filter_menu_classes'),   10, 3);
+            add_action('intelliwidget_action_post_list',    array(&$this, 'action_post_list'),      10, 3);
+            add_action('intelliwidget_action_nav_menu',     array(&$this, 'action_nav_menu'),       10, 3);
+            add_filter('intelliwidget_before_widget',       array(&$this, 'filter_before_widget'),  10, 3);
+            add_filter('intelliwidget_title',               array(&$this, 'filter_title'),          10, 3);
+            add_filter('intelliwidget_custom_text',         array(&$this, 'filter_custom_text'),    10, 3);
+            add_filter('intelliwidget_classes',             array(&$this, 'filter_classes'),        10, 3);
+            add_filter('intelliwidget_menu_classes',        array(&$this, 'filter_menu_classes'),   10, 3);
+            add_filter('intelliwidget_trim_excerpt',        array(&$this, 'filter_trim_excerpt'),   10, 3);
             // default content actions
-            add_action('intelliwidget_above_content',   array(&$this, 'action_addltext_above'), 10, 3);
-            add_action('intelliwidget_below_content',   array(&$this, 'action_addltext_below'), 10, 3);
-        endif;
+            add_action('intelliwidget_above_content',       array(&$this, 'action_addltext_above'), 10, 3);
+            add_action('intelliwidget_below_content',       array(&$this, 'action_addltext_below'), 10, 3);
+            add_action( 'after_setup_theme',                array(&$this, 'ensure_post_thumbnails_support' ) );
+            add_action( 'wp_enqueue_scripts',               array(&$this, 'enqueue_styles'));
+            add_shortcode('intelliwidget',                  array(&$this, 'intelliwidget_shortcode'));
+        endif;  
         $this->WP_Widget('intelliwidget', $intelliwidget->pluginName, $widget_ops, $control_ops);
-    }
-    
-    function load_widget_form(){
-        // lazy load UI
-        include_once('class-intelliwidget-form.php');
-        $this->widget_form = new IntelliWidgetForm();
     }
     
     /**
@@ -55,13 +51,11 @@ class IntelliWidget_Widget extends WP_Widget {
      * @return false
      */
     function widget($args, $instance) {
-        $instance = apply_filters('intelliwidget_extension_settings', $args, $instance);
-        global $post, $intelliwidget, $intelliwidget_post_id;
-        $intelliwidget_post_id = is_object($post) ? $post->ID : null;
+        $instance = apply_filters('intelliwidget_extension_settings', $instance, $args);
         // no page-specific settings, should we hide?
         if (!empty($instance['hide_if_empty']))
             return;
-        // if we get here, there are no page settings and no hide setting, so use the primary widget settings
+        global $intelliwidget;
         $intelliwidget->build_widget($args, $instance);
     }
     
@@ -72,8 +66,8 @@ class IntelliWidget_Widget extends WP_Widget {
      * @return <array>
      */
     function update($new_instance, $old_instance) {
-        global $intelliwidget;
-        $textfields = $intelliwidget->get_text_fields();
+        global $intelliwidget_admin;
+        $textfields = $intelliwidget_admin->get_text_fields();
         foreach ($new_instance as $name => $value):
             // special handling for text inputs
                 if (in_array($name, $textfields)):
@@ -85,13 +79,13 @@ class IntelliWidget_Widget extends WP_Widget {
                             wp_filter_post_kses( addslashes($new_instance[$field]) ) ); 
                     endif;
                 else:
-                    $old_instance[$name] = $intelliwidget->filter_sanitize_input($new_instance[$name]);
+                    $old_instance[$name] = $intelliwidget_admin->filter_sanitize_input($new_instance[$name]);
                 endif;
                 if ('post_types' == $name && empty($value))
                     $old_instance[$name] = array('post');
         endforeach;
         // special handling for checkboxes:
-        foreach (  $intelliwidget->get_checkbox_fields() as $name) :
+        foreach (  $intelliwidget_admin->get_checkbox_fields() as $name) :
             $old_instance[$name] = isset($new_instance[$name]);
         endforeach;
         return $old_instance;
@@ -107,6 +101,46 @@ class IntelliWidget_Widget extends WP_Widget {
         $instance = $intelliwidget->defaults($instance);
         //echo 'AFTER defaults: ' . "\n" . print_r($instance, true) . "\n\n";
         $this->widget_form->render_form($instance, $this);
+    }
+    
+    function load_widget_form(){
+        global $intelliwidget_admin;
+        $intelliwidget_admin->admin_init();
+        // lazy load UI
+        include_once('class-intelliwidget-form.php');
+        $this->widget_form = new IntelliWidgetForm();
+    }
+    
+    /**
+     * Front-end css
+     */
+    function enqueue_styles() {
+        wp_enqueue_style('intelliwidget', $this->get_stylesheet(false));
+        if ($override = $this->get_stylesheet(true)):
+            wp_enqueue_style('intelliwidget-custom', $override);
+        endif;
+    }
+    
+    function get_stylesheet($override = false) {
+        global $intelliwidget;
+        if ($override):
+            $file   = '/intelliwidget/intelliwidget.css';
+            if (file_exists(get_stylesheet_directory() . $file)):
+                return get_stylesheet_directory_uri() . $file;
+            elseif (file_exists(get_template_directory() . $file)):
+                return get_template_directory_uri() . $file;
+            else:
+                return false;
+            endif;
+        else:
+            return $intelliwidget->templatesURL . 'intelliwidget.css';
+        endif;
+        return false;
+    }
+    
+    function get_query(&$instance) {
+        // add query object to instance
+        $instance['query'] = new IntelliWidget_Query();
     }
     
     function filter_custom_text($custom_text, $instance = array(), $args = array()) {
@@ -146,6 +180,40 @@ class IntelliWidget_Widget extends WP_Widget {
         return $classes . (empty($instance['classes']) ? '' : ' ' . $instance['classes']);
     }
     
+    /**
+     * Trim the content to a set number of words.
+     *
+     * @param <string> $text
+     * @param <integer> $length
+     * @return <string>
+     */
+    function filter_trim_excerpt($text, $this_instance) {
+        $length = intval($this_instance['length']);
+        $allowed_tags = '';
+        if (isset($this_instance['allowed_tags'])):
+            $tags = explode(',', $this_instance['allowed_tags']);
+            foreach ( $tags as $tag ):
+                $allowed_tags .= '<' . trim($tag) . '>';
+            endforeach;          
+        endif;
+        $text   = strip_shortcodes($text);
+        $text   = preg_replace( '@<(script|style)[^>]*?>.*?</\\1>@si', '', $text );
+        $text   = apply_filters('the_content', $text);
+        //$text   = str_replace(']]>', ']]&gt;', $text);
+        $text   = strip_tags($text, $allowed_tags);
+        if (empty($allowed_tags)):
+            $words  = preg_split('/[\r\n\t ]+/', $text, $length + 1);
+            if ( count($words) > $length ):
+                array_pop($words);
+                array_push($words, '...');
+                $text = implode(' ', $words);
+            endif;
+        else:
+            $text = $this->get_words_html($text, $length);
+        endif; 
+        return $text;
+    }
+
     function action_addltext_above($instance, $args) {
         if (('above' == $instance['text_position'] || 'only' == $instance['text_position'] )):
             echo apply_filters('intelliwidget_custom_text', $instance['custom_text'], $instance, $args);
@@ -190,40 +258,6 @@ class IntelliWidget_Widget extends WP_Widget {
         endif;
     }
 
-    /**
-     * Trim the content to a set number of words.
-     *
-     * @param <string> $text
-     * @param <integer> $length
-     * @return <string>
-     */
-    function trim_excerpt($text, $this_instance) {
-        $length = intval($this_instance['length']);
-        $allowed_tags = '';
-        if (isset($this_instance['allowed_tags'])):
-            $tags = explode(',', $this_instance['allowed_tags']);
-            foreach ( $tags as $tag ):
-                $allowed_tags .= '<' . trim($tag) . '>';
-            endforeach;          
-        endif;
-        $text   = strip_shortcodes($text);
-        $text   = preg_replace( '@<(script|style)[^>]*?>.*?</\\1>@si', '', $text );
-        $text   = apply_filters('the_content', $text);
-        //$text   = str_replace(']]>', ']]&gt;', $text);
-        $text   = strip_tags($text, $allowed_tags);
-        if (empty($allowed_tags)):
-            $words  = preg_split('/[\r\n\t ]+/', $text, $length + 1);
-            if ( count($words) > $length ):
-                array_pop($words);
-                array_push($words, '...');
-                $text = implode(' ', $words);
-            endif;
-        else:
-            $text = $this->get_words_html($text, $length);
-        endif; 
-        return $text;
-    }
-
     function get_words_html($text, $length) {
         $opentags   = array();
         $excerpt    = '';
@@ -259,14 +293,34 @@ class IntelliWidget_Widget extends WP_Widget {
         endif;
         return $excerpt;
     }
+    
+    /**
+     * Retrieve a template file from either the theme or the plugin directory.
+     * First, check if an action hook exists for this template value and execute
+     * Second check if file exists. If no file exists, return false
+     * @param <string> $template    The name of the template.
+     * @return <string>             The full path to the template file or false if no template exists
+     */
+    function get_template($template = NULL) {
+        global $intelliwidget;
+        if ( NULL == $template ) return false;
+            $themeFile  = get_stylesheet_directory() . '/intelliwidget/' . $template . '.php';
+            $parentFile = get_template_directory() . '/intelliwidget/' . $template . '.php';
+            $pluginFile = $intelliwidget->templatesPath . $template . '.php';
+            if ( file_exists($themeFile ) ) return $themeFile;
+            if ( file_exists($parentFile) ) return $parentFile;
+            if ( file_exists($pluginFile) ) return $pluginFile;
+        return false;
+    }
+
     // widgets only
     function ajax_get_widget_post_select_menus() {
         global $intelliwidget_admin, $wp_registered_widgets;
         $widget_id = sanitize_text_field($_POST['widget-id']);
+        $intelliwidget_admin->is_ajax = true;
         if ( empty($widget_id) || 
             !$intelliwidget_admin->validate_post('save-sidebar-widgets', '_wpnonce_widgets', 'edit_theme_options') 
             ) return false;
-        $this->is_ajax = true;
         
         // getting to the widget info is a complicated task ...
         if (isset($wp_registered_widgets[$widget_id])):
@@ -281,7 +335,7 @@ class IntelliWidget_Widget extends WP_Widget {
                     $this->widget_form = new IntelliWidgetForm();
                     ob_start();
                     $this->widget_form->post_selection_menus($instance, $widget);
-                    $this->widget_form = ob_get_contents();
+                    $form = ob_get_contents();
                     ob_end_clean();
                     die($form);
             endif;
@@ -289,6 +343,14 @@ class IntelliWidget_Widget extends WP_Widget {
         die('fail');
     }
   
+    /**
+     * Ensure that "post-thumbnails" support is available for those themes that don't register it.
+     * @return  void
+     */
+    public function ensure_post_thumbnails_support () {
+        if ( ! current_theme_supports( 'post-thumbnails' ) ) { add_theme_support( 'post-thumbnails' ); }
+    } // End ensure_post_thumbnails_support()
+
 }
 
 // initialize the widget

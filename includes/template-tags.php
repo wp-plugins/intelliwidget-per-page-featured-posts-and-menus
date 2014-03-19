@@ -116,7 +116,7 @@ if ( !function_exists('get_the_intelliwidget_excerpt') ) {
         // use excerpt text if it exists otherwise parse the main content
         $excerpt = empty($intelliwidget_post->post_excerpt) ?
             get_the_intelliwidget_content() : $intelliwidget_post->post_excerpt;
-        return $intelliwidget->trim_excerpt($excerpt, $this_instance);
+        return apply_filters('intelliwidget_trim_excerpt', $excerpt, $this_instance);
     }
 }
 

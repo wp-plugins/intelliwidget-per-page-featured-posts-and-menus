@@ -22,15 +22,15 @@ class IntelliWidgetPost {
         if (is_admin()):
             global $intelliwidget_admin;
             // these actions only apply to admin users
-            add_action('load-post.php',                    array(&$intelliwidget_admin, 'admin_init') );
-            add_action('load-post.php',                    array(&$this, 'add_metabox_actions') );
-            add_action('save_post',                     array(&$this, 'save_postdata'), 1, 2 );
-            add_action('wp_ajax_iw_post_cdfsave',            array(&$this, 'ajax_save_cdfdata' ));
-            add_action('wp_ajax_iw_post_save',               array(&$this, 'ajax_save_data' ));
-            add_action('wp_ajax_iw_post_copy',               array(&$this, 'ajax_copy_post' ));
-            add_action('wp_ajax_iw_post_delete',             array(&$this, 'ajax_delete_tabbed_section' ));
-            add_action('wp_ajax_iw_post_add',                array(&$this, 'ajax_add_tabbed_section' ));
-            add_action('wp_ajax_iw_post_get',                array(&$this, 'ajax_get_select_menus' ));
+            add_action('load-post.php',                     array(&$intelliwidget_admin, 'admin_init') );
+            add_action('load-post.php',                     array(&$this, 'add_metabox_actions') );
+            add_action('save_post',                         array(&$this, 'save_postdata'), 1, 2 );
+            add_action('wp_ajax_iw_post_cdfsave',           array(&$this, 'ajax_save_cdfdata' ));
+            add_action('wp_ajax_iw_post_save',              array(&$this, 'ajax_save_data' ));
+            add_action('wp_ajax_iw_post_copy',              array(&$this, 'ajax_copy_data' ));
+            add_action('wp_ajax_iw_post_delete',            array(&$this, 'ajax_delete_tabbed_section' ));
+            add_action('wp_ajax_iw_post_add',               array(&$this, 'ajax_add_tabbed_section' ));
+            add_action('wp_ajax_iw_post_menus',             array(&$this, 'ajax_get_select_menus' ));
         else:
             add_filter('intelliwidget_extension_settings',  array(&$this, 'get_post_settings'), 10, 3);
         endif;
@@ -42,9 +42,9 @@ class IntelliWidgetPost {
      */
     function main_meta_box() {
         // set up meta boxes
-        $this->init_metabox();
-        global $post;
-        foreach ($this->post_types as $type):
+        global $intelliwidget_admin;
+        $intelliwidget_admin->init_metabox();
+        foreach ($intelliwidget_admin->post_types as $type):
             add_meta_box( 
                 'intelliwidget_main_meta_box',
                 __( 'IntelliWidget', 'intelliwidget'),
@@ -61,8 +61,8 @@ class IntelliWidgetPost {
      * @return  void
      */
     function post_meta_box() {
-        global $post;
-        foreach ($this->post_types as $type):
+        global $post, $intelliwidget_admin;
+        foreach ($intelliwidget_admin->post_types as $type):
             add_meta_box( 
                 'intelliwidget_post_meta_box',
                 __( 'IntelliWidget Custom Fields', 'intelliwidget'),
@@ -90,14 +90,15 @@ class IntelliWidgetPost {
      * @return  void
      */
     function main_meta_box_form($post, $metabox) {
-        $this->metabox->page_form($post);
+        global $intelliwidget, $intelliwidget_admin;
+        $intelliwidget_admin->metabox->page_form($post->ID, 'post', $this->get_id_list($post));
 
         // box_map contains map of meta boxes to their related widgets
-        $box_map = $intelliwidget->get_box_map($post->ID, 'post_meta');
+        $box_map = $intelliwidget->get_box_map($post->ID, 'post');
         if (is_array($box_map)):
             $tabs = $section = '';
             foreach($box_map as $box_id => $sidebar_widget_id):
-                list($tab, $form) = $intelliwidget_admin->get_section($post->ID, $box_id, 'post_meta');
+                list($tab, $form) = $intelliwidget_admin->get_section($post->ID, $box_id, 'post');
                 $tabs .= $tab . "\n";
                 $section .= $form . "\n";
             endforeach;
@@ -110,6 +111,15 @@ class IntelliWidgetPost {
         endif;
     }
     
+    function get_id_list($post) {
+        global $intelliwidget_admin;
+        $copy_id = get_post_meta($post->ID, '_intelliwidget_widget_page_id', true);
+        return '
+  <select style="width:75%" name="intelliwidget_widget_page_id" id="intelliwidget_widget_page_id">
+    <option value="">' . sprintf(__('This %s', 'intelliwidget'), ucfirst($post->post_type)) . '</option>
+      ' . $intelliwidget_admin->get_posts_list(array('post_types' => array($post->post_type), 'page' => $copy_id)) . '
+  </select>';
+    }
     /**
      * Output the form in the post meta box. Params are passed by add_meta_box() function
      * @param <object> $post
@@ -117,7 +127,7 @@ class IntelliWidgetPost {
      * @return  void
      */
     function post_meta_box_form($post, $metabox) {
-        $this->metabox->post_form($post);
+        $this->post_form($post);
     }
     
     function add_metabox_actions() {
@@ -143,13 +153,13 @@ class IntelliWidgetPost {
 
         $post_id = isset($_POST['post_ID']) ? intval($_POST['post_ID']) : NULL;
         if (empty($post_id) || 
-            !$intelliwidget_admin->validate_post('iwpage', 'iwpage_' . $post_id, 'edit_post', $post_id)) die('fail');
+            !$intelliwidget_admin->validate_post('iwpage_' . $post_id, 'iwpage', 'edit_post', $post_id)) die('fail');
 
-        $intelliwidget_admin->save_data($post_id, 'post_meta');
+        $intelliwidget_admin->save_data($post_id, 'post');
         // save custom post data if it exists
         $this->save_cdfdata();
         // save copy page id (i.e., "use settings from ..." ) if it exists
-        $intelliwidget_admin->save_copy_post($post_id, 'post_meta');
+        $intelliwidget_admin->save_copy_post($post_id, 'post');
     }
 
     function save_cdfdata() {
@@ -160,77 +170,77 @@ class IntelliWidgetPost {
             $cdfield = $prefix . $cfield;
             if (array_key_exists($cdfield, $_POST)):
                 if (empty($_POST[$cdfield])):
-                    $intelliwidget_admin->delete_meta($post_id, $cdfield, 'post_meta');
+                    $intelliwidget_admin->delete_meta($post_id, $cdfield, 'post');
                 else:
                     $newdata = $_POST[$cdfield];
                     if ( !current_user_can('unfiltered_html') ):
                         $newdata = stripslashes( 
                         wp_filter_post_kses( addslashes($newdata) ) ); 
                     endif;
-                    $intelliwidget_admin->update_meta($post_id, $cdfield, 'post_meta', $newdata);
+                    $intelliwidget_admin->update_meta($post_id, $cdfield, 'post', $newdata);
                 endif;
             endif;
         endforeach;
     }
     
     // ajax save for posts only - duplicate this for other types
-    function ajax_post_save_data() {
+    function ajax_save_data() {
         global $intelliwidget_admin;
-        $this->is_ajax = true;
+        $intelliwidget_admin->is_ajax = true;
         $post_id = isset($_POST['post_ID']) ? intval($_POST['post_ID']) : NULL;
         $box_id_key = current(preg_grep("/_box_id$/", array_keys($_POST)));
         $box_id = isset($_POST[$box_id_key]) ? intval($_POST[$box_id_key]) : NULL;
         if (empty($post_id) || empty($box_id) || 
-            !$intelliwidget_admin->validate_post('iwpage', 'iwpage_' . $post_id, 'edit_post', $post_id)) die('fail');
-        $intelliwidget_admin->ajax_save_data($post_id, $box_id, 'post_meta');
+            !$intelliwidget_admin->validate_post('iwpage_' . $post_id, 'iwpage', 'edit_post', $post_id)) die('fail');
+        $intelliwidget_admin->ajax_save_data($post_id, $box_id, 'post');
     }
     
     // ajax copy for posts only - duplicate this for other types
-    function ajax_copy_post() {
+    function ajax_copy_data() {
         global $intelliwidget_admin;
-        $this->is_ajax = true;
+        $intelliwidget_admin->is_ajax = true;
         $post_id = isset($_POST['post_ID']) ? intval($_POST['post_ID']) : NULL;
         if (empty($post_id) ||  
-            !$intelliwidget_admin->validate_post('iwpage', 'iwpage_' . $post_id, 'edit_post', $post_id)) die('fail');
+            !$intelliwidget_admin->validate_post('iwpage_' . $post_id, 'iwpage', 'edit_post', $post_id)) die('fail');
 
-        if (false === $intelliwidget_admin->save_copy_post($post_id, 'post_meta')) die('fail');
+        if (false === $intelliwidget_admin->save_copy_post($post_id, 'post')) die('fail');
         die('success');
     }
     
     // posts only
     function ajax_save_cdfdata() {
         global $intelliwidget_admin;
-        $this->is_ajax = true;
+        $intelliwidget_admin->is_ajax = true;
         $post_id = isset($_POST['post_ID']) ? intval($_POST['post_ID']) : NULL;
         if (empty($post_id) || 
-            !$intelliwidget_admin->validate_post('iwpage', 'iwpage_' . $post_id, 'edit_post', $post_id)) die('fail');
+            !$intelliwidget_admin->validate_post('iwpage_' . $post_id, 'iwpage', 'edit_post', $post_id)) die('fail');
         if (false === $this->save_cdfdata()) die('fail');
         die('success');
     }
     
     // ajax delete for posts only - duplicate this for other types
-    function ajax_post_delete_tabbed_section() {
+    function ajax_delete_tabbed_section() {
         global $intelliwidget_admin;
-        $this->is_ajax = true;
+        $intelliwidget_admin->is_ajax = true;
         // note that the query string version uses "post" instead of "post_ID"
         $post_id = isset($_POST['post']) ? intval($_POST['post']) : NULL;
         $box_id = isset($_POST['iwdelete']) ? intval($_POST['iwdelete']) : NULL;
         if (empty($post_id) || empty($box_id) || 
             !$intelliwidget_admin->validate_post('iwdelete', '_wpnonce', 'edit_post', $post_id)) die('fail');
-        if (false === $intelliwidget_admin->delete_tabbed_section($id, $box_id, 'post_meta')) die('fail');
+        if (false === $intelliwidget_admin->delete_tabbed_section($post_id, $box_id, 'post')) die('fail');
         die('success');
     }
 
     // ajax add for posts only - duplicate this for other types
-    function ajax_post_add_tabbed_section() {
+    function ajax_add_tabbed_section() {
         global $intelliwidget_admin;
-        $this->is_ajax = true;
+        $intelliwidget_admin->is_ajax = true;
         // note that the query string version uses "post" instead of "post_ID"
         $post_id = isset($_POST['post']) ? intval($_POST['post']) : NULL;
         if (empty($post_id) 
-            || !$intelliwidget_admin->validate_post('iwpage_' . $post_id, 'iwpage', 'edit_post', $post_id)) die('fail');
+            || !$intelliwidget_admin->validate_post('iwadd', '_wpnonce', 'edit_post', $post_id)) die('fail');
         // note that the query string version uses "post" instead of "post_ID"
-        $intelliwidget_admin->ajax_add_tabbed_section($post_id, 'post_meta');
+        $intelliwidget_admin->ajax_add_tabbed_section($post_id, 'post');
     }
     
     /*
@@ -243,17 +253,162 @@ class IntelliWidgetPost {
      * memory leakage from multiple xhr refreshes of multiple copies of the same huge lists.
      */
     // ajax get for posts only - duplicate this for other types
-    function ajax_post_get_select_menus() {
+    function ajax_get_select_menus() {
         global $intelliwidget_admin;
-        $this->is_ajax = true;
+        $intelliwidget_admin->is_ajax = true;
         $post_id = isset($_POST['post_ID']) ? intval($_POST['post_ID']) : NULL;
         $box_id_key = current(preg_grep("/_box_id$/", array_keys($_POST)));
         $box_id = isset($_POST[$box_id_key]) ? intval($_POST[$box_id_key]) : NULL;
         if (empty($post_id) || empty($box_id) || 
-            !$intelliwidget_admin->validate_post('iwpage', 'iwpage_' . $post_id, 'edit_post', $post_id)) die('fail');
-        $intelliwidget_admin->ajax_get_post_select_menus($post_id, $box_id, 'post_meta');
+            !$intelliwidget_admin->validate_post('iwpage_' . $post_id, 'iwpage', 'edit_post', $post_id)) die('fail');
+        $intelliwidget_admin->ajax_get_post_select_menus($post_id, $box_id, 'post');
+    }
+
+    function get_post_settings($instance, $args) {
+        global $intelliwidget, $post;
+        // if there are post-specific settings for this widget, use them
+        if (is_singular() && is_object($post) && ($post_data = $intelliwidget->get_settings_data($post->ID, $args['widget_id'], 'post'))):
+            // check for no-copy override
+            if (empty($post_data['nocopy'])):
+                // if this page is using another page's settings and they exist for this widget, use them
+                if ($other_post_id = get_post_meta($post->ID, '_intelliwidget_widget_page_id', true)) :
+                    $post_data = $intelliwidget->get_settings_data($other_post_id, $args['widget_id'], 'post');
+                endif;
+            endif;
+            if (!empty($post_data)) return $post_data;
+        endif;
+        return $instance;
+    }
+    
+    function post_form($post) {
+        global $intelliwidget_admin;
+        $keys = $intelliwidget_admin->get_custom_fields();
+        $custom_data = get_post_custom($post->ID);
+        $fields = array();
+        foreach ($keys as $field):
+            $key = 'intelliwidget_' . $field;
+            $fields[$key] = empty($custom_data[$key]) ? '' : $custom_data[$key][0];
+        endforeach;
+?>
+<p>
+  <label title="<?php echo $intelliwidget_admin->get_tip('event_date'); ?>" for="intelliwidget_event_date">
+    <?php echo $intelliwidget_admin->get_label('event_date');?>
+    : <a href="#edit_timestamp" id="intelliwidget_event_date-edit" class="intelliwidget-edit-timestamp hide-if-no-js">
+    <?php _e('Edit', 'intelliwidget') ?>
+    </a> <span id="intelliwidget_event_date_timestamp" class="intelliwidget-timestamp"> <?php echo $fields['intelliwidget_event_date'] ?></span></label>
+  <input type="hidden" class="intelliwidget-input" id="intelliwidget_event_date" name="intelliwidget_event_date" value="<?php echo $fields['intelliwidget_event_date'] ?>" autocomplete="off" />
+<div id="intelliwidget_event_date_div" class="intelliwidget-timestamp-div hide-if-js">
+  <?php $this->timestamp('intelliwidget_event_date', $fields['intelliwidget_event_date']); ?>
+</div>
+</p>
+<p>
+  <label title="<?php echo $intelliwidget_admin->get_tip('expire_date'); ?>" for="intelliwidget_expire_date">
+    <?php echo $intelliwidget_admin->get_label('expire_date');?>
+    : <a href="#edit_timestamp" id="intelliwidget_expire_date-edit" class="intelliwidget-edit-timestamp hide-if-no-js">
+    <?php _e('Edit', 'intelliwidget') ?>
+    </a> <span id="intelliwidget_expire_date_timestamp" class="intelliwidget-timestamp"> <?php echo $fields['intelliwidget_expire_date']; ?></span></label>
+  <input type="hidden" class="intelliwidget-input" id="intelliwidget_expire_date" name="intelliwidget_expire_date" value="<?php echo $fields['intelliwidget_expire_date'] ?>" autocomplete="off" />
+<div id="intelliwidget_expire_date_div" class="intelliwidget-timestamp-div hide-if-js">
+  <?php $this->timestamp('intelliwidget_expire_date', $fields['intelliwidget_expire_date']); ?>
+</div>
+</p>
+<p>
+  <label title="<?php echo $intelliwidget_admin->get_tip('alt_title');?>" for="intelliwidget_alt_title">
+    <?php echo $intelliwidget_admin->get_label('alt_title');?>
+    :</label>
+  <input class="intelliwidget-input" type="text" id="intelliwidget_alt_title" name="intelliwidget_alt_title" value="<?php echo $fields['intelliwidget_alt_title'] ?>" autocomplete="off" />
+</p>
+<p>
+  <label title="<?php echo $intelliwidget_admin->get_tip('external_url');?>" for="intelliwidget_external_url">
+    <?php echo $intelliwidget_admin->get_label('external_url');?>
+    :</label>
+  <input class="intelliwidget-input" type="text" id="intelliwidget_external_url" name="intelliwidget_external_url" value="<?php echo $fields['intelliwidget_external_url'] ?>" autocomplete="off" />
+</p>
+<p>
+  <label title="<?php echo $intelliwidget_admin->get_tip('link_classes');?>" for="intelliwidget_link_classes">
+    <?php echo $intelliwidget_admin->get_label('link_classes');?>
+    :</label>
+  <input class="intelliwidget-input" type="text" id="intelliwidget_link_classes" name="intelliwidget_link_classes" value="<?php echo $fields['intelliwidget_link_classes'] ?>" autocomplete="off" />
+</p>
+<p>
+  <label title="<?php echo $intelliwidget_admin->get_tip('link_target');?>" for="intelliwidget_link_target">
+    <?php echo $intelliwidget_admin->get_label('link_target');?>
+    :</label>
+  <select class="intelliwidget-input" id="intelliwidget_link_target" name="intelliwidget_link_target" autocomplete="off" >
+    <?php foreach ($intelliwidget_admin->get_link_target_menu() as $value => $label): ?>
+    <option value="<?php echo $value; ?>" <?php selected($fields['intelliwidget_link_target'], $value); ?>><?php echo $label; ?></option>
+    <?php endforeach; ?>
+  </select>
+</p>
+<div class="iw-cdf-container">
+  <input name="save" class="iw-cdfsave button button-large" id="iw_cdfsave" value="<?php _e('Save Custom Fields', 'intelliwidget');?>" type="button" style="float:right" />
+  <span class="spinner" id="intelliwidget_cpt_spinner"></span> </div>
+<?php wp_nonce_field('iwpage_' . $post->ID,'iwpage'); ?>
+<div style="clear:both"></div>
+<?php
+    }
+    /**
+     * Display timestamp edit fields for IntelliWidget
+     *
+     * @param <string> $field
+     * @param <string> $post_date
+     */
+    function timestamp($field = 'intelliwidget_event_date', $post_date = null) {
+        global $wp_locale;
+
+        $time_adj = current_time('timestamp');
+        $jj = ($post_date) ? mysql2date( 'd', $post_date, false ) : gmdate( 'd', $time_adj );
+        $mm = ($post_date) ? mysql2date( 'm', $post_date, false ) : gmdate( 'm', $time_adj );
+        $aa = ($post_date) ? mysql2date( 'Y', $post_date, false ) : gmdate( 'Y', $time_adj );
+        $hh = ($post_date) ? mysql2date( 'H', $post_date, false ) : gmdate( 'H', $time_adj );
+        $mn = ($post_date) ? mysql2date( 'i', $post_date, false ) : gmdate( 'i', $time_adj );
+        $ss = ($post_date) ? mysql2date( 's', $post_date, false ) : gmdate( 's', $time_adj );
+
+        $cur_jj = gmdate( 'd', $time_adj );
+        $cur_mm = gmdate( 'm', $time_adj );
+        $cur_aa = gmdate( 'Y', $time_adj );
+        $cur_hh = gmdate( 'H', $time_adj );
+        $cur_mn = gmdate( 'i', $time_adj );
+
+        $month = '<select id="'.$field.'_mm" name="'.$field.'_mm" class="intelliwidget-mm">' ."\n";
+        for ( $i = 1; $i < 13; $i = $i +1 ) {
+            $monthnum = zeroise($i, 2);
+            $month .= "            " . '<option value="' . $monthnum . '"';
+            if ( $i == $mm )
+                $month .= ' selected="selected"';
+                /* translators: 1: month number (01, 02, etc.), 2: month abbreviation */
+            $month .= '>' . $wp_locale->get_month_abbrev( $wp_locale->get_month( $i ) ) . "</option>\n";
+        }
+        $month .= '</select>';
+
+        $day = '<input type="text" id="'.$field.'_jj" class="intelliwidget-jj" name="'.$field.'_jj" value="' . $jj . '" size="2" maxlength="2" autocomplete="off" />';
+        $year = '<input type="text" id="'.$field.'_aa" class="intelliwidget-aa" name="'.$field.'_aa" value="' . $aa . '" size="4" maxlength="4" autocomplete="off" />';
+        $hour = '<input type="text" id="'.$field.'_hh" class="intelliwidget-hh" name="'.$field.'_hh" value="' . $hh . '" size="2" maxlength="2" autocomplete="off" />';
+        $minute = '<input type="text" id="'.$field.'_mn" class="intelliwidget-mn" name="'.$field.'_mn" value="' . $mn . '" size="2" maxlength="2" autocomplete="off" />';
+
+        echo '<div class="timestamp-wrap">';
+        /* translators: 1: month input, 2: day input, 3: year input, 4: hour input, 5: minute input */
+        printf(__('%1$s%2$s, %3$s @ %4$s : %5$s', 'intelliwidget'), $month, $day, $year, $hour, $minute);
+
+        echo '</div><input type="hidden" id="'.$field.'_ss" name="'.$field.'_ss" value="' . $ss . '" />';
+
+        echo "\n\n";
+        foreach ( array('mm', 'jj', 'aa', 'hh', 'mn') as $timeunit ) {
+            echo '<input type="hidden" id="'.$field.'_hidden_' . $timeunit . '" name="'.$field.'_hidden_' . $timeunit . '" value="' . (($post_date) ? $$timeunit : '') . '" />' . "\n";
+            $cur_timeunit = 'cur_' . $timeunit;
+            echo '<input type="hidden" id="'. $field . '_' . $cur_timeunit . '" name="'. $field . '_' . $cur_timeunit . '" value="' . $$cur_timeunit . '" />' . "\n";
+        }
+?>
+<p> <a href="#edit_timestamp" id="<?php echo $field; ?>-save" class="intelliwidget-save-timestamp hide-if-no-js button">
+  <?php _e('OK', 'intelliwidget'); ?>
+  </a> <a href="#edit_timestamp" id="<?php echo $field; ?>-clear" class="intelliwidget-clear-timestamp hide-if-no-js button">
+  <?php _e('Clear', 'intelliwidget'); ?>
+  </a> <a href="#edit_timestamp" id="<?php echo $field; ?>-cancel" class="intelliwidget-cancel-timestamp hide-if-no-js">
+  <?php _e('Cancel', 'intelliwidget'); ?>
+  </a> </p>
+<?php
     }
 
 }
-global $intelliwidget_post;
-$intelliwidget_post = new IntelliWidgetPost();
+global $intelliwidget_ext_post;
+$intelliwidget_ext_post = new IntelliWidgetPost();

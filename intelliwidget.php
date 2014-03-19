@@ -45,12 +45,7 @@ class IntelliWidget {
         $this->pluginURL     = plugin_dir_url($file);// . '/';
         $this->templatesPath = $this->pluginPath . 'templates/';
         $this->templatesURL  = $this->pluginURL . 'templates/';        
-
-        add_shortcode('intelliwidget',      array(&$this, 'intelliwidget_shortcode'));
         register_activation_hook($file,     array(&$this, 'intelliwidget_activate'));
-        // thanks to woothemes for this
-        add_action( 'after_setup_theme',    array(&$this, 'ensure_post_thumbnails_support' ) );
-        add_action( 'wp_enqueue_scripts',   array(&$this, 'enqueue_styles'));
     }
 
     /**
@@ -64,7 +59,7 @@ class IntelliWidget {
         // are there settings for this widget?
         if (!empty($id) && !empty($optiontype)):
             switch($optiontype):
-                case 'post_meta':
+                case 'post':
                     if ($instance = unserialize(get_post_meta($id, '_intelliwidget_data_' . $box_id, true))):
                         if (!empty($instance['custom_text'])):
                             // base64 encoding saves us from markup serialization heartburn
@@ -81,37 +76,11 @@ class IntelliWidget {
         endif;
         return false;
     }
-    /**
-     * Front-end css
-     */
-    function enqueue_styles() {
-        global $intelliwidget;
-        wp_enqueue_style('intelliwidget', $this->get_stylesheet(false));
-        if ($override = $this->get_stylesheet(true)):
-            wp_enqueue_style('intelliwidget-custom', $override);
-        endif;
-    }
-    
-    function get_stylesheet($override = false) {
-        if ($override):
-            $file   = '/intelliwidget/intelliwidget.css';
-            if (file_exists(get_stylesheet_directory() . $file)):
-                return get_stylesheet_directory_uri() . $file;
-            elseif (file_exists(get_template_directory() . $file)):
-                return get_template_directory_uri() . $file;
-            else:
-                return false;
-            endif;
-        else:
-            return $this->templatesURL . 'intelliwidget.css';
-        endif;
-        return false;
-    }
-    
+
     function get_box_map($id, $optiontype) {
         if (!empty($id) && !empty($optiontype)):
             switch($optiontype):
-                case 'post_meta':
+                case 'post':
                     if ($box_map = unserialize(get_post_meta($id, '_intelliwidget_map', true))) 
                         return $box_map;
                     break;
@@ -149,6 +118,7 @@ class IntelliWidget {
         // all failures fall through gracefully
         return false;
     }
+
     /**
      * Shortcode handler
      *
@@ -161,10 +131,9 @@ class IntelliWidget {
 
     function intelliwidget_shortcode($atts) {
         global $post;
-        $old_post = $post;
         // section parameter lets us use page-specific IntelliWidgets in shortcode without all the params
         if (is_object($post) && !empty($atts['section'])):
-            $atts = $this->get_settings_data($post->ID, intval($atts['section']), 'post_meta');
+            $atts = $this->get_meta($post->ID, intval($atts['section']), 'post');
             if (empty($atts)): 
                 return;
             endif;
@@ -221,8 +190,8 @@ class IntelliWidget {
         // skip to after widget content if this is custom text only
         if ('only' != $instance['text_position']):
             // use action hook to render content
-            if ( has_action('intelliwidget_' . $instance['content']))
-                do_action('intelliwidget_' . $instance['content'], $instance, $args, $post_id);
+            if ( has_action('intelliwidget_action_' . $instance['content']))
+                do_action('intelliwidget_action_' . $instance['content'], $instance, $args, $post_id);
         endif;
         // handle custom text below content
         do_action('intelliwidget_below_content', $instance, $args);
@@ -230,15 +199,6 @@ class IntelliWidget {
         echo apply_filters('intelliwidget_after_widget', $after_widget, $instance, $args);
     }
     
-    
-    /**
-     * Ensure that "post-thumbnails" support is available for those themes that don't register it.
-     * @return  void
-     */
-    public function ensure_post_thumbnails_support () {
-        if ( ! current_theme_supports( 'post-thumbnails' ) ) { add_theme_support( 'post-thumbnails' ); }
-    } // End ensure_post_thumbnails_support()
-
     /**
      * Widget Defaults
      * This will utilize an options form in a future release for customization
