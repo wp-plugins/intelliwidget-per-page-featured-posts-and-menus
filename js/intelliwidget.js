@@ -4,7 +4,7 @@
  * @package IntelliWidget
  * @subpackage js
  * @author Jason C Fleming
- * @copyright 2013 Lilaea Media LLC
+ * @copyright 2014 Lilaea Media LLC
  * @access public
  *
  */
@@ -16,7 +16,7 @@ jQuery(document).ready(function($) {
     IWAjax.openPanels   = {};
     var     
     /* 
-     * Functions
+     * BEGIN FUNCTIONS -- FIXME: can we combine these ajax calls???
      */
      // store panel open state so it can persist across ajax refreshes
     updateOpenPanels = function(container) {
@@ -26,9 +26,9 @@ jQuery(document).ready(function($) {
         });
     },
     refreshOpenPanels = function(a,b,c) {
-        if (!b.responseText.match(/intelliwidget/)) {
-            return;
-        }
+        // only process IW responses
+        if ('undefined' == typeof b.responseText || !b.responseText.match(/intelliwidget/)) return;
+        
         for (var key in IWAjax.openPanels) {
             if (
                 IWAjax.openPanels.hasOwnProperty(key) 
@@ -183,8 +183,6 @@ jQuery(document).ready(function($) {
             savebutton      = $(sectionform).find('.iw-save'),
             // parse id to get section number
             pre             = 'intelliwidget_' + thisID.split('_')[1],
-            // get option type
-            otype           = $('#otype').val(),
             // build post data array
             postData        = {};
         // disable the button until ajax returns
@@ -196,10 +194,11 @@ jQuery(document).ready(function($) {
         $('body').off('click', savebutton, save_postdata);
         // special handling for post types (array of checkboxes)
         postData[ pre + '_post_types'] = [];
+        postData['iwpage'] = $('#iwpage').val();
+        postData[IWAjax.idfield] = $('#' + IWAjax.idfield).val();
+        console.log(postData);
         // find inputs for this section
-        $('input[name=post_ID],input[name=iwpage],input[type=text][id^='
-            + pre + '],input[type=checkbox][id^=' + pre +']:checked,select[id^='
-            + pre + '],textarea[id^=' + pre + '],input[type=hidden][id^=' + pre + ']').each(
+        sectionform.find('input,select,textarea').each(
             function(index, element) {
             // get field id
             fieldID = $(this).attr('id');
@@ -212,7 +211,7 @@ jQuery(document).ready(function($) {
             }
         });
         // add wp ajax action to array
-        postData['action'] = 'iw_' + otype + '_save';
+        postData['action'] = 'iw_' + IWAjax.objtype + '_save';
         // send to wp
         $.post(  
             // get ajax url from localized object
@@ -221,7 +220,7 @@ jQuery(document).ready(function($) {
             postData,
             //on success function  
             function(response){
-                //console.log(response);
+                console.log(response);
                 if ('fail' == response) {
                     // show red X
                     $(savecontainer).addClass('failure');
@@ -231,7 +230,7 @@ jQuery(document).ready(function($) {
                         curtab = $('#iw_tabs').find('#' + tab.prop('id'));
                     curtab.html(tab.html());
                     sectionform.html(response.form);
-                    bind_events(sectionform);
+                    if ('post' == IWAjax.objtype) bind_events(sectionform);
                     $('#iw_tabbed_sections').tabs('refresh').tabs({active: curtab.index()});
                     // show check mark
                     $(sectionform).find('.iw-save-container').addClass('success');
@@ -241,7 +240,7 @@ jQuery(document).ready(function($) {
                 // hide spinner
                 $('.' + pre + '_spinner').hide();
                 return false;  
-            }, 'json'
+            }//, 'json'
         ).fail(function(){
             // release button
             $(savebutton).prop('disabled', false);
@@ -266,17 +265,13 @@ jQuery(document).ready(function($) {
         // show spinner
         $('#intelliwidget_spinner').show();
         // build post data array
-        var postData = {}
-            // get option type
-            otype           = $('#otype').val();
+        var postData = {};
         // find inputs for this section
-        $('input[name=post_ID],input[name=iwpage],select[id=intelliwidget_widget_page_id]').each(function(index, element) {
-            // get field id
-            fieldID = $(this).attr('id');
-            postData[fieldID] = $(this).val();
-        });
+        postData['iwpage'] = $('#iwpage').val();
+        postData[IWAjax.idfield] = $('#' + IWAjax.idfield).val();
+        postData['intelliwidget_widget_page_id'] = $('#intelliwidget_widget_page_id').val();
         // add wp ajax action to array
-        postData['action'] = 'iw_' + otype + '_copy';
+        postData['action'] = 'iw_' + IWAjax.objtype + '_copy';
         // send to wp
         $.post(  
             // get ajax url from localized object
@@ -324,16 +319,14 @@ jQuery(document).ready(function($) {
             sel      = '#' + thisID,
             // get href from link
             href     = $(this).attr('href'),
-            // get option type
-            otype           = $('#otype').val(),
             // build post data array from query string
             postData = url_to_array(href);
         // show spinner
         $('#intelliwidget_spinner').show();
         // add wp ajax action to array
-        postData['action'] = 'iw_' + otype + '_add';
+        postData['action'] = 'iw_' + IWAjax.objtype + '_add';
         // send to wp
-        //console.log(postData);
+        console.log(postData);
         $.post(  
             // get ajax url from localized object
             IWAjax.ajaxurl,  
@@ -341,7 +334,7 @@ jQuery(document).ready(function($) {
             postData,
             //on success function  
             function(response){
-                //console.log(response);
+                console.log(response);
                 $(sel).removeClass('disabled');
                 $('#intelliwidget_spinner').hide();
                 if ('fail' == response) {
@@ -390,8 +383,6 @@ jQuery(document).ready(function($) {
             sel      = '#' + thisID,
             // get href from link
             href     = $(this).attr('href'),
-            // get option type
-            otype           = $('#otype').val(),
             // build post data array from query string
             postData = url_to_array(href),
             // get box id 
@@ -399,7 +390,7 @@ jQuery(document).ready(function($) {
         // show spinner
         $('.intelliwidget_' + pre + '_spinner').show();
         // add wp ajax action to array
-        postData['action'] = 'iw_' + otype + '_delete';
+        postData['action'] = 'iw_' + IWAjax.objtype + '_delete';
         // send to wp
         $.post(  
         // get ajax url from localized object
@@ -448,8 +439,6 @@ jQuery(document).ready(function($) {
             savecontainer   = $(sectionform).find('.iw-save-container'),
             // get button selector
             savebutton      = $(sectionform).find('.iw-save'),
-            // get option type
-            otype           = $('#otype').val(),
             // build post data array
             postData        = {};
         // only load once
@@ -460,15 +449,19 @@ jQuery(document).ready(function($) {
         // show spinner
         $('.' + pre + '_spinner').show();
         // find inputs for this section
-        $('input[name=post_ID],input[name=iwpage],input[type=hidden][id^=' + pre + ']').each(
+        postData['iwpage'] = $('#iwpage').val();
+        postData[IWAjax.idfield] = $('#' + IWAjax.idfield).val();
+        // add wp ajax action to array
+        postData['action'] = 'iw_' + IWAjax.objtype + '_menus';
+        // find inputs for this section
+        sectionform.find('input[type="hidden"]').each(
             function(index, element) {
             // get field id
             fieldID = $(this).attr('id');
             // add to post data
             postData[fieldID] = $(this).val();
         });
-        // add wp ajax action to array
-        postData['action'] = 'iw_' + otype + '_menus';
+        console.log(postData);
         // send to wp
         $.post(  
             // get ajax url from localized object
@@ -477,7 +470,7 @@ jQuery(document).ready(function($) {
             postData,
             //on success function  
             function(response){
-                //console.log(response);
+                console.log(response);
                 if ('fail' == response) {
                     // show red X
                     $(savecontainer).addClass('failure');
@@ -507,7 +500,7 @@ jQuery(document).ready(function($) {
     },
 
     /**
-     * Ajax Fetch multiselect menus
+     * Ajax Fetch widget multiselect menus
      */
     get_widget_menus = function (){ 
         var sectionform     = $(this).parents('.widget').first(),
@@ -644,26 +637,27 @@ jQuery(document).ready(function($) {
         }
         return true;
     };
-    
-    /*
-     * Bind events
+    /* END OF FUNCTIONS
+     *
+     * START EVENT BINDINGS
      */
     // if panels were open before ajax save, reopen
     $(document).ajaxComplete(refreshOpenPanels);
     $('#iw_tabbed_sections').tabs(); //{ active: 0 });
     
     // bind postbox collapse behavior to widgets admin
-    $('body').on('click', '.iw-collapsible > .handlediv, .iw-collapsible > h4', function(e) {
-        e.stopPropagation();
-        var p = $(this).parent('.postbox'), 
-            //id = p.attr('id'),
-            sectionform = $(this).parents('div.widget').first();
-        p.toggleClass('closed')
-            //.find('#' + id + '-inside')
-            //.stop().slideToggle(function(){});
-        updateOpenPanels(sectionform);
-    });
-    
+    if ('post' != IWAjax.objtype) {
+        $('body').on('click', '.iw-collapsible > .handlediv, .iw-collapsible > h4, .iw-collapsible > h3', function(e) {
+            e.stopPropagation();
+            var p = $(this).parent('.postbox'), 
+                //id = p.attr('id'),
+                sectionform = $(this).parents('div.widget, div.iw-tabbed-section').first();
+            p.toggleClass('closed')
+                //.find('#' + id + '-inside')
+                //.stop().slideToggle(function(){});
+            updateOpenPanels(sectionform);
+        });
+    }
     $('body').on('click', '#iw_tabbed_sections .panel-selection h3, #iw_tabbed_sections .panel-selection .handlediv', get_menus);
     $('body').on('click', '.widget-inside .panel-selection h4, .widget-inside .panel-selection .handlediv', get_widget_menus);
     // bind click events to edit page meta box buttons
@@ -739,6 +733,7 @@ jQuery(document).ready(function($) {
         }
         return false;
     });
+    // bind right and left scroll arrows
     $('#iw_tabbed_sections').on('click', '#iw_larr, #iw_rarr', function(e) {
         e.preventDefault();
         e.stopPropagation();
@@ -747,7 +742,11 @@ jQuery(document).ready(function($) {
             else leftShiftTabs();
         }
     });
+    // reflow tabs on resize
     $(window).resize(reflowTabs);
+    // END EVENT BINDINGS
+    // reveal intelliwidget sections
     $('#iw_tabbed_sections').slideDown();
+    // set up tabs
     initTabs();
 });

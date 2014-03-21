@@ -23,7 +23,7 @@ class IntelliWidget_Widget extends WP_Widget {
         $control_ops         = array('width' => 400, 'height' => 350);
         if (is_admin()):
             add_action('load-widgets.php',                  array(&$this, 'load_widget_form') );
-            add_action('wp_ajax_iw_widget_menus',             array(&$this, 'ajax_get_widget_post_select_menus'));
+            add_action('wp_ajax_iw_widget_menus',           array(&$this, 'ajax_get_widget_post_select_menus'));
         else:
             add_action('intelliwidget_action_post_list',    array(&$this, 'action_post_list'),      10, 3);
             add_action('intelliwidget_action_nav_menu',     array(&$this, 'action_nav_menu'),       10, 3);
@@ -36,7 +36,6 @@ class IntelliWidget_Widget extends WP_Widget {
             // default content actions
             add_action('intelliwidget_above_content',       array(&$this, 'action_addltext_above'), 10, 3);
             add_action('intelliwidget_below_content',       array(&$this, 'action_addltext_below'), 10, 3);
-            add_action( 'after_setup_theme',                array(&$this, 'ensure_post_thumbnails_support' ) );
             add_action( 'wp_enqueue_scripts',               array(&$this, 'enqueue_styles'));
             add_shortcode('intelliwidget',                  array(&$this, 'intelliwidget_shortcode'));
         endif;  
@@ -317,11 +316,10 @@ class IntelliWidget_Widget extends WP_Widget {
     function ajax_get_widget_post_select_menus() {
         global $intelliwidget_admin, $wp_registered_widgets;
         $widget_id = sanitize_text_field($_POST['widget-id']);
-        $intelliwidget_admin->is_ajax = true;
         if ( empty($widget_id) || 
-            !$intelliwidget_admin->validate_post('save-sidebar-widgets', '_wpnonce_widgets', 'edit_theme_options') 
+            !$intelliwidget_admin->validate_post('save-sidebar-widgets', '_wpnonce_widgets', 'edit_theme_options', true) 
             ) return false;
-        
+        $intelliwidget_admin->admin_init();
         // getting to the widget info is a complicated task ...
         if (isset($wp_registered_widgets[$widget_id])):
             if (isset($wp_registered_widgets[$widget_id]['callback']) && isset($wp_registered_widgets[$widget_id]['params'])
@@ -330,7 +328,6 @@ class IntelliWidget_Widget extends WP_Widget {
                     $params = $wp_registered_widgets[$widget_id]['params'][0];
                     $settings = $widget->get_settings($widget_id);
                     $instance = $settings[$params['number']];
-                    if (!isset($intelliwidget_admin->lists)) $intelliwidget_admin->admin_init();
                     include_once('class-intelliwidget-form.php');
                     $this->widget_form = new IntelliWidgetForm();
                     ob_start();
@@ -343,14 +340,6 @@ class IntelliWidget_Widget extends WP_Widget {
         die('fail');
     }
   
-    /**
-     * Ensure that "post-thumbnails" support is available for those themes that don't register it.
-     * @return  void
-     */
-    public function ensure_post_thumbnails_support () {
-        if ( ! current_theme_supports( 'post-thumbnails' ) ) { add_theme_support( 'post-thumbnails' ); }
-    } // End ensure_post_thumbnails_support()
-
 }
 
 // initialize the widget

@@ -130,3 +130,7 @@ li.iw-tab {
     padding:2px 0 0 6px;
     cursor:pointer;
 }
+
+.wrap .postbox h2, .wrap .postbox h3, .wrap .postbox h4 {
+    padding: 8px 12px;
+}

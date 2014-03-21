@@ -20,28 +20,32 @@ class IntelliWidgetMetaBox {
         add_action('intelliwidget_metabox_all_after',   array($this, 'general_settings'), 10, 3);
     }
 
-    function page_form($id, $optiontype, $id_list) {
+    function copy_form($id, $id_list) {
         
         global $intelliwidget_admin;
         echo $intelliwidget_admin->docsLink; ?>
 
 <p>
-  <input type="hidden" id="otype" name="otype" value="<?php echo $optiontype; ?>" />
   <label title="<?php echo $intelliwidget_admin->get_tip('widget_page_id');?>" for="<?php echo 'intelliwidget_widget_page_id'; ?>">
     <?php echo $intelliwidget_admin->get_label('widget_page_id'); ?>
     : </label>
   <input name="save" class="iw-copy button button-large" id="iw_copy" value="<?php _e('Save', 'intelliwidget'); ?>" type="button" style="max-width:24%;float:right;clear:both;margin-top:4px" />
   <?php echo $id_list; ?>
 </p>
-<div class="iw-copy-container"> <span class="spinner" id="intelliwidget_spinner"></span> </div>
-<a title="<?php echo $intelliwidget_admin->get_tip('iw_add'); ?>" style="float:left;" href="<?php echo wp_nonce_url(admin_url('post.php?action=edit&iwadd=1&post=' . $id), 'iwadd'); ?>" id="iw_add" class="iw-add">
+<?php
+    }
+    function add_form($id) {
+        global $intelliwidget_admin;
+?>
+<div class="iw-copy-container"> 
+<span class="spinner" id="intelliwidget_spinner"></span> </div>
+<a title="<?php echo $intelliwidget_admin->get_tip('iw_add'); ?>" style="float:left;" href="<?php echo $intelliwidget_admin->get_nonce_url($id, 'add'); ?>" id="iw_add" class="iw-add">
 <?php echo $intelliwidget_admin->get_label('iw_add'); ?>
 </a>
 <?php wp_nonce_field('iwpage_' . $id,'iwpage'); ?>
 <div style="clear:both"></div>
 <?php
     }
-    
     function metabox($id, $box_id, $instance) {
         global $intelliwidget_admin;
         ?>
@@ -68,7 +72,7 @@ class IntelliWidgetMetaBox {
 <div class="iw-save-container">
   <input name="save" class="button button-large iw-save" id="<?php echo 'intelliwidget_' . $box_id . '_save'; ?>" value="<?php _e('Save Settings', 'intelliwidget'); ?>" type="button" style="float:right" autocomplete="off" />
   <span class="spinner <?php echo 'intelliwidget_' . $box_id . '_spinner'; ?>"></span> </div>
-<a style="float:left;" href="<?php echo wp_nonce_url(admin_url('post.php?action=edit&iwdelete='.$box_id.'&post=' . $id), 'iwdelete'); ?>" id="iw_delete_<?php echo $box_id; ?>" class="iw-delete">
+<a style="float:left;" href="<?php echo $intelliwidget_admin->get_nonce_url($id, 'delete', $box_id); ?>" id="iw_delete_<?php echo $box_id; ?>" class="iw-delete">
 <?php _e('Delete', 'intelliwidget'); ?>
 </a>
 <div style="clear:both"></div>
@@ -78,7 +82,7 @@ class IntelliWidgetMetaBox {
     function general_settings($id, $box_id, $instance) {
         global $intelliwidget_admin;
         ?>
-<div id="iw-generalsettings-<?php echo $box_id; ?>" class="postbox closed panel-general">
+<div id="iw-generalsettings-<?php echo $box_id; ?>" class="postbox closed iw-collapsible panel-general">
   <div class="handlediv" title="<?php _e('Click to toggle', 'intelliwidget'); ?>"></div>
   <h3 title="<?php echo $intelliwidget_admin->get_tip('generalsettings'); ?>"><span>
     <?php echo $intelliwidget_admin->get_label('generalsettings'); ?>
@@ -128,7 +132,7 @@ class IntelliWidgetMetaBox {
     function addl_text_settings($id, $box_id, $instance) {
         global $intelliwidget_admin;
         ?>
-<div id="iw-addltext-<?php echo $box_id; ?>" class="postbox closed panel-addltext">
+<div id="iw-addltext-<?php echo $box_id; ?>" class="postbox closed iw-collapsible panel-addltext">
   <div class="handlediv" title="<?php _e('Click to toggle', 'intelliwidget'); ?>"></div>
   <h3 title="<?php echo $intelliwidget_admin->get_tip('addltext'); ?>"><span>
     <?php echo $intelliwidget_admin->get_label('addltext'); ?>
@@ -159,7 +163,7 @@ class IntelliWidgetMetaBox {
     function appearance_settings($id, $box_id, $instance) {
         global $intelliwidget_admin, $_wp_additional_image_sizes;
         ?>
-<div id="iw-appearance-<?php echo $box_id; ?>" class="postbox closed panel-appearance">
+<div id="iw-appearance-<?php echo $box_id; ?>" class="postbox closed iw-collapsible panel-appearance">
   <div class="handlediv" title="<?php _e('Click to toggle', 'intelliwidget'); ?>"></div>
   <h3 title="<?php echo $intelliwidget_admin->get_tip('appearance'); ?>"><span>
     <?php echo $intelliwidget_admin->get_label('appearance'); ?>
@@ -249,7 +253,7 @@ class IntelliWidgetMetaBox {
     function post_selection_settings($id, $box_id, $instance) {
         global $intelliwidget_admin;
         ?>
-<div id="iw-selection-<?php echo $box_id; ?>" class="postbox closed panel-selection">
+<div id="iw-selection-<?php echo $box_id; ?>" class="postbox closed iw-collapsible panel-selection">
   <div class="handlediv" title="<?php _e('Click to toggle', 'intelliwidget'); ?>"></div>
   <h3 title="<?php echo $intelliwidget_admin->get_tip('selection'); ?>"><span>
     <?php echo $intelliwidget_admin->get_label('selection'); ?>

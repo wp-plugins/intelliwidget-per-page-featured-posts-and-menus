@@ -2,7 +2,7 @@
 // Exit if accessed directly
 if ( !defined('ABSPATH')) exit;
 /**
- * class-walker-intelliwidget.php - IntelliWidget Walker Class
+ * class-intelliwidget-walker.php - IntelliWidget Walker Class
  * based in part on code from Wordpress core post-template.php
  *
  * @package IntelliWidget

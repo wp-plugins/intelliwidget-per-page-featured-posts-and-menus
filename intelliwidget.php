@@ -24,6 +24,7 @@ class IntelliWidget {
     var $pluginURL;
     var $templatesPath;
     var $templatesURL;
+    var $metacache;
     var $dir;
     /**
      * Object constructor
@@ -46,6 +47,7 @@ class IntelliWidget {
         $this->templatesPath = $this->pluginPath . 'templates/';
         $this->templatesURL  = $this->pluginURL . 'templates/';        
         register_activation_hook($file,     array(&$this, 'intelliwidget_activate'));
+        add_action( 'after_setup_theme',                array(&$this, 'ensure_post_thumbnails_support' ) );
     }
 
     /**
@@ -55,40 +57,36 @@ class IntelliWidget {
         
     }
 
-    function get_meta($id, $box_id, $optiontype) {
+    function get_meta($id, $optionname, $objecttype, $index = NULL) {
         // are there settings for this widget?
-        if (!empty($id) && !empty($optiontype)):
-            switch($optiontype):
-                case 'post':
-                    if ($instance = unserialize(get_post_meta($id, '_intelliwidget_data_' . $box_id, true))):
-                        if (!empty($instance['custom_text'])):
-                            // base64 encoding saves us from markup serialization heartburn
-                            $instance['custom_text'] = stripslashes(base64_decode($instance['custom_text']));
-                        endif;
-                        return $instance;
-                    endif;
+        if (!empty($id) && !empty($objecttype)):
+            switch($objecttype):
+                case 'post':               
+                    if (isset($index)) $optionname .= $index;
+                    $instance = maybe_unserialize(get_post_meta($id, $optionname, true));
                     break;
                 default:
-                    $optionname = 'intelliwidget_data_' . $optiontype . '_' . $id;
-                    if ($instance = unserialize(get_option($optionname)))
-                        return $instance;
+                    $optionname = 'intelliwidget_data_' . $objecttype . '_' . $id;
+                    if ($data = get_option($optionname)):
+                        if (isset($index) && isset($data[$index])):
+                            $instance = $data[$index];
+                        endif;
+                    endif;
             endswitch;
+            if (!empty($instance)):
+                if (!empty($instance['custom_text']))
+                    // base64 encoding saves us from markup serialization heartburn
+                    $instance['custom_text'] = stripslashes(base64_decode($instance['custom_text']));
+                return $instance;
+            endif;
         endif;
         return false;
     }
 
-    function get_box_map($id, $optiontype) {
-        if (!empty($id) && !empty($optiontype)):
-            switch($optiontype):
-                case 'post':
-                    if ($box_map = unserialize(get_post_meta($id, '_intelliwidget_map', true))) 
-                        return $box_map;
-                    break;
-                default:
-                    $optionname = 'intelliwidget_map_' . $optiontype . '_' . $id;
-                    if ($box_map = unserialize(get_option($optionname)))
-                        return $box_map;
-            endswitch;
+    function get_box_map($id, $objecttype) {
+        if (!empty($id) && !empty($objecttype)):
+            if ($data = $this->get_meta($id, '_intelliwidget_', $objecttype, 'map')) 
+                return $data;
         endif;
         return array();
     }
@@ -101,16 +99,16 @@ class IntelliWidget {
      * @param <string> $widget_id
      * @return <array> if exists or false if empty
      */
-    function get_settings_data($id, $widget_id, $optiontype) {
+    function get_settings_data($id, $widget_id, $objecttype) {
         // the box map stores meta box => widget id relations in page meta data
-        $box_map = $this->get_box_map($id, $optiontype);
+        $box_map = $this->get_box_map($id, $objecttype);
         if (is_array($box_map)):
             $widget_map = array_flip($box_map);
             // if two boxes point to the same widget, the second gets clobbered here
             if (array_key_exists($widget_id, $widget_map)):
                 $box_id = $widget_map[$widget_id];
                 // are there settings for this widget?
-                if ($instance = $this->get_meta($id, $box_id, $optiontype)):
+                if ($instance = $this->get_meta($id, '_intelliwidget_data_', $objecttype, $box_id)):
                     return $instance;
                 endif;
             endif;
@@ -133,7 +131,7 @@ class IntelliWidget {
         global $post;
         // section parameter lets us use page-specific IntelliWidgets in shortcode without all the params
         if (is_object($post) && !empty($atts['section'])):
-            $atts = $this->get_meta($post->ID, intval($atts['section']), 'post');
+            $atts = $this->get_meta($post->ID, '_intelliwidget_data_', 'post', intval($atts['section']));
             if (empty($atts)): 
                 return;
             endif;
@@ -200,6 +198,14 @@ class IntelliWidget {
     }
     
     /**
+     * Ensure that "post-thumbnails" support is available for those themes that don't register it.
+     * @return  void
+     */
+    public function ensure_post_thumbnails_support () {
+        if ( ! current_theme_supports( 'post-thumbnails' ) ) { add_theme_support( 'post-thumbnails' ); }
+    } // End ensure_post_thumbnails_support()
+
+    /**
      * Widget Defaults
      * This will utilize an options form in a future release for customization
      * @param <array> $instance
@@ -253,7 +259,6 @@ class IntelliWidget {
 
 define('INTELLIWIDGET_VERSION', '1.5.0');
 
-//require_once( 'includes/class-intelliwidget.php' );
 include_once( 'includes/class-intelliwidget-widget.php' );
 include_once( 'includes/class-intelliwidget-post.php' );
 include_once( 'includes/class-intelliwidget-query.php'  );
