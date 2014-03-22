@@ -37,10 +37,9 @@ class IntelliWidgetPost {
 
     function metabox_actions() {
         global $intelliwidget_admin;
-        $intelliwidget_admin->admin_init('post', 'post_ID');
+        if (!isset($intelliwidget_admin->objecttype)) $intelliwidget_admin->admin_init('post', 'post_ID');
         add_action('add_meta_boxes',            array(&$this, 'main_meta_box'));
         add_action('add_meta_boxes',            array(&$this, 'post_meta_box'));
-        add_filter('intelliwidget_object_id',   array(&$this, 'get_object_id' ));
     }
     /**
      * Generate input form that applies to entire page (add new, copy settings)
@@ -49,7 +48,7 @@ class IntelliWidgetPost {
     function main_meta_box() {
         // set up meta boxes
         global $intelliwidget_admin;
-        $intelliwidget_admin->init_metabox();
+        $intelliwidget_admin->metabox_init();
         foreach ($intelliwidget_admin->post_types as $type):
             add_meta_box( 
                 'intelliwidget_main_meta_box',
@@ -97,8 +96,8 @@ class IntelliWidgetPost {
      */
     function main_meta_box_form($post, $metabox) {
         global $intelliwidget_admin;
-        $intelliwidget_admin->metabox->copy_form($post->ID, 'post', $this->get_id_list($post));
-        $intelliwidget_admin->render_tabbed_sections($post->ID, 'post');
+        $intelliwidget_admin->metabox->copy_form($post->ID, $this->get_id_list($post));
+        $intelliwidget_admin->render_tabbed_sections($post->ID);
     }
     
     function get_id_list($post) {
@@ -111,10 +110,6 @@ class IntelliWidgetPost {
   </select>';
     }
     
-    function get_object_id($id) {
-        $id = 'post_ID';
-        return $id;
-    }
     /**
      * Output the form in the post meta box. Params are passed by add_meta_box() function
      * @param <object> $post
@@ -146,22 +141,24 @@ class IntelliWidgetPost {
         if (empty($post_id) || 
             !$intelliwidget_admin->validate_post('iwpage_' . $post_id, 'iwpage', 'edit_post', false, $post_id)) return false;
 
-        $intelliwidget_admin->save_data($post_id, 'post');
+        $intelliwidget_admin->admin_init('post', 'post_ID');
+
+        $intelliwidget_admin->save_data($post_id);
         // save custom post data if it exists
-        $this->save_cdfdata();
+        $this->save_cdfdata($post_id);
         // save copy page id (i.e., "use settings from ..." ) if it exists
-        $intelliwidget_admin->save_copy_id($post_id, 'post');
+        $intelliwidget_admin->save_copy_id($post_id);
     }
 
     function save_cdfdata($post_id) {
         global $intelliwidget_admin;
         // reset the data array
         $prefix    = 'intelliwidget_';
-        foreach ($this->get_custom_fields() as $cfield):
+        foreach ($intelliwidget_admin->get_custom_fields() as $cfield):
             $cdfield = $prefix . $cfield;
             if (array_key_exists($cdfield, $_POST)):
                 if (empty($_POST[$cdfield])):
-                    $intelliwidget_admin->delete_meta($post_id, $cdfield, 'post');
+                    $intelliwidget_admin->delete_meta($post_id, $cdfield);
                 else:
                     $newdata = $_POST[$cdfield];
                     if ( !current_user_can('unfiltered_html') ):
@@ -183,7 +180,7 @@ class IntelliWidgetPost {
         $box_id = isset($_POST[$box_id_key]) ? intval($_POST[$box_id_key]) : NULL;
         if (empty($post_id) || empty($box_id) || 
             !$intelliwidget_admin->validate_post('iwpage_' . $post_id, 'iwpage', 'edit_post', true, $post_id)) die('fail');
-        $intelliwidget_admin->ajax_save_data($post_id, $box_id, 'post');
+        $intelliwidget_admin->ajax_save_data($post_id, $box_id);
     }
     
     // ajax copy for posts only - duplicate this for other types
@@ -194,7 +191,7 @@ class IntelliWidgetPost {
         if (empty($post_id) ||  
             !$intelliwidget_admin->validate_post('iwpage_' . $post_id, 'iwpage', 'edit_post', true, $post_id)) die('fail');
 
-        if (false === $intelliwidget_admin->save_copy_id($post_id, 'post')) die('fail');
+        if (false === $intelliwidget_admin->save_copy_id($post_id)) die('fail');
         die('success');
     }
     
@@ -218,7 +215,7 @@ class IntelliWidgetPost {
         $box_id = isset($_POST['iwdelete']) ? intval($_POST['iwdelete']) : NULL;
         if (empty($post_id) || empty($box_id) || 
             !$intelliwidget_admin->validate_post('iwdelete', '_wpnonce', 'edit_post', true, $post_id)) die('fail');
-        if (false === $intelliwidget_admin->delete_tabbed_section($post_id, $box_id, 'post')) die('fail');
+        if (false === $intelliwidget_admin->delete_tabbed_section($post_id, $box_id)) die('fail');
         die('success');
     }
 
@@ -231,7 +228,7 @@ class IntelliWidgetPost {
         if (empty($post_id) 
             || !$intelliwidget_admin->validate_post('iwadd', '_wpnonce', 'edit_post', true, $post_id)) die('fail');
         // note that the query string version uses "post" instead of "post_ID"
-        $intelliwidget_admin->ajax_add_tabbed_section($post_id, 'post');
+        $intelliwidget_admin->ajax_add_tabbed_section($post_id);
     }
     
     /*
@@ -252,13 +249,13 @@ class IntelliWidgetPost {
         $box_id = isset($_POST[$box_id_key]) ? intval($_POST[$box_id_key]) : NULL;
         if (empty($post_id) || empty($box_id) || 
             !$intelliwidget_admin->validate_post('iwpage_' . $post_id, 'iwpage', 'edit_post', true, $post_id)) die('fail');
-        $intelliwidget_admin->ajax_get_post_select_menus($post_id, $box_id, 'post');
+        $intelliwidget_admin->ajax_get_post_select_menus($post_id, $box_id);
     }
 
     function get_post_settings($instance, $args) {
         global $intelliwidget, $post;
         // if there are post-specific settings for this widget, use them
-        if (is_singular() 
+        if (is_singular() // this is an individual post, custom post type or page
             && is_object($post) 
             && isset($args['widget_id'])
             && ($post_data = $intelliwidget->get_settings_data($post->ID, $args['widget_id'], 'post'))):

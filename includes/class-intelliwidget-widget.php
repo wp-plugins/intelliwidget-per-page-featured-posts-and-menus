@@ -43,7 +43,7 @@ class IntelliWidget_Widget extends WP_Widget {
     }
     
     /**
-     * Main widget logic - determine if this is a customized page, copied page or global widget
+     * intelliwidget_extension_settings filter allows widget instance to be replaced by extensions
      *
      * @param <array> $args
      * @param <array> $instance
@@ -220,6 +220,8 @@ class IntelliWidget_Widget extends WP_Widget {
     }
 
     function action_post_list($instance = array(), $args = array(), $post_id = NULL) {
+        // skip to after widget content if this is custom text only
+        if ('only' == $instance['text_position']) return;
         if (!empty($instance['template'])):
             if (has_action('intelliwidget_action_' . $instance['template'])):
                 do_action('intelliwidget_action_' . $instance['template'], $instance);
@@ -238,6 +240,8 @@ class IntelliWidget_Widget extends WP_Widget {
         endif;
     }
     function action_nav_menu($instance = array(), $args = array(), $post_id = NULL) {
+        // skip to after widget content if this is custom text only
+        if ('only' == $instance['text_position']) return;
         if (!empty($instance['nav_menu'])):
             if ('-1' == $instance['nav_menu'] ):
                 wp_page_menu( array( 

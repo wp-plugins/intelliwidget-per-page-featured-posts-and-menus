@@ -185,12 +185,9 @@ class IntelliWidget {
         endif;
         // handle custom text above content
         do_action('intelliwidget_above_content', $instance, $args);
-        // skip to after widget content if this is custom text only
-        if ('only' != $instance['text_position']):
-            // use action hook to render content
-            if ( has_action('intelliwidget_action_' . $instance['content']))
-                do_action('intelliwidget_action_' . $instance['content'], $instance, $args, $post_id);
-        endif;
+        // use action hook to render content
+        if ( has_action('intelliwidget_action_' . $instance['content']))
+            do_action('intelliwidget_action_' . $instance['content'], $instance, $args, $post_id);
         // handle custom text below content
         do_action('intelliwidget_below_content', $instance, $args);
         // render after widget argument

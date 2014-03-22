@@ -103,7 +103,7 @@ class IntelliWidgetMetaBox {
       <label title="<?php echo $intelliwidget_admin->get_tip('link_title'); ?>">
         <input name="<?php echo 'intelliwidget_' . $box_id . '_link_title'; ?>" id="<?php echo 'intelliwidget_' . $box_id . '_link_title'; ?>" type="checkbox" <?php checked($instance['link_title'], 1); ?> value="1" />
         <?php echo $intelliwidget_admin->get_label('link_title'); ?>
-      </label>
+      </label><br/>
       <input id="<?php echo 'intelliwidget_' . $box_id . '_title'; ?>" name="<?php echo 'intelliwidget_' . $box_id . '_title'; ?>" type="text" value="<?php echo esc_attr($instance['title']); ?>" />
     </p>
     <p>
@@ -320,7 +320,7 @@ class IntelliWidgetMetaBox {
     <p>
       <label title="<?php echo $intelliwidget_admin->get_tip('terms'); ?>">
         <?php echo $intelliwidget_admin->get_label('terms'); ?>
-        :</label>
+        :</label><br/>
       <select class="widefat intelliwidget-multiselect" name="<?php echo 'intelliwidget_' . $box_id . '_terms'; ?>[]" size="1" multiple="multiple" id="<?php echo 'intelliwidget_' . $box_id . '_terms'; ?>">
         <?php echo $intelliwidget_admin->get_terms_list($instance); ?>
       </select>
@@ -328,7 +328,7 @@ class IntelliWidgetMetaBox {
     <p>
       <label title="<?php echo $intelliwidget_admin->get_tip('page'); ?>">
         <?php echo $intelliwidget_admin->get_label('page'); ?>
-        :</label>
+        :</label><br/>
       <select class="widefat intelliwidget-multiselect" name="<?php echo 'intelliwidget_' . $box_id . '_page'; ?>[]" size="1" multiple="multiple" id="<?php echo 'intelliwidget_' . $box_id . '_page'; ?>">
         <?php echo $intelliwidget_admin->get_posts_list($instance); ?>
       </select>

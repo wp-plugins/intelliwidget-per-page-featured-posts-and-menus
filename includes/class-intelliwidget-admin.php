@@ -30,11 +30,12 @@ class IntelliWidgetAdmin {
     }
 
     /**
-     * Stub for registering scripts in future release.
+     * Configures the admin object for this request
      */
     function admin_init($objecttype = '', $idfield = '') {
             include_once( 'class-intelliwidget-list.php' );
             include_once( 'class-intelliwidget-walker.php' );
+            // this property tells IW how to set/get options (post uses post_meta, others use options table)
             $this->objecttype       = $objecttype;
             // cache lists and labels
             $this->lists            = new IntelliWidgetList();
@@ -55,7 +56,8 @@ class IntelliWidgetAdmin {
     
     
     /**
-     * Stub for printing the scripts needed for the admin.
+     * Output scripts to the admin. 
+     * @param <string> $idfield - the input field name to use as the object id
      */
     function admin_scripts($idfield) {
         global $intelliwidget;
@@ -69,7 +71,7 @@ class IntelliWidgetAdmin {
         ));
     }
      
-    function init_metabox() {
+    function metabox_init() {
         include_once('class-intelliwidget-metabox.php');
         $this->metabox = new IntelliWidgetMetaBox();
     }
@@ -225,7 +227,7 @@ class IntelliWidgetAdmin {
     function ajax_save_data($id, $box_id) {
         if (false === $this->save_data($id, $this->objecttype)) die('fail'); 
         global $intelliwidget;
-        $this->init_metabox();
+        $this->metabox_init();
         add_action('intelliwidget_post_selection_menus', array($this->metabox, 'post_selection_menus'), 10, 4);
         $instance = $intelliwidget->defaults($intelliwidget->get_meta($id, '_intelliwidget_data_', $this->objecttype, $box_id));
         die(json_encode(array(
@@ -238,7 +240,7 @@ class IntelliWidgetAdmin {
     function ajax_add_tabbed_section($id) {
         if (!($box_id = $this->add_tabbed_section($id))) die('fail');
         global $intelliwidget;
-        $this->init_metabox();
+        $this->metabox_init();
         $instance = $intelliwidget->defaults();
         $response = array(
                 'tab'   => $this->get_tab($box_id, $instance['replace_widget']),
@@ -259,7 +261,7 @@ class IntelliWidgetAdmin {
     // use this for all gets
     function ajax_get_post_select_menus($id, $box_id) {
         global $intelliwidget;
-        $this->init_metabox();
+        $this->metabox_init();
         $instance = $intelliwidget->defaults($intelliwidget->get_meta($id, '_intelliwidget_data_', $this->objecttype, $box_id));
         ob_start();
         $this->metabox->post_selection_menus($id, $box_id, $instance);
@@ -428,6 +430,7 @@ class IntelliWidgetAdmin {
             case 'post':
                 if (isset($index)) $optionname .= $index;
                 $serialized = maybe_serialize($data);
+                
                 update_post_meta($id, $optionname, $serialized);
                 break;
             default:

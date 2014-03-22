@@ -61,6 +61,7 @@ select.intelliwidget-multiselect {
     resize:both;
     font-size:x-small;
     min-height:100px;
+    max-width:600px;
 }
 
 #intelliwidget_main_meta_box .postbox {
@@ -133,4 +134,5 @@ li.iw-tab {
 
 .wrap .postbox h2, .wrap .postbox h3, .wrap .postbox h4 {
     padding: 8px 12px;
+    margin:0;
 }
