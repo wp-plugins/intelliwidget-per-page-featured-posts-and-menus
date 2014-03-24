@@ -18,7 +18,11 @@ class IntelliWidgetList {
     
     function __construct() {
         $this->labels = array(
-            'hide_if_empty'     =>  __('Placeholder Only (do not display)', 'intelliwidget'),
+            'metabox_title'     => __('IntelliWidget Profile', 'intelliwidget'),
+            
+            'cdf_title'         => __('IntelliWidget Custom Fields', 'intelliwidget'),
+            
+            'hide_if_empty'     => __('Placeholder Only (do not display)', 'intelliwidget'),
 
             'generalsettings'   => __('General Settings', 'intelliwidget'),
 
@@ -34,15 +38,15 @@ class IntelliWidgetList {
 
             'addltext'          => __('Additional Text/HTML', 'intelliwidget'),
 
-            'text_position'     => __( 'Display', 'intelliwidget'),
+            'text_position'     => __('Display', 'intelliwidget'),
 
             'filter'            => __('Automatically add paragraphs', 'intelliwidget'),
 
-            'appearance'        => __('Appearance Settings', 'intelliwidget'),
+            'appearance'        => __('Appearance', 'intelliwidget'),
 
             'template'          => __('Template', 'intelliwidget'),
 
-            'sortby'            => __( 'Sort posts by', 'intelliwidget'),
+            'sortby'            => __('Sort posts by', 'intelliwidget'),
 
             'items'             => __('Max posts', 'intelliwidget'),
 
@@ -56,7 +60,7 @@ class IntelliWidgetList {
 
             'image_size'        => __('Image Size', 'intelliwidget'),
 
-            'selection'         => __('Post Selection Settings', 'intelliwidget'),
+            'selection'         => __('Post Selection', 'intelliwidget'),
 
             'post_types'        => __('Select from these Post Types', 'intelliwidget'),
 
@@ -90,9 +94,9 @@ class IntelliWidgetList {
             
             'link_target'       => __('Link Target', 'intelliwidget'),
             
-            'replace_widget'    => __( 'Use these settings to replace', 'intelliwidget'),
+            'replace_widget'    => __('Use these settings to replace', 'intelliwidget'),
             
-            'nocopy'            => __('Use these settings even if using settings from another page/post', 'intelliwidget'),
+            'nocopy'            => __('Use these settings even if using settings from another profile', 'intelliwidget'),
 );
 
         $this->tips = array(
@@ -152,7 +156,7 @@ class IntelliWidgetList {
 
             'nav_menu'          => __("This menu controls the Navigation Menu to be displayed in this IntelliWidget section. To show all pages (including a home page), use the 'Automatic Page Menu' option. Nav Menus are customized from Appearance > Menus in the WordPress admin.", 'intelliwidget'),
             
-            'widget_page_id'    => __("If this post will display the same IntelliWidgets as another post, you can use the other post's settings by selecting it from this menu.", 'intelliwidget'),
+            'widget_page_id'    => __("Instead entering new settings below, you can reuse all the settings from another IntelliWidget Profile by selecting it from this menu.", 'intelliwidget'),
             
             'iw_add'            => __('Click to add a new IntelliWidget section tab.', 'intelliwidget'),
             
@@ -183,7 +187,7 @@ class IntelliWidgetList {
             'replaces' => apply_filters('intelliwidget_replaces_menu', 
                 array(
                     'none'      => __('Unassigned', 'intelliwidget'),
-                    'content'   => __('Shortcode [intelliwidget section=tab#]', 'intelliwidget'),
+                    'content'   => __('Shortcode in Post Content', 'intelliwidget'),
                     )
                 ),
             'text_position' => apply_filters('intelliwidget_text_position_menu', 

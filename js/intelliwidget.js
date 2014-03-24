@@ -45,69 +45,80 @@ jQuery(document).ready(function($) {
         }
     },
     initTabs = function() {
-        IWAjax.viewWidth    = 0;
-        IWAjax.visWidth     = 0;
-        IWAjax.leftTabs     = []; 
-        IWAjax.rightTabs    = [];
-        IWAjax.visTabs      = [];
-        $('.iw-tab').each(function(){
-            IWAjax.visTabs.push($(this).prop('id'));
-            IWAjax.visWidth += $(this).outerWidth();
-            $(this).show();
+        $('.iw-tabbed-sections').each(function(){
+            var container = $(this);
+            container.data('viewWidth', 0);
+            container.data('visWidth',  0);
+            container.data('leftTabs',  []); 
+            container.data('rightTabs', []);
+            container.data('visTabs',   []);
+            container.find('.iw-tab').each(function(){
+                container.data('visTabs').push($(this).prop('id'));
+                container.data('visWidth', container.data('visWidth') + $(this).outerWidth());
+                $(this).show();
+            });
         });
         reflowTabs();
     },
     reflowTabs = function() {
-        IWAjax.viewWidth = $('#iw_tabs').width() - 24; // minus space for arrows
-        if (IWAjax.viewWidth > 0) {
-            count = 0;
-            while (IWAjax.visTabs.length && IWAjax.visWidth > IWAjax.viewWidth) {
-                var leftMost = IWAjax.visTabs.shift(),
-                    tabWidth = $('#' + leftMost).outerWidth();
-                IWAjax.visWidth -= tabWidth;
-                $('#' + leftMost).hide();
-                IWAjax.leftTabs.push(leftMost);
-                if (++count > 50) break; // infinite loop safety check
+        $('.iw-tabbed-sections').each(function(){
+            var container = $(this);
+            container.data('viewWidth', container.find('.iw-tabs').width() - 24); // minus space for arrows
+            if (container.data('viewWidth') > 0) {
+                count = 0;
+                while (container.data('visTabs').length && container.data('visWidth') > container.data('viewWidth')) {
+                    var leftMost = container.data('visTabs').shift(),
+                        tabWidth = $('#' + leftMost).outerWidth();
+                    container.data('visWidth', container.data('visWidth') - tabWidth);
+                    $('#' + leftMost).hide();
+                    container.data('leftTabs').push(leftMost);
+                    if (++count > 50) break; // infinite loop safety check
+                }
             }
-        }
+        });
         setArrows();
     },
-    rightShiftTabs = function() {
+    rightShiftTabs = function(el) {
         // left arrow clicked, shift all tabs to the right
-        var rightMost;
-        if (rightMost = IWAjax.visTabs.pop()) {
-            IWAjax.visWidth -= $('#' + rightMost).outerWidth();
+        var container = el.parent('.iw-tabbed-sections'),
+            rightMost;
+        if (rightMost = container.data('visTabs').pop()) {
+            container.data('visWidth', container.data('visWidth') - $('#' + rightMost).outerWidth());
             $('#' + rightMost).hide();
-            IWAjax.rightTabs.unshift(rightMost);
+            container.data('rightTabs').unshift(rightMost);
         }
-        if (rightMost = IWAjax.leftTabs.pop()){
-            IWAjax.visWidth += $('#' + rightMost).outerWidth();
+        if (rightMost = container.data('leftTabs').pop()){
+            container.data('visWidth', container.data('visWidth') + $('#' + rightMost).outerWidth());
             $('#' + rightMost).show();
-            IWAjax.visTabs.unshift(rightMost);
+            container.data('visTabs').unshift(rightMost);
         }
         setArrows();
     },
-    leftShiftTabs = function() {
+    leftShiftTabs = function(el) {
         // right arrow clicked, shift all tabs to the left
-        var leftMost;
-        if (leftMost = IWAjax.visTabs.shift()) {
-            IWAjax.visWidth -= $('#' + leftMost).outerWidth();
+        var container = el.parent('.iw-tabbed-sections'),
+            leftMost;
+        if (leftMost = container.data('visTabs').shift()) {
+            container.data('visWidth', container.data('visWidth') - $('#' + leftMost).outerWidth());
             $('#' + leftMost).hide();
-            IWAjax.leftTabs.push(leftMost);
+            container.data('leftTabs').push(leftMost);
         }
-        if (leftMost = IWAjax.rightTabs.shift()){
-            IWAjax.visWidth += $('#' + leftMost).outerWidth();
+        if (leftMost = container.data('rightTabs').shift()){
+            container.data('visWidth', container.data('visWidth') + $('#' + leftMost).outerWidth());
             $('#' + leftMost).show();
-            IWAjax.visTabs.push(leftMost);
+            container.data('visTabs').push(leftMost);
         }
         setArrows();
     },
     setArrows = function() {
-        $('#iw_larr, #iw_rarr').css('visibility', 'hidden');
-        // if rightTabs, show >>
-        if (IWAjax.rightTabs.length) $('#iw_rarr').css('visibility', 'visible');
-        // if leftTabs, show <<
-        if (IWAjax.leftTabs.length) $('#iw_larr').css('visibility', 'visible');
+        $('.iw-larr, .iw-rarr').css('visibility', 'hidden');
+        $('.iw-tabbed-sections').each(function(){
+            var container = $(this);
+            // if rightTabs, show >>
+            if (container.data('rightTabs').length) container.find('.iw-rarr').css('visibility', 'visible');
+            // if leftTabs, show <<
+            if (container.data('leftTabs').length) container.find('.iw-larr').css('visibility', 'visible');
+        });
     },
     bind_events = function(el) {
         // since postbox.js does not delegate events, 
@@ -174,6 +185,13 @@ jQuery(document).ready(function($) {
         });  
         return false;  
     },
+    parse_ids = function(id) {
+            // parse id to get section number
+        var idparts         = id.split('_'),
+            boxid           = idparts.pop(),
+            objid           = idparts.pop();
+        return objid + '_' + boxid;
+    },
     /**
      * Ajax Save IntelliWidget Meta Box Data
      */
@@ -183,26 +201,27 @@ jQuery(document).ready(function($) {
         IWAjax.ajaxSemaphore   = true;
         
         $('.iw-copy-container,.iw-save-container,.iw-cdf-container').removeClass('success failure');
-        var thisID          = $(this).prop('id'),
-            // get section selector
+        var // get section selector
             sectionform     = $(this).parents('.iw-tabbed-section').first(),
+            container       = sectionform.parent('.iw-tabbed-sections');
+            thisID          = sectionform.attr('id'),
             // get controls container selector
             savecontainer   = $(sectionform).find('.iw-save-container'),
             // get button selector
             savebutton      = $(sectionform).find('.iw-save'),
-            // parse id to get section number
-            pre             = 'intelliwidget_' + thisID.split('_')[1],
+            pre             = parse_ids(thisID),
             // build post data array
             postData        = {};
+        console.log('thisID: ' + thisID + ' pre: ' + pre);
         // disable the button until ajax returns
         $(savebutton).prop('disabled', true);
         updateOpenPanels(sectionform);
         // show spinner
-        $('.' + pre + '_spinner').show();
+        $('.intelliwidget_' + pre + '_spinner').show();
         // unbind button from click event
         $('body').off('click', savebutton, save_postdata);
         // special handling for post types (array of checkboxes)
-        postData[ pre + '_post_types'] = [];
+        postData['intelliwidget_' + pre + '_post_types'] = [];
         postData['iwpage'] = $('#iwpage').val();
         postData[IWAjax.idfield] = $('#' + IWAjax.idfield).val();
         // find inputs for this section
@@ -213,7 +232,7 @@ jQuery(document).ready(function($) {
             console.log('fieldID: ' + fieldID);
             if (fieldID.indexOf('_post_types') > 0) {
                 // special handling for post types
-                postData[pre + '_post_types'].push($(this).val());
+                postData['intelliwidget_' + pre + '_post_types'].push($(this).val());
             } else {
                 // otherwise add to post data
                 postData[fieldID] = $(this).val();
@@ -237,18 +256,18 @@ jQuery(document).ready(function($) {
                 } else {
                     // refresh section form
                     var tab = $(response.tab),
-                        curtab = $('#iw_tabs').find('#' + tab.prop('id'));
+                        curtab = $('.iw-tabs').find('#' + tab.prop('id'));
                     curtab.html(tab.html());
                     sectionform.html(response.form);
                     if ('post' == IWAjax.objtype) bind_events(sectionform);
-                    $('#iw_tabbed_sections').tabs('refresh').tabs({active: curtab.index()});
+                    container.tabs('refresh').tabs({active: curtab.index()});
                     // show check mark
-                    $(sectionform).find('.iw-save-container').addClass('success');
+                    sectionform.find('.iw-save-container').addClass('success');
                 }
                 // release button
                 $(savebutton).prop('disabled', false);
                 // hide spinner
-                $('.' + pre + '_spinner').hide();
+                $('.intelliwidget_' + pre + '_spinner').hide();
                 // release ajax
                 IWAjax.ajaxSemaphore   = false;
                 return false;  
@@ -257,7 +276,7 @@ jQuery(document).ready(function($) {
             // release button
             $(savebutton).prop('disabled', false);
             // hide spinner
-            $('.' + pre + '_spinner').hide();
+            $('.intelliwidget_' + pre + '_spinner').hide();
             // show red X
             $(savecontainer).addClass('failure');
             // release ajax
@@ -288,6 +307,7 @@ jQuery(document).ready(function($) {
         postData['intelliwidget_widget_page_id'] = $('#intelliwidget_widget_page_id').val();
         // add wp ajax action to array
         postData['action'] = 'iw_' + IWAjax.objtype + '_copy';
+        console.log(postData);
         // send to wp
         $.post(  
             // get ajax url from localized object
@@ -340,9 +360,10 @@ jQuery(document).ready(function($) {
         // clear previous success/fail icons
         $('.iw-copy-container,.iw-save-container,.iw-cdf-container').removeClass('success failure');
         // get id of button
-        var thisID   = $(this).attr('id'),
+        var container = $(this).parent('.inside').find('.iw-tabbed-sections'),
+            thisID   = container.prop('id'),
             // munge selector
-            sel      = '#' + thisID,
+            sel      = $(this),
             // get href from link
             href     = $(this).attr('href'),
             // build post data array from query string
@@ -361,18 +382,18 @@ jQuery(document).ready(function($) {
             //on success function  
             function(response){
                 console.log(response);
-                $(sel).removeClass('disabled');
+                sel.removeClass('disabled');
                 $('#intelliwidget_spinner').hide();
                 if ('fail' == response) {
                     $('.iw-copy-container').addClass('failure');
                 } else {
                     form = $(response.form).hide();
                     tab  = $(response.tab).hide();
-                    $('#iw_tabbed_sections').append(form);
+                    container.append(form);
                     if ('post' == IWAjax.objtype) bind_events(form);
-                    $('#iw_tabs').append(tab);
+                    container.find('.iw-tabs').append(tab);
                     tab.show();
-                    $('#iw_tabbed_sections').tabs('refresh').tabs({active: tab.index()});
+                    container.tabs('refresh').tabs({active: tab.index()});
                     initTabs();
                     // show check mark
                     $('.iw-copy-container').addClass('success');
@@ -383,7 +404,7 @@ jQuery(document).ready(function($) {
             }, 'json'
         ).fail(function(){
             // release button
-            $(sel).removeClass('disabled');
+            sel.removeClass('disabled');
             // hide spinner
             $('#intelliwidget_spinner').hide();
             // show red X
@@ -413,16 +434,18 @@ jQuery(document).ready(function($) {
         $(this).addClass('disabled');
         // clear previous success/fail icons
         $('.iw-copy-container,.iw-save-container,.iw-cdf-container').removeClass('success failure');
-        // get id of button
-        var thisID = $(this).attr('id'),
-            // munge selector
-            sel      = '#' + thisID,
-            // get href from link
-            href     = $(this).attr('href'),
-            // build post data array from query string
-            postData = url_to_array(href),
+        // munge selectors
+        var sel         = $(this),
+            sectionform = sel.parents('.iw-tabbed-section').first(),
+            container   = sectionform.parent('.iw-tabbed-sections'),
+            thisID      = sectionform.prop('id'),
             // get box id 
-            pre      = postData['iwdelete'];
+            pre         = parse_ids(thisID),
+            // get href from link
+            href        = $(this).attr('href'),
+            // build post data array from query string
+            postData    = url_to_array(href);
+        console.log('thisID: ' + thisID + ' pre: ' + pre);
         // show spinner
         $('.intelliwidget_' + pre + '_spinner').show();
         // add wp ajax action to array
@@ -436,17 +459,16 @@ jQuery(document).ready(function($) {
             //on success function  
             function(response){
                 //console.log(response);
-                $(sel).removeClass('disabled');
+                sel.removeClass('disabled');
                 $('#intelliwidget_' + pre + '_spinner').hide();
                 if ('success' == response ) {
-                        var target = $('#iw_tabbed_section_' + pre),
-                            survivor = target.index();
-                        target.remove();
+                        var survivor = sectionform.index();
+                        sectionform.remove();
                         $('#iw_tab_' + pre).remove();
-                        $('#iw_tabbed_sections').tabs('refresh');
+                        container.tabs('refresh');
                         initTabs();
-                        survivor -= IWAjax.leftTabs.length;
-                        $('#iw_tabbed_sections').tabs({active:survivor});
+                        //survivor -= target.parent('.iw-tabbed-sections').data('leftTabs').length;
+                        container.tabs({active:survivor});
                 }
                 // release ajax
                 IWAjax.ajaxSemaphore   = false;
@@ -454,7 +476,7 @@ jQuery(document).ready(function($) {
             }
         ).fail(function(){
             // release button
-            $(sel).removeClass('disabled');
+            sel.removeClass('disabled');
             // hide spinner
             $('#intelliwidget_' + pre + '_spinner').hide();
             // release ajax
@@ -474,9 +496,9 @@ jQuery(document).ready(function($) {
             // parse id to get section number
             thisID          = sectionform.prop('id'),
             // get section selector
-            pre             = 'intelliwidget_' + thisID.split('_').pop(),
+            pre             = parse_ids(thisID),
             // get menu container
-            menucontainer   = sectionform.find('#' + pre + '_menus'),
+            menucontainer   = sectionform.find('#intelliwidget_' + pre + '_menus'),
             // get controls container selector
             savecontainer   = $(sectionform).find('.iw-save-container'),
             // get button selector
@@ -489,7 +511,7 @@ jQuery(document).ready(function($) {
         $(savebutton).prop('disabled', true);
         //menucontainer.hide();
         // show spinner
-        $('.' + pre + '_spinner').show();
+        $('.intelliwidget_' + pre + '_spinner').show();
         // find inputs for this section
         postData['iwpage'] = $('#iwpage').val();
         postData[IWAjax.idfield] = $('#' + IWAjax.idfield).val();
@@ -526,14 +548,14 @@ jQuery(document).ready(function($) {
                 // release button
                 $(savebutton).prop('disabled', false);
                 // hide spinner
-                $('.' + pre + '_spinner').hide();
+                $('.intelliwidget_' + pre + '_spinner').hide();
                 return false;  
             }
         ).fail(function(){
             // release button
             $(savebutton).prop('disabled', false);
             // hide spinner
-            $('.' + pre + '_spinner').hide();
+            $('.intelliwidget_' + pre + '_spinner').hide();
             // show red X
             $(savecontainer).addClass('failure');
             return false;  
@@ -685,8 +707,7 @@ jQuery(document).ready(function($) {
      */
     // if panels were open before ajax save, reopen
     $(document).ajaxComplete(refreshOpenPanels);
-    $('#iw_tabbed_sections').tabs({ active: ($('iw-tab').length - 1) });
-    
+    $('.iw-tabbed-sections').tabs({ active: ($('iw-tab').length - 1) });
     // for object types other than post we can delegate postbox collapse behavior once on load
     // postbox bindings on edit post/page must be refreshed using bind_events() after refresh
     if ('post' != IWAjax.objtype) {
@@ -701,7 +722,7 @@ jQuery(document).ready(function($) {
             updateOpenPanels(sectionform);
         });
     }
-    $('body').on('click', '#iw_tabbed_sections .panel-selection h3, #iw_tabbed_sections .panel-selection .handlediv', get_menus);
+    $('body').on('click', '.iw-tabbed-sections .panel-selection h3, .iw-tabbed-sections .panel-selection .handlediv', get_menus);
     $('body').on('click', '.widget-inside .panel-selection h4, .widget-inside .panel-selection .handlediv', get_widget_menus);
     // bind click events to edit page meta box buttons
     $('body').on('click', '.iw-save', save_postdata);    
@@ -777,19 +798,19 @@ jQuery(document).ready(function($) {
         return false;
     });
     // bind right and left scroll arrows
-    $('#iw_tabbed_sections').on('click', '#iw_larr, #iw_rarr', function(e) {
+    $('.iw-tabbed-sections').on('click', '.iw-larr, .iw-rarr', function(e) {
         e.preventDefault();
         e.stopPropagation();
         if ($(this).is(':visible')) {
-            if ('iw_larr' == $(this).prop('id')) rightShiftTabs();
-            else leftShiftTabs();
+            if ($(this).hasClass('iw-larr')) rightShiftTabs($(this));
+            else leftShiftTabs($(this));
         }
     });
     // reflow tabs on resize
     $(window).resize(reflowTabs);
     // END EVENT BINDINGS
     // reveal intelliwidget sections
-    $('#iw_tabbed_sections').slideDown();
+    $('.iw-tabbed-sections').slideDown();
     // set up tabs
     initTabs();
 });

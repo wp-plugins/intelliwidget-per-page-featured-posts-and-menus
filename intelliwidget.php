@@ -38,8 +38,10 @@ class IntelliWidget {
         // sorry, only english for now (stub)
         load_plugin_textdomain('intelliwidget', false, $lang_dir, $lang_dir);
         /* Plugin Details */
-        $this->pluginName = __('IntelliWidget', 'intelliwidget');
-        $this->pluginPath    = $this->dir . '/';
+        $this->pluginName   = __('IntelliWidget', 'intelliwidget');
+        $this->pluginPath   = $this->dir . '/';
+        $this->shortName    = __('IntelliWidget', 'intelliwidget');
+        $this->menuName     = 'intelliwidget';
         /* get url to this directory 
          * Thanks to Spokesrider for finding this bug! 
          */
@@ -47,6 +49,7 @@ class IntelliWidget {
         $this->templatesPath = $this->pluginPath . 'templates/';
         $this->templatesURL  = $this->pluginURL . 'templates/';        
         register_activation_hook($file,     array(&$this, 'intelliwidget_activate'));
+        add_action('admin_menu',                        array(&$this, 'admin_menu'));
         add_action( 'after_setup_theme',                array(&$this, 'ensure_post_thumbnails_support' ) );
     }
 
@@ -55,6 +58,22 @@ class IntelliWidget {
      */
     function intelliwidget_activate() {
         
+    }
+
+    function admin_menu() {
+        if (has_action('intelliwidget_options_panel')):
+            $this->hook = add_theme_page(
+                $this->pluginName, 
+                $this->shortName, 
+                'edit_theme_options', 
+                $this->menuName, 
+                array(&$this, 'options_panel') 
+            );
+            // only load plugin-specific data 
+            // when ctc page is loaded
+            if (has_action('intelliwidget_options_init'))
+                add_action( 'load-' . $this->hook, array(&$this, 'options_init') );
+        endif;
     }
 
     function get_meta($id, $optionname, $objecttype, $index = NULL) {
@@ -244,13 +263,31 @@ class IntelliWidget {
             'imagealign'        => 'none',
             'image_size'        => 'none',
         ));
-        // convert legacy values
+        // backwards compatibility: add content=nav_menu if nav_menu param set
         if (empty($instance['content']) && !empty($instance['nav_menu']) && '' != ($instance['nav_menu'])) 
             $instance['content'] = 'nav_menu';
         // standard WP function for merging argument lists
         $merged = wp_parse_args($instance, $defaults);
-        // backwards compatibility: add content=nav_menu if nav_menu param set
         return $merged;
+    }
+    
+    function options_init() {
+        do_action('intelliwidget_options_init');
+    }
+        
+    function options_panel() {
+        $active_tab = isset( $_GET[ 'tab' ] ) ? sanitize_text_field($_GET[ 'tab' ]) : '';
+?>
+<div class="wrap">
+  <div id="icon-appearance" class="icon32"></div>
+  <h2><?php echo $this->pluginName . ' ' . __('Extended Settings', 'intelliwidget'); ?></h2>
+  <div id="intelliwidget_error_notice">
+    <?php echo apply_filters('intelliwidget_options_errors', ''); ?>
+  </div>
+  <h2 class="nav-tab-wrapper"><?php do_action('intelliwidget_options_tab', $active_tab); ?></h2>
+  <div class="intelliwidget-option-panel-container"><?php do_action('intelliwidget_options_panel'); ?></div>
+</div>
+<?php
     }
 }
 

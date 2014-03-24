@@ -52,7 +52,7 @@ class IntelliWidgetPost {
         foreach ($intelliwidget_admin->post_types as $type):
             add_meta_box( 
                 'intelliwidget_main_meta_box',
-                __( 'IntelliWidget', 'intelliwidget'),
+                $intelliwidget_admin->get_label('metabox_title'),
                 array( &$this, 'main_meta_box_form' ),
                 $type,
                 'side',
@@ -70,7 +70,7 @@ class IntelliWidgetPost {
         foreach ($intelliwidget_admin->post_types as $type):
             add_meta_box( 
                 'intelliwidget_post_meta_box',
-                __( 'IntelliWidget Custom Fields', 'intelliwidget'),
+                $intelliwidget_admin->get_label('cdf_title'),
                 array( &$this, 'post_meta_box_form' ),
                 $type,
                 'side',
@@ -101,8 +101,8 @@ class IntelliWidgetPost {
     }
     
     function get_id_list($post) {
-        global $intelliwidget_admin;
-        $copy_id = get_post_meta($post->ID, '_intelliwidget_widget_page_id', true);
+        global $intelliwidget, $intelliwidget_admin;
+        $copy_id = $intelliwidget->get_meta($post->ID, '_intelliwidget_', 'post', 'widget_page_id');
         return '
   <select style="width:75%" name="intelliwidget_widget_page_id" id="intelliwidget_widget_page_id">
     <option value="">' . sprintf(__('This %s', 'intelliwidget'), ucfirst($post->post_type)) . '</option>

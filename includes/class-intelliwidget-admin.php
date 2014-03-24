@@ -78,7 +78,7 @@ class IntelliWidgetAdmin {
     
     function begin_tab_container() {
         echo apply_filters('intelliwidget_start_tab_container', 
-            '<div id="iw_tabbed_sections"><a id="iw_larr">&#171</a><a id="iw_rarr">&#187;</a><ul id="iw_tabs" class="">');
+            '<div class="iw-tabbed-sections"><a class="iw-larr">&#171</a><a class="iw-rarr">&#187;</a><ul class="iw-tabs">');
     }
     
     function end_tab_container() {
@@ -93,8 +93,8 @@ class IntelliWidgetAdmin {
         echo apply_filters('intelliwidget_end_section_container', '</div>');
     }
     
-    function begin_section($box_id) {
-        return apply_filters('intelliwidget_begin_section', '<div id="iw_tabbed_section_' . $box_id . '" class="iw-tabbed-section">');
+    function begin_section($id, $box_id) {
+        return apply_filters('intelliwidget_begin_section', '<div id="iw_tabbed_section_' . $id . '_' . $box_id . '" class="iw-tabbed-section">');
     }
     
     function end_section() {
@@ -140,10 +140,10 @@ class IntelliWidgetAdmin {
          */
         foreach(preg_grep('#^' . $prefix . '#', array_keys($_POST)) as $field):
             // find the box id and field name in the post key with a perl regex
-            preg_match('#^' . $prefix . '(\d+)_([\w\-]+)$#', $field, $matches);
+            preg_match('#^' . $prefix . '(\d+)_(\d+)_([\w\-]+)$#', $field, $matches);
             if (count($matches)):
-                if (!$box_id = $matches[1]) continue;
-                $name      = $matches[2];
+                if (!($id == $matches[1]) || !($box_id = $matches[2])) continue;
+                $name      = $matches[3];
             else: 
                 continue;
             endif;
@@ -175,7 +175,7 @@ class IntelliWidgetAdmin {
             // special handling for checkboxes:
             foreach($checkbox_fields as $name)
                 $old_instance[$name] = isset($new_instance[$name]);
-            $old_instance['custom_text'] = base64_encode($old_instance['custom_text']);
+            if (isset($old_instance['custom_text'])) $old_instance['custom_text'] = base64_encode($old_instance['custom_text']);
             // save new data
             $this->update_meta($id, '_intelliwidget_data_', $old_instance, $box_id);
             // increment box counter
@@ -192,9 +192,9 @@ class IntelliWidgetAdmin {
             $this->update_meta($id, '_intelliwidget_', $copy_id, 'widget_page_id');
     }
     
-    function validate_post($action, $noncefield, $capability, $is_ajax = false, $post_id = NULL) {
+    function validate_post($action, $noncefield, $capability, $is_ajax = false, $post_id = NULL, $get = false) {
         
-        return ('POST' == $_SERVER['REQUEST_METHOD'] 
+        return (($get ? 'GET' : 'POST') == $_SERVER['REQUEST_METHOD'] 
             && ($is_ajax ? check_ajax_referer( $action, $noncefield, false ) : check_admin_referer($action, $noncefield, false ))
             && current_user_can($capability, $post_id)
             );
@@ -231,7 +231,7 @@ class IntelliWidgetAdmin {
         add_action('intelliwidget_post_selection_menus', array($this->metabox, 'post_selection_menus'), 10, 4);
         $instance = $intelliwidget->defaults($intelliwidget->get_meta($id, '_intelliwidget_data_', $this->objecttype, $box_id));
         die(json_encode(array(
-            'tab'   => $this->get_tab($box_id, $instance['replace_widget']),
+            'tab'   => $this->get_tab($id, $box_id, $instance['replace_widget']),
             'form'  => $this->get_metabox($id, $box_id, $instance),
         )));
     }
@@ -243,8 +243,8 @@ class IntelliWidgetAdmin {
         $this->metabox_init();
         $instance = $intelliwidget->defaults();
         $response = array(
-                'tab'   => $this->get_tab($box_id, $instance['replace_widget']),
-                'form'  => $this->begin_section($box_id) . $this->get_metabox($id, $box_id, $instance) . $this->end_section(),
+                'tab'   => $this->get_tab($id, $box_id, $instance['replace_widget']),
+                'form'  => $this->begin_section($id, $box_id) . $this->get_metabox($id, $box_id, $instance) . $this->end_section(),
             );
         die(json_encode($response));
     }
@@ -293,17 +293,17 @@ class IntelliWidgetAdmin {
         return $widgets;
     }
 
-    function get_tab($box_id, $replace_widget = '') {
+    function get_tab($id, $box_id, $replace_widget = '') {
         $title = (empty($this->intelliwidgets[$replace_widget]) ? $this->intelliwidgets['none'] : $this->intelliwidgets[$replace_widget]);
-        return apply_filters('intelliwidget_tab', '<li id="iw_tab_' . $box_id . '" class="iw-tab">
-        <a href="#iw_tabbed_section_' . $box_id . '" title="' . $title . '">' . $box_id . '</a></li>', $box_id);
+        return apply_filters('intelliwidget_tab', '<li id="iw_tab_' . $id . '_' . $box_id . '" class="iw-tab">
+        <a href="#iw_tabbed_section_' . $id . '_' . $box_id . '" title="' . $title . '">' . $box_id . '</a></li>', $id, $box_id);
     }
     
     function get_section($id, $box_id) {
         global $intelliwidget;
         $instance   = $intelliwidget->defaults($intelliwidget->get_meta($id, '_intelliwidget_data_', $this->objecttype, $box_id));
-        $tab        = $this->get_tab($box_id, $instance['replace_widget']);
-        $section    = $this->begin_section($box_id) . $this->get_metabox($id, $box_id, $instance) . $this->end_section();
+        $tab        = $this->get_tab($id, $box_id, $instance['replace_widget']);
+        $section    = $this->begin_section($id, $box_id) . $this->get_metabox($id, $box_id, $instance) . $this->end_section();
         return array($tab, $section);
     }
 
