@@ -23,7 +23,7 @@ jQuery(document).ready(function($) {
     updateOpenPanels = function(container) {
         container.find('.inside').each(function(){
             var inside = $(this).prop('id');
-            console.log('update panels: ' + inside);
+            //console.log('update panels: ' + inside);
             IWAjax.openPanels[inside] = $(this).parent('.postbox').hasClass('closed') ? 0 : 1;
         });
     },
@@ -32,13 +32,13 @@ jQuery(document).ready(function($) {
         if ('undefined' == typeof b.responseText || !b.responseText.match(/intelliwidget/)) return;
         
         for (var key in IWAjax.openPanels) {
-            console.log('refresh panels: ' + key);
+            //console.log('refresh panels: ' + key);
             if (
                 IWAjax.openPanels.hasOwnProperty(key) 
                 && 
                 IWAjax.openPanels[key] == 1
                 ) {
-            console.log('refresh panels: ' + key);
+            //console.log('refresh panels: ' + key);
                 $('#' + key).parent('.postbox').removeClass('closed');
                 $('#' + key).show();
             }
@@ -290,13 +290,13 @@ jQuery(document).ready(function($) {
     /**
      * Ajax Save Copy Page Input
      */
-    copy_post = function (){ 
+    copy_profile = function (){ 
         // disable the button until ajax returns
         $(this).prop('disabled', true);
         // clear previous success/fail icons
         $('.iw-copy-container,.iw-save-container,.iw-cdf-container').removeClass('success failure');
         // unbind button from click event
-        $('body').off('click', '#iw_copy', copy_post);
+        $('body').off('click', '#iw_copy', copy_profile);
         // show spinner
         $('#intelliwidget_spinner').show();
         // build post data array
@@ -360,14 +360,14 @@ jQuery(document).ready(function($) {
         // clear previous success/fail icons
         $('.iw-copy-container,.iw-save-container,.iw-cdf-container').removeClass('success failure');
         // get id of button
-        var container = $(this).parent('.inside').find('.iw-tabbed-sections'),
-            thisID   = container.prop('id'),
+        var container   = $(this).parent('.inside').find('.iw-tabbed-sections'),
+            thisID      = container.prop('id'),
             // munge selector
-            sel      = $(this),
+            sel         = $(this),
             // get href from link
-            href     = $(this).attr('href'),
+            href        = $(this).attr('href'),
             // build post data array from query string
-            postData = url_to_array(href);
+            postData    = url_to_array(href);
         // show spinner
         $('#intelliwidget_spinner').show();
         // add wp ajax action to array
@@ -435,16 +435,16 @@ jQuery(document).ready(function($) {
         // clear previous success/fail icons
         $('.iw-copy-container,.iw-save-container,.iw-cdf-container').removeClass('success failure');
         // munge selectors
-        var sel         = $(this),
-            sectionform = sel.parents('.iw-tabbed-section').first(),
-            container   = sectionform.parent('.iw-tabbed-sections'),
-            thisID      = sectionform.prop('id'),
+        var sel             = $(this),
+            sectionform     = sel.parents('.iw-tabbed-section').first(),
+            container       = sectionform.parent('.iw-tabbed-sections'),
+            thisID          = sectionform.prop('id'),
             // get box id 
-            pre         = parse_ids(thisID),
+            pre             = parse_ids(thisID),
             // get href from link
-            href        = $(this).attr('href'),
+            href            = $(this).attr('href'),
             // build post data array from query string
-            postData    = url_to_array(href);
+            postData        = url_to_array(href);
         console.log('thisID: ' + thisID + ' pre: ' + pre);
         // show spinner
         $('.intelliwidget_' + pre + '_spinner').show();
@@ -727,7 +727,7 @@ jQuery(document).ready(function($) {
     // bind click events to edit page meta box buttons
     $('body').on('click', '.iw-save', save_postdata);    
     $('body').on('click', '.iw-cdfsave', save_cdfdata);    
-    $('body').on('click', '.iw-copy', copy_post);    
+    $('body').on('click', '.iw-copy', copy_profile);    
     $('body').on('click', '.iw-add', add_tabbed_section);    
     $('body').on('click', '.iw-delete', delete_tabbed_section);
     // update visibility of form inputs

@@ -107,6 +107,7 @@ class IntelliWidgetAdmin {
         // box_map contains map of meta boxes to their related widgets
         $box_map = $intelliwidget->get_box_map($id, $this->objecttype);
         if (is_array($box_map)):
+            ksort($box_map);
             $tabs = $section = '';
             foreach($box_map as $box_id => $sidebar_widget_id):
                 list($tab, $form) = $this->get_section($id, $box_id);
@@ -225,7 +226,7 @@ class IntelliWidgetAdmin {
     
     // use this for all saves
     function ajax_save_data($id, $box_id) {
-        if (false === $this->save_data($id, $this->objecttype)) die('fail'); 
+        if (false === $this->save_data($id)) die('fail'); 
         global $intelliwidget;
         $this->metabox_init();
         add_action('intelliwidget_post_selection_menus', array($this->metabox, 'post_selection_menus'), 10, 4);

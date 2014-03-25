@@ -105,7 +105,7 @@ class IntelliWidgetPost {
         $copy_id = $intelliwidget->get_meta($post->ID, '_intelliwidget_', 'post', 'widget_page_id');
         return '
   <select style="width:75%" name="intelliwidget_widget_page_id" id="intelliwidget_widget_page_id">
-    <option value="">' . sprintf(__('This %s', 'intelliwidget'), ucfirst($post->post_type)) . '</option>
+    <option value="">' . __('this form', 'intelliwidget') . '</option>
       ' . $intelliwidget_admin->get_posts_list(array('post_types' => array($post->post_type), 'page' => $copy_id)) . '
   </select>';
     }
