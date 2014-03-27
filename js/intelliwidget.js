@@ -206,13 +206,13 @@ jQuery(document).ready(function($) {
             container       = sectionform.parent('.iw-tabbed-sections');
             thisID          = sectionform.attr('id'),
             // get controls container selector
-            savecontainer   = $(sectionform).find('.iw-save-container'),
+            savecontainer   = sectionform.find('.iw-save-container'),
             // get button selector
-            savebutton      = $(sectionform).find('.iw-save'),
+            savebutton      = sectionform.find('.iw-save'),
             pre             = parse_ids(thisID),
             // build post data array
             postData        = {};
-        console.log('thisID: ' + thisID + ' pre: ' + pre);
+        //console.log('thisID: ' + thisID + ' pre: ' + pre);
         // disable the button until ajax returns
         $(savebutton).prop('disabled', true);
         updateOpenPanels(sectionform);
@@ -229,7 +229,7 @@ jQuery(document).ready(function($) {
             function() {
             // get field id
             fieldID = $(this).prop('id');
-            console.log('fieldID: ' + fieldID);
+            //console.log('fieldID: ' + fieldID);
             if (fieldID.indexOf('_post_types') > 0) {
                 // special handling for post types
                 postData['intelliwidget_' + pre + '_post_types'].push($(this).val());
@@ -240,7 +240,7 @@ jQuery(document).ready(function($) {
         });
         // add wp ajax action to array
         postData['action'] = 'iw_' + IWAjax.objtype + '_save';
-        console.log(postData);
+        //console.log(postData);
         // send to wp
         $.post(  
             // get ajax url from localized object
@@ -249,10 +249,10 @@ jQuery(document).ready(function($) {
             postData,
             //on success function  
             function(response){
-                console.log(response);
+                //console.log(response);
                 if ('fail' == response) {
                     // show red X
-                    $(savecontainer).addClass('failure');
+                    savecontainer.addClass('failure');
                 } else {
                     // refresh section form
                     var tab = $(response.tab),
@@ -265,7 +265,7 @@ jQuery(document).ready(function($) {
                     sectionform.find('.iw-save-container').addClass('success');
                 }
                 // release button
-                $(savebutton).prop('disabled', false);
+                savebutton.prop('disabled', false);
                 // hide spinner
                 $('.intelliwidget_' + pre + '_spinner').hide();
                 // release ajax
@@ -274,11 +274,11 @@ jQuery(document).ready(function($) {
             }, 'json'
         ).fail(function(){
             // release button
-            $(savebutton).prop('disabled', false);
+            savebutton.prop('disabled', false);
             // hide spinner
             $('.intelliwidget_' + pre + '_spinner').hide();
             // show red X
-            $(savecontainer).addClass('failure');
+            savecontainer.addClass('failure');
             // release ajax
             IWAjax.ajaxSemaphore   = false;
             return false;  
@@ -307,7 +307,7 @@ jQuery(document).ready(function($) {
         postData['intelliwidget_widget_page_id'] = $('#intelliwidget_widget_page_id').val();
         // add wp ajax action to array
         postData['action'] = 'iw_' + IWAjax.objtype + '_copy';
-        console.log(postData);
+        //console.log(postData);
         // send to wp
         $.post(  
             // get ajax url from localized object
@@ -316,7 +316,7 @@ jQuery(document).ready(function($) {
             postData,
             //on success function  
             function(response){
-                console.log(response);
+                //console.log(response);
                 // release button
                 $('#iw_copy').prop('disabled', false);
                 // hide spinner
@@ -373,7 +373,7 @@ jQuery(document).ready(function($) {
         // add wp ajax action to array
         postData['action'] = 'iw_' + IWAjax.objtype + '_add';
         // send to wp
-        console.log(postData);
+        //console.log(postData);
         $.post(  
             // get ajax url from localized object
             IWAjax.ajaxurl,  
@@ -381,7 +381,7 @@ jQuery(document).ready(function($) {
             postData,
             //on success function  
             function(response){
-                console.log(response);
+                //console.log(response);
                 sel.removeClass('disabled');
                 $('#intelliwidget_spinner').hide();
                 if ('fail' == response) {
@@ -439,6 +439,7 @@ jQuery(document).ready(function($) {
             sectionform     = sel.parents('.iw-tabbed-section').first(),
             container       = sectionform.parent('.iw-tabbed-sections'),
             thisID          = sectionform.prop('id'),
+            savecontainer   = sectionform.find('.iw-save-container'),
             // get box id 
             pre             = parse_ids(thisID),
             // get href from link
@@ -450,6 +451,7 @@ jQuery(document).ready(function($) {
         $('.intelliwidget_' + pre + '_spinner').show();
         // add wp ajax action to array
         postData['action'] = 'iw_' + IWAjax.objtype + '_delete';
+        console.log(postData);
         // send to wp
         $.post(  
         // get ajax url from localized object
@@ -458,9 +460,9 @@ jQuery(document).ready(function($) {
             postData,
             //on success function  
             function(response){
-                //console.log(response);
+                console.log(response);
                 sel.removeClass('disabled');
-                $('#intelliwidget_' + pre + '_spinner').hide();
+                $('.intelliwidget_' + pre + '_spinner').hide();
                 if ('success' == response ) {
                         var survivor = sectionform.index();
                         sectionform.remove();
@@ -469,6 +471,8 @@ jQuery(document).ready(function($) {
                         initTabs();
                         //survivor -= target.parent('.iw-tabbed-sections').data('leftTabs').length;
                         container.tabs({active:survivor});
+                } else {
+                    savecontainer.addClass('failure');
                 }
                 // release ajax
                 IWAjax.ajaxSemaphore   = false;
@@ -478,7 +482,8 @@ jQuery(document).ready(function($) {
             // release button
             sel.removeClass('disabled');
             // hide spinner
-            $('#intelliwidget_' + pre + '_spinner').hide();
+            $('.intelliwidget_' + pre + '_spinner').hide();
+            savecontainer.addClass('failure');
             // release ajax
             IWAjax.ajaxSemaphore   = false;
             return false;  
@@ -500,9 +505,9 @@ jQuery(document).ready(function($) {
             // get menu container
             menucontainer   = sectionform.find('#intelliwidget_' + pre + '_menus'),
             // get controls container selector
-            savecontainer   = $(sectionform).find('.iw-save-container'),
+            savecontainer   = sectionform.find('.iw-save-container'),
             // get button selector
-            savebutton      = $(sectionform).find('.iw-save'),
+            savebutton      = sectionform.find('.iw-save'),
             // build post data array
             postData        = {};
         // only load once
@@ -525,7 +530,7 @@ jQuery(document).ready(function($) {
             // add to post data
             postData[fieldID] = $(this).val();
         });
-        console.log(postData);
+        //console.log(postData);
         // send to wp
         $.post(  
             // get ajax url from localized object
@@ -534,30 +539,30 @@ jQuery(document).ready(function($) {
             postData,
             //on success function  
             function(response){
-                console.log(response);
+                //console.log(response);
                 if ('fail' == response) {
                     // show red X
-                    $(savecontainer).addClass('failure');
+                    savecontainer.addClass('failure');
                 } else {
                     // refresh menus
                     menucontainer.html(response);
                     //menucontainer.slideDown();
                     // show check mark
-                    $(sectionform).find('.iw-save-container').addClass('success');
+                    sectionform.find('.iw-save-container').addClass('success');
                 }
                 // release button
-                $(savebutton).prop('disabled', false);
+                savebutton.prop('disabled', false);
                 // hide spinner
                 $('.intelliwidget_' + pre + '_spinner').hide();
                 return false;  
             }
         ).fail(function(){
             // release button
-            $(savebutton).prop('disabled', false);
+            savebutton.prop('disabled', false);
             // hide spinner
             $('.intelliwidget_' + pre + '_spinner').hide();
             // show red X
-            $(savecontainer).addClass('failure');
+            savecontainer.addClass('failure');
             return false;  
         });  
         return false;  

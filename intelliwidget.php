@@ -21,10 +21,12 @@ class IntelliWidget {
 
     var $pluginName;
     var $pluginPath;
+    var $shortName;
+    var $menuName;
     var $pluginURL;
     var $templatesPath;
     var $templatesURL;
-    var $metacache;
+    var $admin_hook;
     var $dir;
     /**
      * Object constructor
@@ -42,15 +44,12 @@ class IntelliWidget {
         $this->pluginPath   = $this->dir . '/';
         $this->shortName    = __('IntelliWidget', 'intelliwidget');
         $this->menuName     = 'intelliwidget';
-        /* get url to this directory 
-         * Thanks to Spokesrider for finding this bug! 
-         */
         $this->pluginURL     = plugin_dir_url($file);// . '/';
         $this->templatesPath = $this->pluginPath . 'templates/';
         $this->templatesURL  = $this->pluginURL . 'templates/';        
-        register_activation_hook($file,     array(&$this, 'intelliwidget_activate'));
-        add_action('admin_menu',                        array(&$this, 'admin_menu'));
-        add_action( 'after_setup_theme',                array(&$this, 'ensure_post_thumbnails_support' ) );
+        add_shortcode('intelliwidget',  array(&$this, 'intelliwidget_shortcode'));
+        register_activation_hook($file, array(&$this, 'intelliwidget_activate'));
+        add_action('after_setup_theme', array(&$this, 'ensure_post_thumbnails_support' ) );
     }
 
     /**
@@ -60,22 +59,11 @@ class IntelliWidget {
         
     }
 
-    function admin_menu() {
-        if (has_action('intelliwidget_options_panel')):
-            $this->hook = add_theme_page(
-                $this->pluginName, 
-                $this->shortName, 
-                'edit_theme_options', 
-                $this->menuName, 
-                array(&$this, 'options_panel') 
-            );
-            // only load plugin-specific data 
-            // when ctc page is loaded
-            if (has_action('intelliwidget_options_init'))
-                add_action( 'load-' . $this->hook, array(&$this, 'options_init') );
-        endif;
+    // semaphore to create options page once
+    function set_admin_hook($hook) {
+        $this->admin_hook = $hook;
     }
-
+    
     function get_meta($id, $optionname, $objecttype, $index = NULL) {
         // are there settings for this widget?
         if (!empty($id) && !empty($objecttype)):
@@ -176,7 +164,6 @@ class IntelliWidget {
         // retrieve widget content from buffer
         $content = ob_get_contents();
         ob_end_clean();
-        $post = $old_post;
         // return widget content
         return $content;
     }
@@ -271,35 +258,17 @@ class IntelliWidget {
         return $merged;
     }
     
-    function options_init() {
-        do_action('intelliwidget_options_init');
-    }
-        
-    function options_panel() {
-        $active_tab = isset( $_GET[ 'tab' ] ) ? sanitize_text_field($_GET[ 'tab' ]) : '';
-?>
-<div class="wrap">
-  <div id="icon-appearance" class="icon32"></div>
-  <h2><?php echo $this->pluginName . ' ' . __('Extended Settings', 'intelliwidget'); ?></h2>
-  <div id="intelliwidget_error_notice">
-    <?php echo apply_filters('intelliwidget_options_errors', ''); ?>
-  </div>
-  <h2 class="nav-tab-wrapper"><?php do_action('intelliwidget_options_tab', $active_tab); ?></h2>
-  <div class="intelliwidget-option-panel-container"><?php do_action('intelliwidget_options_panel'); ?></div>
-</div>
-<?php
-    }
 }
 
 define('INTELLIWIDGET_VERSION', '1.5.0');
 
+if (is_admin())
+    include_once( 'includes/class-intelliwidget-admin.php' );
+else
+    include_once( 'includes/template-tags.php' );
 include_once( 'includes/class-intelliwidget-widget.php' );
 include_once( 'includes/class-intelliwidget-post.php' );
 include_once( 'includes/class-intelliwidget-query.php'  );
-if (is_admin())
-    include_once( 'includes/class-intelliwidget-admin.php'  );
-else
-    include_once( 'includes/template-tags.php' );
     
 global $intelliwidget;
 $intelliwidget = new IntelliWidget( __FILE__ );

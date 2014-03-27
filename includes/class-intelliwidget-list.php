@@ -114,15 +114,15 @@ class IntelliWidgetList {
 
             'classes'           => __("Enter additional CSS class names if you wish to customize this section's styles.", 'intelliwidget'),
 
-            'addltext'          => __('These settings allow you to add additional text to display above or below the IntelliWidget output. If your user account has HTML editing capabilities, you can enter HTML as well.', 'intelliwidget'),
+            'addltext'          => __('These settings allow you to add additional text to display above or below the IntelliWidget output. If your theme supports shortcodes in text widgets, you can use them here. If your user account has HTML editing capabilities, you can enter HTML as well.', 'intelliwidget'),
 
-            'text_position'     => __('This menu controls the position of the custom text. You can also choose to display custom text only, skipping the post list entirely.', 'intelliwidget'),
+            'text_position'     => __('This menu controls the position of the additional text. You can also choose to display only the text, skipping the post selection entirely.', 'intelliwidget'),
 
             'filter'            => __('Check this box to insert paragraph breaks wherever blank lines appear in the text you enter.', 'intelliwidget'),
 
-            'appearance'        => __('These settings control the way IntelliWidget renders the output, including the Template to use, number of posts, excerpt length and other settings.', 'intelliwidget'),
+            'appearance'        => __('These settings control how the output is rendered, including the template, number of posts, excerpt length and other settings.', 'intelliwidget'),
 
-            'template'          => __('This menu controls the IntelliWidget Template used to display the output. If you are using custom templates, they will appear here as well.', 'intelliwidget'),
+            'template'          => __('This menu controls the IntelliWidget template used to display the output. If you are using custom templates, they will appear here as well.', 'intelliwidget'),
 
             'sortby'            => __('This menu controls the post attribute used to sort the posts that are selected. Select ascending or descending order with the second menu (does not apply to random). Start Date is set for each post with IntelliWidget Custom Fields (see).', 'intelliwidget'),
 
@@ -138,7 +138,7 @@ class IntelliWidgetList {
 
             'image_size'        => __('If you are using a Template that includes the featured image, this menu controls the display size of the image.', 'intelliwidget'),
 
-            'selection'         => __('These settings control the way IntelliWidget chooses posts to display, including Post Type, Taxonomy and date. You can also restrict selection to specific posts.', 'intelliwidget'),
+            'selection'         => __('These settings control the posts that are displayed by post type, taxonomy and date. You can also restrict selection to specific posts.', 'intelliwidget'),
 
             'post_types'        => __('These checkboxes restrict the selection to specific Post Types, post and page by default. At least one must be checked.', 'intelliwidget'),
 

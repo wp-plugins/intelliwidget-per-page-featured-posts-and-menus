@@ -12,8 +12,7 @@ if ( !defined('ABSPATH')) exit;
  */
 class IntelliWidget_Widget extends WP_Widget {
 
-    var $version     = '1.5.0';
-    var $widget_form;
+    var $admin;
     /**
      * Constructor
      */
@@ -22,8 +21,8 @@ class IntelliWidget_Widget extends WP_Widget {
         $widget_ops          = array('description' => __('Menus, Featured Posts, HTML and more, customized per page or site-wide.', 'intelliwidget'));
         $control_ops         = array('width' => 400, 'height' => 350);
         if (is_admin()):
-            add_action('load-widgets.php',                  array(&$this, 'load_widget_form') );
-            add_action('wp_ajax_iw_widget_menus',           array(&$this, 'ajax_get_widget_post_select_menus'));
+            include_once('class-intelliwidget-widget-admin.php');
+            $this->admin = new IntelliWidget_WidgetAdmin();
         else:
             add_action('intelliwidget_action_post_list',    array(&$this, 'action_post_list'),      10, 3);
             add_action('intelliwidget_action_nav_menu',     array(&$this, 'action_nav_menu'),       10, 3);
@@ -65,29 +64,7 @@ class IntelliWidget_Widget extends WP_Widget {
      * @return <array>
      */
     function update($new_instance, $old_instance) {
-        global $intelliwidget_admin;
-        $textfields = $intelliwidget_admin->get_text_fields();
-        foreach ($new_instance as $name => $value):
-            // special handling for text inputs
-                if (in_array($name, $textfields)):
-                    if ( current_user_can('unfiltered_html') ):
-                        $old_instance[$field] =  $new_instance[$field];
-                    else:
-                        // raw html parser/cleaner-upper: see WP docs re: KSES
-                        $old_instance[$field] = stripslashes( 
-                            wp_filter_post_kses( addslashes($new_instance[$field]) ) ); 
-                    endif;
-                else:
-                    $old_instance[$name] = $intelliwidget_admin->filter_sanitize_input($new_instance[$name]);
-                endif;
-                if ('post_types' == $name && empty($value))
-                    $old_instance[$name] = array('post');
-        endforeach;
-        // special handling for checkboxes:
-        foreach (  $intelliwidget_admin->get_checkbox_fields() as $name) :
-            $old_instance[$name] = isset($new_instance[$name]);
-        endforeach;
-        return $old_instance;
+        return $this->admin->update($new_instance, $old_instance);
     }
     /**
      * Output Widget form
@@ -95,21 +72,9 @@ class IntelliWidget_Widget extends WP_Widget {
      * @param <array> $instance
      */
     function form($instance) {
-        //echo 'BEFORE defaults: ' . "\n" . print_r($instance, true) . "\n\n";
-        global $intelliwidget;
-        $instance = $intelliwidget->defaults($instance);
-        //echo 'AFTER defaults: ' . "\n" . print_r($instance, true) . "\n\n";
-        $this->widget_form->render_form($instance, $this);
+        $this->admin->render_form($this, $instance);
     }
-    
-    function load_widget_form(){
-        global $intelliwidget_admin;
-        $intelliwidget_admin->admin_init();
-        // lazy load UI
-        include_once('class-intelliwidget-form.php');
-        $this->widget_form = new IntelliWidgetForm();
-    }
-    
+        
     /**
      * Front-end css
      */
@@ -143,6 +108,7 @@ class IntelliWidget_Widget extends WP_Widget {
     }
     
     function filter_custom_text($custom_text, $instance = array(), $args = array()) {
+        $custom_text = apply_filters( 'widget_text', $custom_text, $instance );
         if ( !empty( $instance['filter'] ))
             $custom_text = wpautop( $custom_text );
         return '<div class="textwidget">' . $custom_text . '</div>';
@@ -314,34 +280,6 @@ class IntelliWidget_Widget extends WP_Widget {
             if ( file_exists($parentFile) ) return $parentFile;
             if ( file_exists($pluginFile) ) return $pluginFile;
         return false;
-    }
-
-    // widgets only
-    function ajax_get_widget_post_select_menus() {
-        global $intelliwidget_admin, $wp_registered_widgets;
-        $widget_id = sanitize_text_field($_POST['widget-id']);
-        if ( empty($widget_id) || 
-            !$intelliwidget_admin->validate_post('save-sidebar-widgets', '_wpnonce_widgets', 'edit_theme_options', true) 
-            ) return false;
-        $intelliwidget_admin->admin_init();
-        // getting to the widget info is a complicated task ...
-        if (isset($wp_registered_widgets[$widget_id])):
-            if (isset($wp_registered_widgets[$widget_id]['callback']) && isset($wp_registered_widgets[$widget_id]['params'])
-                && count($wp_registered_widgets[$widget_id]['callback']) && count($wp_registered_widgets[$widget_id]['params'])):
-                    $widget = $wp_registered_widgets[$widget_id]['callback'][0];
-                    $params = $wp_registered_widgets[$widget_id]['params'][0];
-                    $settings = $widget->get_settings($widget_id);
-                    $instance = $settings[$params['number']];
-                    include_once('class-intelliwidget-form.php');
-                    $this->widget_form = new IntelliWidgetForm();
-                    ob_start();
-                    $this->widget_form->post_selection_menus($instance, $widget);
-                    $form = ob_get_contents();
-                    ob_end_clean();
-                    die($form);
-            endif;
-        endif;
-        die('fail');
     }
   
 }

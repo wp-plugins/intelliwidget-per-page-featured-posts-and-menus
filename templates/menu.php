@@ -12,12 +12,16 @@ if ( !defined('ABSPATH')) exit;
  * @copyright 2014 Lilaea Media LLC
  * @access public
  */
-global $intelliwidget_post_id;
+$post_id    = get_the_ID();
+$ancestors  = get_post_ancestors($post_id);
+$parent     = current($ancestors);
  ?>
 
 <ul class="intelliwidget-menu">
-    <?php if ( $selected->have_posts() ) : while ($selected->have_posts()) : $selected->the_post(); ?>
-    <li id="intelliwidget_<?php the_intelliwidget_ID(); ?>" class="intelliwidget-menu-item <?php echo $intelliwidget_post_id == get_the_intelliwidget_ID() ? 'intelliwidget-current-menu-item' : ''; ?>">
+    <?php if ( $selected->have_posts() ) : while ($selected->have_posts()) : $selected->the_post(); 
+    $intelliwidget_post_id    = get_the_intelliwidget_ID();
+    ?>
+    <li id="intelliwidget_<?php $intelliwidget_post_id; ?>" class="intelliwidget-menu-item<?php echo ($post_id == $intelliwidget_post_id ? ' intelliwidget-current-menu-item' : '') . (in_array( $intelliwidget_post_id, $ancestors) ? ' intelliwidget-current-menu-ancestor' : '') . ($intelliwidget_post_id == $parent ? ' intelliwidget-current-menu-parent' : ''); ?>">
         <?php if ( has_intelliwidget_image() ) : ?>
         <div class="intelliwidget-image-container-<?php echo $instance['image_size'];?> intelliwidget-align-<?php echo $instance['imagealign']; ?>">
             <?php the_intelliwidget_image(); ?>

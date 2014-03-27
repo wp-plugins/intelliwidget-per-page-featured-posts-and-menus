@@ -24,6 +24,8 @@
  * intelliwidget-menu
  * intelliwidget-menu-item
  * intelliwidget-current-menu-item
+ * intelliwidget-current-menu-parent
+ * intelliwidget-current-menu-ancestor
  * intelliwidget-month
  * intelliwidget-more-link
  * intelliwidget-title
@@ -96,19 +98,25 @@
     margin: 0;
     padding: 4px 0;
 }
-
 .widget_intelliwidget li.intelliwidget-current-menu-item {
 }
+.widget_intelliwidget li.intelliwidget-current-menu-parent {
+}
+.widget_intelliwidget li.intelliwidget-current-menu-ancestor {
+}
+.widget_intelliwidget li.intelliwidget-menu-item a {
+}
+.widget_intelliwidget li.intelliwidget-current-menu-item a {
+}
+.widget_intelliwidget li.intelliwidget-current-menu-parent a {
+}
+.widget_intelliwidget li.intelliwidget-current-menu-ancestor a {
+}
 
-.widget_intelliwidget .intelliwidget-menu-item .intelliwidget-image-container-thumbnail {
+
+.widget_intelliwidget li.intelliwidget-menu-item .intelliwidget-image-container-thumbnail {
     max-width: 2em;
     max-height: 2em;
-}
-
-.widget_intelliwidget .intelliwidget-menu-item a {
-}
-
-.widget_intelliwidget .intelliwidget-current-menu-item a {
 }
 
 .widget_intelliwidget .intelliwidget-event {

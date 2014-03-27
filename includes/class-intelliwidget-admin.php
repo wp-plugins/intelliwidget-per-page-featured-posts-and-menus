@@ -53,8 +53,7 @@ class IntelliWidgetAdmin {
             $this->docsLink         = '<a href="http://www.lilaeamedia.com/plugins/intelliwidget/" target="_blank" title="' . __('Hover labels for more info or click here to view documentation.', 'intelliwidget') . '" style="float:right">' . __('Help', 'intelliwidget') . '</a>';
         
     }
-    
-    
+
     /**
      * Output scripts to the admin. 
      * @param <string> $idfield - the input field name to use as the object id
@@ -64,13 +63,53 @@ class IntelliWidgetAdmin {
         wp_enqueue_style('intelliwidget-js', $intelliwidget->pluginURL . 'templates/intelliwidget-admin.css');
         wp_enqueue_script('jquery-ui-tabs');
         wp_enqueue_script('intelliwidget-js', $intelliwidget->pluginURL . 'js/intelliwidget.js', array('jquery'), '1.5.0', false);
+        //wp_enqueue_script('intelliwidget-js', $intelliwidget->pluginURL . 'js/intelliwidget.min.js', array('jquery'), '1.5.0', false);
         wp_localize_script( 'intelliwidget-js', 'IWAjax', array(
             'ajaxurl'   => admin_url( 'admin-ajax.php' ),
             'objtype'   => $this->objecttype,
             'idfield'   => $idfield,
         ));
     }
-     
+    
+    function add_options_page() {
+        global $intelliwidget;
+        if (empty($intelliwidget->admin_hook)):
+            $hook = add_theme_page(
+                $intelliwidget->pluginName, 
+                $intelliwidget->shortName, 
+                'edit_theme_options', 
+                $intelliwidget->menuName, 
+                array(&$this, 'options_page') 
+            );
+            $intelliwidget->set_admin_hook($hook);
+            // only load plugin-specific data 
+            // when options page is loaded
+            if (has_action('intelliwidget_options_init'))
+                add_action( 'load-' . $hook, array(&$this, 'options_init') );
+        endif;
+    }
+
+    function options_init() {
+        do_action('intelliwidget_options_init');
+    }
+
+    function options_page() {
+        global $intelliwidget;
+        $active_tab = isset( $_GET[ 'tab' ] ) ? sanitize_text_field($_GET[ 'tab' ]) : '';
+?>
+<div class="wrap">
+  <div id="icon-appearance" class="icon32"></div>
+  <h2><?php echo $intelliwidget->pluginName . ' ' . __('Extended Settings', 'intelliwidget'); ?></h2>
+  <div id="intelliwidget_error_notice">
+    <?php echo apply_filters('intelliwidget_options_errors', ''); ?>
+  </div>
+  <h2 class="nav-tab-wrapper"><?php do_action('intelliwidget_options_tab', $active_tab); ?></h2>
+  <div class="intelliwidget-option-panel-container"><?php do_action('intelliwidget_options_panel'); ?></div>
+</div>
+<?php
+
+    }
+    
     function metabox_init() {
         include_once('class-intelliwidget-metabox.php');
         $this->metabox = new IntelliWidgetMetaBox();
@@ -103,7 +142,7 @@ class IntelliWidgetAdmin {
     
     function render_tabbed_sections($id) {
         global $intelliwidget;
-        $this->metabox->add_form($id);
+        $this->metabox->add_form($this, $id);
         // box_map contains map of meta boxes to their related widgets
         $box_map = $intelliwidget->get_box_map($id, $this->objecttype);
         if (is_array($box_map)):
@@ -205,7 +244,7 @@ class IntelliWidgetAdmin {
         global $intelliwidget;
         $box_map = $intelliwidget->get_box_map($id, $this->objecttype);
         $this->delete_meta($id, '_intelliwidget_data_', $box_id);
-        unset($box_map[$box_id]);
+        unset($box_map[NULL == $box_id ? '' : $box_id]);
         $this->update_meta($id, '_intelliwidget_', $box_map, 'map');
     }
 
@@ -265,14 +304,16 @@ class IntelliWidgetAdmin {
         $this->metabox_init();
         $instance = $intelliwidget->defaults($intelliwidget->get_meta($id, '_intelliwidget_data_', $this->objecttype, $box_id));
         ob_start();
-        $this->metabox->post_selection_menus($id, $box_id, $instance);
+        $this->metabox->post_selection_menus($this, $id, $box_id, $instance);
         $form = ob_get_contents();
         ob_end_clean();
         die($form);
     }
     
     function get_nonce_url($id, $action, $box_id = NULL) {
-        return apply_filters('intelliwidget_nonce_url_' . $action, '#', $id, $this->objecttype, $box_id);
+        global $pagenow; 
+        $val = 'delete' == $action ? $box_id : 1;
+        return wp_nonce_url(admin_url($pagenow . '?iw' . $action . '=' . $val . '&objid=' . $id), 'iw' . $action);
     }
     
     function get_intelliwidgets() {
@@ -310,7 +351,7 @@ class IntelliWidgetAdmin {
 
     function get_metabox($id, $box_id, $instance) {
         ob_start();
-        $this->metabox->metabox($id, $box_id, $instance);
+        $this->metabox->metabox($this, $id, $box_id, $instance);
         $form = ob_get_contents();
         ob_end_clean();
         return $form;
@@ -372,8 +413,8 @@ class IntelliWidgetAdmin {
         $paths      = array();
         $parentPath = get_template_directory() . '/intelliwidget';
         $themePath  = get_stylesheet_directory() . '/intelliwidget';
-        $paths[] = $intelliwidget->templatesPath;
-        $paths[] = $parentPath;
+        $paths[]    = $intelliwidget->templatesPath;
+        $paths[]    = $parentPath;
         if ($parentPath != $themePath) $paths[] = $themePath;
         foreach ($paths as $path):
             if (file_exists($path) && ($handle = opendir($path)) ):
@@ -396,10 +437,10 @@ class IntelliWidgetAdmin {
     function get_eligible_post_types() {
         $eligible = array();
         if ( function_exists('get_post_types') ):
-            $args = array('public' => true);
-            $types = get_post_types($args);
+            $args   = array('public' => true);
+            $types  = get_post_types($args);
         else:
-            $types = array('post', 'page');
+            $types  = array('post', 'page');
         endif;
         foreach($types as $type):
             if (post_type_supports($type, 'custom-fields')):
@@ -508,8 +549,7 @@ class IntelliWidgetAdmin {
     /**
      * Stub for data validation
      * @param <string> $unclean - data to parse
-     * @param <array> $rules
-     * @return <string> $clean - sanitized data
+     * @return <string> - sanitized data
      */
     function filter_sanitize_input($unclean = NULL) {
         if (is_array($unclean)):
@@ -519,7 +559,7 @@ class IntelliWidgetAdmin {
         endif;
     }
     
-
+    // Backwards compatability: replaces original category value with new term taxonomy id value
     function map_category_to_tax($category) {
         // echo '<textarea>' .   print_r(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS), true) . '</textarea>';
         $catarr = $this->val2array($category);
@@ -570,5 +610,3 @@ class IntelliWidgetAdmin {
     }
     
 }
-global $intelliwidget_admin;
-$intelliwidget_admin = new IntelliWidgetAdmin();
