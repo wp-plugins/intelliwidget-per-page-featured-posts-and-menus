@@ -43,9 +43,14 @@ class IntelliWidgetMetaBox {
     }
     function metabox($obj, $id, $box_id, $instance) {
         ?>
-        <p>
+<p>
   <input type="hidden" id="<?php echo 'intelliwidget_' . $id . '_' . $box_id . '_category'; ?>" name="<?php echo 'intelliwidget_' . $box_id . '_category'; ?>" value="-1" /><?php /* Original Categories: <?php echo implode(',', $obj->val2array($instance['category'])); */ ?>
-        </p>
+<?php echo apply_filters('intelliwidget_nocopy_setting', '
+  <label title="' . $obj->get_tip('nocopy') . '">
+    <input name="intelliwidget_' . $box_id . '_nocopy" id="intelliwidget_' . $id . '_' . $box_id . '_nocopy" type="checkbox" ' . checked($instance['nocopy'], 1) . ' value="1"/> ' . $obj->get_label('nocopy') . '
+  </label>
+'); ?>
+</p>
 <p>
   <input type="hidden" id="<?php echo 'intelliwidget_' . $id . '_' . $box_id . '_box_id'; ?>" name="<?php echo 'intelliwidget_' . $box_id . '_box_id'; ?>" value="<?php echo $box_id; ?>" />
   <label title="<?php echo $obj->get_tip('replace_widget'); ?>" for="<?php echo 'intelliwidget_' . $id . '_' . $box_id . '_replace_widget'; ?>">
@@ -110,13 +115,6 @@ class IntelliWidgetMetaBox {
         : </label>
       <input name="<?php echo 'intelliwidget_' . $box_id . '_classes'; ?>" id="<?php echo 'intelliwidget_' . $id . '_' . $box_id . '_classes'; ?>" type="text" value="<?php echo esc_attr($instance['classes']); ?>" />
     </p>
-<?php echo apply_filters('intelliwidget_nocopy_setting', '
-    <p>
-      <label title="' . $obj->get_tip('nocopy') . '">
-        <input name="intelliwidget_' . $box_id . '_nocopy" id="intelliwidget_' . $id . '_' . $box_id . '_nocopy" type="checkbox" ' . checked($instance['nocopy'], 1) . ' value="1"/> ' . $obj->get_label('nocopy') . '
-      </label>
-    </p>
-'); ?>
   </div>
 </div>
 <?php
@@ -161,16 +159,6 @@ class IntelliWidgetMetaBox {
     <?php echo $obj->get_label('appearance'); ?>
     </span></h3>
   <div id="iw_appearance_<?php echo $id . '_' . $box_id; ?>_inside" class="inside">
-    <p>
-      <label title="<?php echo $obj->get_tip('template'); ?>" for="<?php echo 'intelliwidget_' . $id . '_' . $box_id . '_template'; ?>">
-        <?php echo $obj->get_label('template'); ?>
-        :</label>
-      <select name="<?php echo 'intelliwidget_' . $box_id . '_template'; ?>" id="<?php echo 'intelliwidget_' . $id . '_' . $box_id . '_template'; ?>">
-        <?php foreach ( $obj->templates as $template => $name ) : ?>
-        <option value="<?php echo $template; ?>" <?php selected($instance['template'], $template); ?>><?php echo $name; ?></option>
-        <?php endforeach; ?>
-      </select>
-    </p>
     <p>
       <label title="<?php echo $obj->get_tip('sortby'); ?>" for="<?php echo 'intelliwidget_' . $id . '_' . $box_id . '_sortby'; ?>">
         <?php echo $obj->get_label('sortby'); ?>
@@ -251,6 +239,16 @@ class IntelliWidgetMetaBox {
     </span></h3>
   <div id="iw_selection_<?php echo $id . '_' . $box_id; ?>_inside" class="inside">
     <p>
+      <label title="<?php echo $obj->get_tip('template'); ?>" for="<?php echo 'intelliwidget_' . $id . '_' . $box_id . '_template'; ?>">
+        <?php echo $obj->get_label('template'); ?>
+        :</label>
+      <select name="<?php echo 'intelliwidget_' . $box_id . '_template'; ?>" id="<?php echo 'intelliwidget_' . $id . '_' . $box_id . '_template'; ?>">
+        <?php foreach ( $obj->templates as $template => $name ) : ?>
+        <option value="<?php echo $template; ?>" <?php selected($instance['template'], $template); ?>><?php echo $name; ?></option>
+        <?php endforeach; ?>
+      </select>
+    </p>
+    <p>
       <label title="<?php echo $obj->get_tip('post_types'); ?>" style="display:block;margin-bottom:10px"><span class="spinner <?php echo 'intelliwidget_' . $id . '_' . $box_id . '_spinner'; ?>"></span>
         <?php echo $obj->get_label('post_types'); ?>
         :</label>
@@ -308,14 +306,6 @@ class IntelliWidgetMetaBox {
             $instance['terms'] = $obj->map_category_to_tax($instance['category']);
 ?>
     <p>
-      <label title="<?php echo $obj->get_tip('terms'); ?>">
-        <?php echo $obj->get_label('terms'); ?>
-        :</label><br/>
-      <select class="widefat intelliwidget-multiselect" name="<?php echo 'intelliwidget_' . $box_id . '_terms'; ?>[]" size="1" multiple="multiple" id="<?php echo 'intelliwidget_' . $id . '_' . $box_id . '_terms'; ?>">
-        <?php echo $obj->get_terms_list($instance); ?>
-      </select>
-    </p>
-    <p>
       <label title="<?php echo $obj->get_tip('page'); ?>">
         <?php echo $obj->get_label('page'); ?>
         :</label><br/>
@@ -323,7 +313,14 @@ class IntelliWidgetMetaBox {
         <?php echo $obj->get_posts_list($instance); ?>
       </select>
     </p>
-
+    <p>
+      <label title="<?php echo $obj->get_tip('terms'); ?>">
+        <?php echo $obj->get_label('terms'); ?>
+        :</label><br/>
+      <select class="widefat intelliwidget-multiselect" name="<?php echo 'intelliwidget_' . $box_id . '_terms'; ?>[]" size="1" multiple="multiple" id="<?php echo 'intelliwidget_' . $id . '_' . $box_id . '_terms'; ?>">
+        <?php echo $obj->get_terms_list($instance); ?>
+      </select>
+    </p>
 <?php
     }
     

@@ -18,7 +18,7 @@ class IntelliWidgetList {
     
     function __construct() {
         $this->labels = array(
-            'metabox_title'     => __('IntelliWidget Profile', 'intelliwidget'),
+            'metabox_title'     => __('IntelliWidget Profiles', 'intelliwidget'),
             
             'cdf_title'         => __('IntelliWidget Custom Fields', 'intelliwidget'),
             
@@ -32,9 +32,9 @@ class IntelliWidgetList {
 
             'link_title'        => __('Link', 'intelliwidget'),
 
-            'container_id'      => __('Container ID', 'intelliwidget'),
+            'container_id'      => __('Unique ID', 'intelliwidget'),
 
-            'classes'           => __('Style Classes', 'intelliwidget'),
+            'classes'           => __('Classes', 'intelliwidget'),
 
             'addltext'          => __('Additional Text/HTML', 'intelliwidget'),
 
@@ -64,7 +64,7 @@ class IntelliWidgetList {
 
             'post_types'        => __('Select from these Post Types', 'intelliwidget'),
 
-            'terms'             => __('Select by Category, Tag, etc.', 'intelliwidget'),
+            'terms'             => __('Terms: Select by Category, Tag, etc.', 'intelliwidget'),
 
             'page'              => __('Select specific posts', 'intelliwidget'),
 
@@ -78,9 +78,9 @@ class IntelliWidgetList {
 
             'nav_menu'          => __('Menu to display', 'intelliwidget'),
 
-            'widget_page_id'    => __('Use settings from', 'intelliwidget'),
+            'widget_page_id'    => __('Use Profiles from', 'intelliwidget'),
 
-            'iw_add'            => __('+ Add New Section', 'intelliwidget'),
+            'iw_add'            => __('+ Add New Profile', 'intelliwidget'),
             
             'event_date'        => __('Start Date', 'intelliwidget'),
             
@@ -94,9 +94,9 @@ class IntelliWidgetList {
             
             'link_target'       => __('Link Target', 'intelliwidget'),
             
-            'replace_widget'    => __('Use these settings to replace', 'intelliwidget'),
+            'replace_widget'    => __('Parent Profile to replace', 'intelliwidget'),
             
-            'nocopy'            => __('Use these settings even if using settings from another profile', 'intelliwidget'),
+            'nocopy'            => __('Override profiles selected above with this Profile', 'intelliwidget'),
 );
 
         $this->tips = array(
@@ -120,7 +120,7 @@ class IntelliWidgetList {
 
             'filter'            => __('Check this box to insert paragraph breaks wherever blank lines appear in the text you enter.', 'intelliwidget'),
 
-            'appearance'        => __('These settings control how the output is rendered, including the template, number of posts, excerpt length and other settings.', 'intelliwidget'),
+            'appearance'        => __('Control the number of posts displayed, excerpt length, featured image and other settings.', 'intelliwidget'),
 
             'template'          => __('This menu controls the IntelliWidget template used to display the output. If you are using custom templates, they will appear here as well.', 'intelliwidget'),
 
@@ -138,7 +138,7 @@ class IntelliWidgetList {
 
             'image_size'        => __('If you are using a Template that includes the featured image, this menu controls the display size of the image.', 'intelliwidget'),
 
-            'selection'         => __('These settings control the posts that are displayed by post type, taxonomy and date. You can also restrict selection to specific posts.', 'intelliwidget'),
+            'selection'         => __('These settings control the template used and the posts that are displayed. Select post type, taxonomy terms and date conditions. You can also restrict selection to specific posts.', 'intelliwidget'),
 
             'post_types'        => __('These checkboxes restrict the selection to specific Post Types, post and page by default. At least one must be checked.', 'intelliwidget'),
 
@@ -173,7 +173,7 @@ class IntelliWidgetList {
             
             'replace_widget'    => __("This menu determines the IntelliWidget instance to replace with these settings. Options are labeled by Sidebar Name followed by the nth IntelliWidget in that sidebar. Even if there are other Widgets in the Sidebar, the number represents only the IntelliWidgets in the Sidebar. If you reorder the Widgets in the Sidebar, the number will reflect the change. To use these settings for a shortcode on the post, select 'Shortcode' and use the format [intelliwidget section=tab#], where 'tab#' corresponds to the number of the tab (above) containing the settings you wish to use.", 'intelliwidget'),
 
-            'nocopy'            => __("Even if you are using IntelliWidget settings from another post, you can still customize this section by checking this box.", 'intelliwidget'),
+            'nocopy'            => __("Check this box to keep these settings even when using another profile from the menu above.", 'intelliwidget'),
             
 );
 

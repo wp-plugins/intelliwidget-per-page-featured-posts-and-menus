@@ -79,7 +79,7 @@ class IntelliWidget_Widget extends WP_Widget {
      * Front-end css
      */
     function enqueue_styles() {
-        wp_enqueue_style('intelliwidget', $this->get_stylesheet(false));
+        wp_enqueue_style('intelliwidget', $this->get_stylesheet(false), array(), INTELLIWIDGET_VERSION);
         if ($override = $this->get_stylesheet(true)):
             wp_enqueue_style('intelliwidget-custom', $override);
         endif;

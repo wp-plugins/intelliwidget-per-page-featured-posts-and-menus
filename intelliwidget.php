@@ -6,7 +6,7 @@ if ( !defined('ABSPATH')) exit;
     Plugin Name: IntelliWidget Per Page Featured Posts and Menus
     Plugin URI: http://www.lilaeamedia.com/plugins/intelliwidget
     Description: Display featured posts, custom menus, html content and more within a single dynamic sidebar that can be customized on a per-page or site-wide basis.
-    Version: 1.5.0
+    Version: 2.0.0
     Author: Jason C Fleming
     Author URI: http://www.lilaeamedia.com/
     Text Domain: intelliwidget
@@ -260,7 +260,7 @@ class IntelliWidget {
     
 }
 
-define('INTELLIWIDGET_VERSION', '1.5.0');
+define('INTELLIWIDGET_VERSION', '2.0.0');
 
 if (is_admin())
     include_once( 'includes/class-intelliwidget-admin.php' );

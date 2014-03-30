@@ -35,6 +35,7 @@ class IntelliWidgetPost {
             // if this page is using another page's settings and they exist for this widget, use them
             $other_post_id = $intelliwidget->get_meta($post->ID, '_intelliwidget_', 'post', 'widget_page_id');
             $post_data = $intelliwidget->get_settings_data($post->ID, $args['widget_id'], 'post');
+
             // check for no-copy override
             if ($other_post_id && empty($post_data['nocopy'])):
                 if ($post_data = $intelliwidget->get_settings_data($other_post_id, $args['widget_id'], 'post')):

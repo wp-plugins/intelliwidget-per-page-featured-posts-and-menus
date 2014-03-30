@@ -34,6 +34,7 @@ class IntelliWidgetPostAdmin extends IntelliWidgetAdmin {
         if (!isset($this->objecttype)) $this->admin_init('post', 'post_ID');
         add_action('add_meta_boxes',            array(&$this, 'post_main_meta_box'));
         add_action('add_meta_boxes',            array(&$this, 'post_cdf_meta_box'));
+        wp_enqueue_style('wp-jquery-ui-dialog');
     }
     /**
      * Generate input form that applies to entire page (add new, copy settings)
@@ -97,7 +98,7 @@ class IntelliWidgetPostAdmin extends IntelliWidgetAdmin {
         $copy_id = $intelliwidget->get_meta($post->ID, '_intelliwidget_', 'post', 'widget_page_id');
         return '
   <select style="width:75%" name="intelliwidget_widget_page_id" id="intelliwidget_widget_page_id">
-    <option value="">' . __('This Profile', 'intelliwidget') . '</option>
+    <option value="">' . __('This form', 'intelliwidget') . '</option>
       ' . $this->get_posts_list(array('post_types' => array($post->post_type), 'page' => $copy_id)) . '
   </select>';
     }
@@ -136,7 +137,7 @@ class IntelliWidgetPostAdmin extends IntelliWidgetAdmin {
 
         $this->save_data($post_id);
         // save custom post data if it exists
-        $this->save_cdfdata($post_id);
+        $this->post_save_cdf_data($post_id);
         // save copy page id (i.e., "use settings from ..." ) if it exists
         $this->save_copy_id($post_id);
     }
