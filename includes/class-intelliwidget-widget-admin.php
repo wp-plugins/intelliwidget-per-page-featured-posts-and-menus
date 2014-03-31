@@ -34,11 +34,11 @@ class IntelliWidget_WidgetAdmin extends IntelliWidgetAdmin {
             // special handling for text inputs
                 if (in_array($name, $textfields)):
                     if ( current_user_can('unfiltered_html') ):
-                        $old_instance[$field] =  $new_instance[$field];
+                        $old_instance[$name] =  $new_instance[$name];
                     else:
                         // raw html parser/cleaner-upper: see WP docs re: KSES
-                        $old_instance[$field] = stripslashes( 
-                            wp_filter_post_kses( addslashes($new_instance[$field]) ) ); 
+                        $old_instance[$name] = stripslashes( 
+                            wp_filter_post_kses( addslashes($new_instance[$name]) ) ); 
                     endif;
                 else:
                     $old_instance[$name] = $this->filter_sanitize_input($new_instance[$name]);

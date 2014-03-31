@@ -23,7 +23,7 @@ $parent     = current($ancestors);
     ?>
   <li id="intelliwidget_<?php $intelliwidget_post_id; ?>" class="intelliwidget-menu-item<?php echo ($post_id == $intelliwidget_post_id ? ' intelliwidget-current-menu-item' : '') . (in_array( $intelliwidget_post_id, $ancestors) ? ' intelliwidget-current-menu-ancestor' : '') . ($intelliwidget_post_id == $parent ? ' intelliwidget-current-menu-parent' : ''); ?>">
     <?php if ( has_intelliwidget_image() ) : ?>
-    <div class="intelliwidget-image-container-<?php echo $instance['image_size'];?> intelliwidget-align-<?php echo $instance['imagealign']; ?>">
+    <div class="intelliwidget-image-container intelliwidget-image-container-<?php echo $instance['image_size'];?> intelliwidget-align-<?php echo $instance['imagealign']; ?>">
       <?php the_intelliwidget_image(); ?>
     </div>
     <?php endif; ?>
