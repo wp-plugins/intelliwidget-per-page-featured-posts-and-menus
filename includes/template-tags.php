@@ -6,8 +6,8 @@ if ( !defined('ABSPATH')) exit;
  *
  * @package IntelliWidget
  * @subpackage includes
- * @author Lilaea Media
- * @copyright 2013
+ * @author Jason C Fleming
+ * @copyright 2014 Lilaea Media LLC
  * @access public
  */
 if ( !function_exists('get_the_intelliwidget_ID') ) {
@@ -17,8 +17,8 @@ if ( !function_exists('get_the_intelliwidget_ID') ) {
      * @return <integer> post ID
      */
     function get_the_intelliwidget_ID() {
-        global $post;
-        return $post->ID;
+        global $intelliwidget_post;
+        return $intelliwidget_post->ID;
     }
 }
 if ( !function_exists('the_intelliwidget_ID') ) {
@@ -34,15 +34,15 @@ if ( !function_exists('get_the_intelliwidget_image') ) {
      * Return the featured post image with link to the full image.
      *
      * @global <array> $this_instance
-     * @global <object> $post
+     * @global <object> $intelliwidget_post
      * @return <string> image link if exists, <boolean> false if none
      */
     function get_the_intelliwidget_image() {
-        global $this_instance, $post;
+        global $this_instance, $intelliwidget_post;
         if ($this_instance['image_size'] != 'none' && has_intelliwidget_image() ) :
             return '<a title="' . strip_tags(get_the_intelliwidget_title()) . '" href="' . get_the_intelliwidget_url() . '">'
                 . get_the_post_thumbnail(
-                    $post->ID, 
+                    $intelliwidget_post->ID, 
                     $this_instance['image_size'], 
                     array(
                         'title' => strip_tags(get_the_intelliwidget_title()), 
@@ -59,12 +59,12 @@ if ( !function_exists('has_intelliwidget_image') ) {
     /**
      * Check if the post has a featured image.
      * 
-     * @global <object> $post
+     * @global <object> $intelliwidget_post
      * @return <boolean>
      */
     function has_intelliwidget_image() {
-        global $this_instance, $post;
-        return !($this_instance['image_size'] == 'none' || empty($post->thumbnail_id));
+        global $this_instance, $intelliwidget_post;
+        return !($this_instance['image_size'] == 'none' || empty($intelliwidget_post->thumbnail_id));
     }
 }
 
@@ -82,12 +82,12 @@ if ( !function_exists('get_the_intelliwidget_author') ) {
      * Return meta data from the post author
      *
      * @param <string> $meta - field to retrieve
-     * @global <object> $post
+     * @global <object> $intelliwidget_post
      * @return <string>
      */
     function get_the_intelliwidget_author_meta($meta) {
-        global $post;
-        if ($value = get_the_author_meta($meta, $post->post_author)) return $value;
+        global $intelliwidget_post;
+        if ($value = get_the_author_meta($meta, $intelliwidget_post->post_author)) return $value;
         return false;
     }
 }
@@ -108,15 +108,15 @@ if ( !function_exists('get_the_intelliwidget_excerpt') ) {
      * Return the excerpt to display with the current post.
      *
      * @global <array> $this_instance
-     * @global <object> $post
+     * @global <object> $intelliwidget_post
      * @return <string>
      */
     function get_the_intelliwidget_excerpt() {
-        global $intelliwidget, $this_instance, $post;
+        global $intelliwidget, $this_instance, $intelliwidget_post;
         // use excerpt text if it exists otherwise parse the main content
-        $excerpt = empty($post->post_excerpt) ?
-            get_the_intelliwidget_content() : $post->post_excerpt;
-        return $intelliwidget->trim_excerpt($excerpt, $this_instance);
+        $excerpt = empty($intelliwidget_post->post_excerpt) ?
+            get_the_intelliwidget_content() : $intelliwidget_post->post_excerpt;
+        return apply_filters('intelliwidget_trim_excerpt', $excerpt, $this_instance);
     }
 }
 
@@ -133,12 +133,12 @@ if ( !function_exists('get_the_intelliwidget_content') ) {
     /**
      * Return the excerpt to display with the current post.
      *
-     * @global <object> $post
+     * @global <object> $intelliwidget_post
      * @return <string>
      */
     function get_the_intelliwidget_content() {
-        global $post;
-        $content = $post->post_content;
+        global $intelliwidget_post;
+        $content = $intelliwidget_post->post_content;
         if ( strpos( $content, '<!--nextpage-->' ) ) {
             $content = preg_replace("#\s*<!\-\-nextpage\-\->.*#s", '', $content);
         }
@@ -164,22 +164,23 @@ if ( !function_exists('get_the_intelliwidget_link') ) {
     /**
      * Return a link for a post based on parameters
      *
-     * @global <object> $post
+     * @global <object> $intelliwidget_post
      * @param <integer> $post_id (optional)
      * @param <string> $link_text (optional) - text inside area tag
      * @param <integer> $category_id (optional) - return category permalink
      * @return <string>
      */
     function get_the_intelliwidget_link($post_id = NULL, $link_text = NULL, $category_id = NULL) {
-        global $post;
-        $post_id =  intval($post_id) ? $post_id : $post->ID;
+        global $intelliwidget_post;
+        $post_id =  intval($post_id) ? $post_id : (is_object($intelliwidget_post) ? $intelliwidget_post->ID : NULL);
+        if (isset($category_id) && -1 != $category_id) $url = get_category_link($category_id);
+        $url     = isset($url) ? $url : get_the_intelliwidget_url($post_id);
         if (empty( $link_text )):
             $link_text = get_the_intelliwidget_title($post_id);
         endif;
         $title_text = esc_attr(strip_tags($link_text));
-        $url     = get_the_intelliwidget_url($post_id, $category_id);
-        $classes = empty($post->link_classes) ? '' :  ' class="' . $post->link_classes . '"';
-        $target  = empty($post->link_target) ? '' : ' target="' . $post->link_target . '"';
+        $classes = empty($intelliwidget_post->link_classes) ? '' :  ' class="' . $intelliwidget_post->link_classes . '"';
+        $target  = empty($intelliwidget_post->link_target) ? '' : ' target="' . $intelliwidget_post->link_target . '"';
         $content = '<a title="' . $title_text . '" href="' . $url . '"' . $classes . $target . '>' . $link_text .  '</a>';
         return $content;
     }
@@ -193,8 +194,8 @@ if ( !function_exists('the_intelliwidget_link') ) {
      * @param <strong> $link_text (optional) - text inside area tag
      * @param <integer> $category_id (optional) - return category permalink
      */
-    function the_intelliwidget_link($post_id = NULL, $title = NULL, $category_id = NULL) {
-        echo get_the_intelliwidget_link($post_id, $title, $category_id);
+    function the_intelliwidget_link($post_id = NULL, $title = NULL) {
+        echo get_the_intelliwidget_link($post_id, $title);
     }
 }
 
@@ -202,19 +203,35 @@ if ( !function_exists('get_the_intelliwidget_url')) {
     /**
      * Return a url for a post based on parameters
      *
-     * @global <object> $post
+     * @global <object> $intelliwidget_post
      * @param <integer> $post_id (optional)
      * @param <integer> $category_id (optional) - return category url
      * @return <string>
      */
-    function get_the_intelliwidget_url($post_id = NULL, $category_id = NULL) {
-        global $post;
-        $post_id = intval($post_id) ? $post_id : $post->ID;
-        if (intval($category_id) && $category_id != -1):
-            return get_category_link($category_id);
-        else:
-            return empty($post->external_url) ? get_permalink($post_id) : $post->external_url;
+    function get_the_intelliwidget_url($post_id = NULL) {
+        global $intelliwidget_post;
+        $post_id = intval($post_id) ? $post_id : $intelliwidget_post->ID;
+        return empty($intelliwidget_post->external_url) ? get_permalink($post_id) : $intelliwidget_post->external_url;
+    }
+}
+if ( !function_exists('get_the_intelliwidget_taxonomy_link')) {
+
+    function get_the_intelliwidget_taxonomy_link($title, $instance) {
+        if (!isset($instance['query'])):
+            global $intelliwidget;
+            $intelliwidget->get_query($instance);
         endif;
+        if (isset($instance['terms']) && '-1' != $instance['terms']):
+            $term = $instance['query']->terms_query($instance['terms']);
+            if ($term):
+                $url = get_term_link($term);
+                $title_text = esc_attr(strip_tags($title));
+                return '<a title="' . $title_text . '" href="' . $url . '">' . apply_filters( 'widget_title', $title ) .  '</a>';
+            endif;
+        endif;
+        $post_id        = count($instance['query']->posts) ? $instance['query']->posts[0]->ID : NULL;
+        $category_id    = isset($instance['category']) ? $instance['category'] : NULL;
+        return get_the_intelliwidget_link($post_id, $title, $category_id);
     }
 }
 
@@ -235,12 +252,12 @@ if ( !function_exists('get_the_intelliwidget_title') ) {
     /**
      * Get the title for the current featured post, use alt title if it exists.
      *
-     * @global <object> $post
+     * @global <object> $intelliwidget_post
      * @return <string>
      */
     function get_the_intelliwidget_title() {
-        global $post;
-        $title = empty($post->alt_title) ? $post->post_title : $post->alt_title;
+        global $intelliwidget_post;
+        $title = empty($intelliwidget_post->alt_title) ? $intelliwidget_post->post_title : $intelliwidget_post->alt_title;
         return $title; //esc_attr($title);
     }
 }
@@ -258,13 +275,13 @@ if ( !function_exists('get_the_intelliwidget_date') ) {
     /**
      * Get the event date for the post if it exists, otherwise return the post date.
      *
-     * @global <object> $post
+     * @global <object> $intelliwidget_post
      * @param <string> $format
      * @return <string>
      */
     function get_the_intelliwidget_date($format = 'j') {
-        global $post;
-        $date = empty($post->event_date) ? $post->post_date : $post->event_date;
+        global $intelliwidget_post;
+        $date = empty($intelliwidget_post->event_date) ? $intelliwidget_post->post_date : $intelliwidget_post->event_date;
         return date($format, strtotime($date));
     }
 }
@@ -282,18 +299,18 @@ if ( !function_exists('get_the_intelliwidget_exp_date') ) {
     /**
      * Get the event date for the post if it exists, otherwise return the post date.
      *
-     * @global <object> $post
+     * @global <object> $intelliwidget_post
      * @param <string> $format
      * @return <string>
      */
     function get_the_intelliwidget_exp_date($format = 'j') {
-        global $post;
-        if (empty($post->expire_date) || 
-            (date('j', strtotime($post->event_date)) == date('j', strtotime($post->expire_date)) 
-                && date('m', strtotime($post->event_date)) == date('m', strtotime($post->expire_date)))):
+        global $intelliwidget_post;
+        if (empty($intelliwidget_post->expire_date) || 
+            (date('j', strtotime($intelliwidget_post->event_date)) == date('j', strtotime($intelliwidget_post->expire_date)) 
+                && date('m', strtotime($intelliwidget_post->event_date)) == date('m', strtotime($intelliwidget_post->expire_date)))):
             return false;
         else:
-            return date($format, strtotime($post->expire_date));
+            return date($format, strtotime($intelliwidget_post->expire_date));
         endif;
     }
 }

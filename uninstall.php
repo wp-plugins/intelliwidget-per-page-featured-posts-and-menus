@@ -6,8 +6,8 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) )
  * uninstall.php - IntelliWidget Uninstall
  *
  * @package IntelliWidget
- * @author Lilaea Media
- * @copyright 2013
+ * @author Jason C Fleming
+ * @copyright 2014 Lilaea Media LLC
  * @access public
  */
 function intelliwidget_delete_plugin() {
