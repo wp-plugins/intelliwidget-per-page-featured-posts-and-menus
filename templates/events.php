@@ -25,8 +25,7 @@ if ( $selected->have_posts() ) : while ($selected->have_posts()) : $selected->th
     <div class="intelliwidget-date"> <?php printf(__('%1$s %2$s, %3$s', 'intelliwidget'),
             get_the_intelliwidget_date('M'),
             get_the_intelliwidget_date('j'),
-            get_the_intelliwidget_date('Y')); ?>
-    </div>
+            get_the_intelliwidget_date('Y')); ?> </div>
     <h3 id="intelliwidget_title_<?php the_intelliwidget_ID(); ?>" class="intelliwidget-title">
       <?php the_intelliwidget_link(); ?>
     </h3>
@@ -35,6 +34,7 @@ if ( $selected->have_posts() ) : while ($selected->have_posts()) : $selected->th
       <span id="intelliwidget_more_link_<?php the_intelliwidget_ID(); ?>" class="intelliwidget-more-link">
       <?php the_intelliwidget_link(get_the_intelliwidget_id(), $instance['link_text']); ?>
       </span></div>
+    <div style="clear:both"></div>
   </div>
 </div>
 <?php endwhile; endif; ?>

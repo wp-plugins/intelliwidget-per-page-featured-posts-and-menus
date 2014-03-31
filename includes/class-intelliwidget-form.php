@@ -12,7 +12,6 @@ if ( !defined('ABSPATH')) exit;
  */
 class IntelliWidgetForm {
     function __construct() {
-//        print_r(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS));
         add_action('intelliwidget_form_all_before', array($this, 'general_settings'), 10, 4);
         add_action('intelliwidget_form_post_list',  array($this, 'post_selection_settings'), 5, 4);
         add_action('intelliwidget_form_post_list',  array($this, 'appearance_settings'), 10, 4);

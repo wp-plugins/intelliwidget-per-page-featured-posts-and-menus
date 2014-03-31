@@ -560,7 +560,6 @@ class IntelliWidgetAdmin {
     
     // Backwards compatability: replaces original category value with new term taxonomy id value
     function map_category_to_tax($category) {
-        // echo '<textarea>' .   print_r(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS), true) . '</textarea>';
         $catarr = $this->val2array($category);
         $tax = array('category');
         if (!isset($this->terms)) $this->load_terms();

@@ -159,7 +159,8 @@ Change the 'supports' parameter in the register_post_type function to include 'c
 == Changelog ==
 
 = 2.0.0 =
-* IMPORTANT: This release includes major changes to the User Interface. Please see the updated documentation.
+* IMPORTANT: This release includes major changes to the User Interface. Please see the updated documentation:
+* http://www.lilaeamedia.com/plugins/intelliwidget
 * Overhauled most of the code to simplify logic flow and enable filter and action hooks for extensibility
 * Replaced 'Categories' with 'Terms' to include any taxonomies associated with selected post types
 * Reorganized User Interface to be more intuitive
@@ -294,7 +295,8 @@ Change the 'supports' parameter in the register_post_type function to include 'c
 == Upgrade Notice ==
 
 = 2.0.0 =
-* IMPORTANT: This release includes major changes to the User Interface. Please see the changelog and updated documentation.
+* IMPORTANT: This release includes major changes to the User Interface. Please see the changelog and updated documentation:
+* http://www.lilaeamedia.com/plugins/intelliwidget
 
 == Getting Started ==
 

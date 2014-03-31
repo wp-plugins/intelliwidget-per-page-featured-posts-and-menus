@@ -187,7 +187,6 @@ LEFT JOIN {$wpdb->postmeta} pm2 ON pm2.post_id = p1.ID
             $prepargs[] = $items;
         endif;
         $query = $select . implode(' ', $joins) . ' WHERE ' . implode("\n AND ", $clauses) . $orderby . $limit;
-        //echo 'query: ' . "\n" . $query . " \n";
         $res      = $wpdb->get_results($wpdb->prepare($query, $prepargs));
         if (count($res)):
             $clauses = $prepargs = $ids = array();
@@ -237,7 +236,6 @@ LEFT JOIN {$wpdb->postmeta} pm7 ON pm7.post_id = p1.ID
     AND pm7.meta_key = '_thumbnail_id'
             ");
             $query = $select . implode(' ', $joins) . ' WHERE ' . implode("\n AND ", $clauses) . $orderby;
-            //echo 'query: ' . "\n" . $query . " \n";
             $res      = $wpdb->get_results($wpdb->prepare($query, $prepargs), OBJECT);
         endif;
         $this->posts = $res;
@@ -272,7 +270,6 @@ LEFT JOIN {$wpdb->postmeta} pm7 ON pm7.post_id = p1.ID
             AND (post_password = '' OR post_password IS NULL)
         ORDER BY post_type, post_title
         ";
-        // echo 'query: ' . "\n" . $query . " \n";
         return $wpdb->get_results($wpdb->prepare($query, $args), OBJECT);
     }
     

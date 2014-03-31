@@ -58,10 +58,8 @@ class IntelliWidget_WidgetAdmin extends IntelliWidgetAdmin {
      * @param <array> $instance
      */
     function render_form($obj, $instance) {
-        //echo 'BEFORE defaults: ' . "\n" . print_r($instance, true) . "\n\n";
         global $intelliwidget;
         $instance = $intelliwidget->defaults($instance);
-        //echo 'AFTER defaults: ' . "\n" . print_r($instance, true) . "\n\n";
         $this->widget_form->render_form($this, $obj, $instance);
     }
     

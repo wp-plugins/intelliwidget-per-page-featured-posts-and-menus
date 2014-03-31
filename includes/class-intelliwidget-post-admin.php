@@ -148,10 +148,8 @@ class IntelliWidgetPostAdmin extends IntelliWidgetAdmin {
         foreach ($this->get_custom_fields() as $cfield):
             $cdfield = $prefix . $cfield;
             if (array_key_exists($cdfield, $_POST)):
-            echo $cdfield . ' exists ' . "\n\n";
                 if (empty($_POST[$cdfield]) || '' == $_POST[$cdfield]):
                     $this->delete_meta($post_id, $cdfield);
-            echo $cdfield . ' empty, deleted ' . "\n\n";
                 else:
                     $newdata = $_POST[$cdfield];
                     if ( !current_user_can('unfiltered_html') ):

@@ -156,7 +156,7 @@ jQuery(document).ready(function($) {
         });
         // add wp ajax action to array
         postData['action'] = 'iw_' + IWAjax.objtype + '_cdfsave';
-        console.log(postData);
+        //console.log(postData);
         // send to wp
         $.post(  
             // get ajax url from localized object
@@ -165,7 +165,7 @@ jQuery(document).ready(function($) {
             postData,
             //on success function  
             function(response){
-                console.log(response);
+                //console.log(response);
                 // release button
                 $('#iw_cdfsave').prop('disabled', false);
                 // hide spinner
@@ -446,12 +446,12 @@ jQuery(document).ready(function($) {
             href            = $(this).attr('href'),
             // build post data array from query string
             postData        = url_to_array(href);
-        console.log('thisID: ' + thisID + ' pre: ' + pre);
+        //console.log('thisID: ' + thisID + ' pre: ' + pre);
         // show spinner
         $('.intelliwidget_' + pre + '_spinner').show();
         // add wp ajax action to array
         postData['action'] = 'iw_' + IWAjax.objtype + '_delete';
-        console.log(postData);
+        //console.log(postData);
         // send to wp
         $.post(  
         // get ajax url from localized object
@@ -460,7 +460,7 @@ jQuery(document).ready(function($) {
             postData,
             //on success function  
             function(response){
-                console.log(response);
+                //console.log(response);
                 sel.removeClass('disabled');
                 $('.intelliwidget_' + pre + '_spinner').hide();
                 if ('success' == response ) {
