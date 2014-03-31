@@ -189,4 +189,3 @@ function intelliwidget_timestamp($field = 'intelliwidget_event_date', $post_date
 </p>
 <?php
 }
-?>
