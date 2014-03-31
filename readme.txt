@@ -4,7 +4,7 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_i
 Tags: featured posts, events, page menu, plugin, textwidget, widget, custom post types, custom sidebar
 Requires at least: 3.5
 Tested up to: 3.8.1
-Stable tag: 2.0.1
+Stable tag: 2.0.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -158,9 +158,10 @@ Change the 'supports' parameter in the register_post_type function to include 'c
 
 == Changelog ==
 
-= 2.0.1 =
+= 2.0.2 =
 * IMPORTANT: This release includes major changes to the User Interface. Please see the updated documentation:
 * http://www.lilaeamedia.com/plugins/intelliwidget
+* Fixed incorrect Nav Menu option values on both Parent and Child Profile forms.
 * Overhauled most of the code to simplify logic flow and enable filter and action hooks for extensibility
 * Replaced 'Categories' with 'Terms' to include any taxonomies associated with selected post types
 * Reorganized User Interface to be more intuitive
@@ -294,7 +295,7 @@ Change the 'supports' parameter in the register_post_type function to include 'c
 
 == Upgrade Notice ==
 
-= 2.0.1 =
+= 2.0.2 =
 * IMPORTANT: This release includes major changes to the User Interface. Please see the changelog and updated documentation:
 * http://www.lilaeamedia.com/plugins/intelliwidget
 
