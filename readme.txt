@@ -151,9 +151,9 @@ Change the 'supports' parameter in the register_post_type function to include 'c
 == Screenshots ==
 
 1. Example of the Widgets Admin Panel.
-2. Example of the Page Admin Panel.
-3. Example of the Main Settings Panel.
-4. Example of the Advanced Settings Panel.
+2. Example of the Edit Post Admin Panel.
+3. Example of the Profiles Panel.
+4. Example of the Post Selection Panel.
 5. Example of the Custom Data Fields Panel.
 
 == Changelog ==
