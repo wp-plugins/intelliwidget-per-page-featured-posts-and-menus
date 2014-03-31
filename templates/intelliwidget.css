@@ -67,7 +67,9 @@
     padding: 0;
     margin: 0;
 }
-
+.widget_intelliwidget .intelliwidget-image-container {
+    max-width: 100%;
+}
 .widget_intelliwidget .intelliwidget-image-container.intelliwidget-align-right,
 .widget_intelliwidget .intelliwidget-image-container.intelliwidget-align-left {
     max-width: 35%;
@@ -164,6 +166,3 @@
     text-align: center;
 }
 
-.intelliwidget-image-container {
-    max-width: 100%;
-}

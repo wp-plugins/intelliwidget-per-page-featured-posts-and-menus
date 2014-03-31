@@ -528,7 +528,7 @@ class IntelliWidgetAdmin {
     
     function get_nav_menu() {
         $defaults = $this->lists->get_menu('default_nav');
-        return array_merge($this->lists->get_menu('default_nav'), $this->menus);
+        return $defaults + $this->menus;
     }
     
     function get_nav_menus() {
