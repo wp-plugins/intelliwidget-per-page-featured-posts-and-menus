@@ -15,8 +15,6 @@ function intelliwidget_delete_plugin() {
     global $wpdb;
     // remove widgets
     delete_option( 'widget_intelliwidget' );
-    // remove plugin
-    delete_option( 'intelliwidget' );
     // remove postmeta entries
     $wpdb->query( "DELETE FROM " . $wpdb->prefix . "postmeta WHERE meta_key LIKE '%intelliwidget%'" );
 }

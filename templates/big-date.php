@@ -23,7 +23,7 @@ if ( $selected->have_posts() ) : while ($selected->have_posts()) : $selected->th
     </span></div>
   <div class="intelliwidget-item">
     <?php if ( has_intelliwidget_image() ) : ?>
-    <div class="intelliwidget-image-container-<?php echo $instance['image_size'];?> intelliwidget-align-<?php echo $instance['imagealign']; ?>">
+    <div class="intelliwidget-image-container intelliwidget-image-container-<?php echo $instance['image_size'];?> intelliwidget-align-<?php echo $instance['imagealign']; ?>">
       <?php the_intelliwidget_image(); ?>
     </div>
     <?php endif; ?>
