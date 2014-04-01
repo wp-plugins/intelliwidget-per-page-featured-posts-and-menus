@@ -4,7 +4,7 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_i
 Tags: featured posts, events, page menu, plugin, textwidget, widget, custom post types, custom sidebar
 Requires at least: 3.5
 Tested up to: 3.8.1
-Stable tag: 2.0.2
+Stable tag: 2.0.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -112,6 +112,46 @@ http://www.youtube.com/watch?v=XwESsBRK9hg
 
 Docs can be found at http://www.lilaeamedia.com/plugins/intelliwidget/
 
+= How do I put a custom menu on one specific page? =
+
+*Method 1:*
+
+ * Add a new IntelliWidget to one of your sidebars on the Widgets Admin. Check the "Placeholder only" box. This keeps the widget from appearing on all the pages.
+
+ * Go to Pages and click the page to edit.
+
+ * You will see a new meta box labeled "IntelliWidget Profiles."
+
+ * Click "+ Add New Profile."
+
+ * Select the sidebar to which you added the IntelliWidget in the first step from the "Parent Profile to replace" menu.
+
+ * From the "Post Selection" panel, choose the "Menu" template.
+
+ * Select the posts for your menu from the "specific posts" multi-select menu.
+
+ * Click "Save Settings."
+
+*Method 2:*
+
+ * If you have a custom menu already set up in the "Appearance > Menus" you can use it instead of building it from scratch.
+
+ * Follow the steps as before.
+
+ * In the Child Profile, open the "General Settings" panel. Select "Nav Menu" from the "IntelliWidget Type" menu.
+
+ * Select the menu you want to use from the "Menu to use" select menu.
+
+ * Click "Save Settings."
+
+*Method 3:*
+
+ * Use the IntelliWidget Shortcode on the page. You don't need a Placeholder to do this option.
+
+ * Set up a new Child Profile on the page like usual, but select "Shortcode in Post Content" as the "Profile to replace" option.
+
+ * In the content, add the shortcode [intelliwidget section=#] where # is the number of the Child Profile tab.
+
 = Where do I put custom templates/stylesheets? =
 
 Here are the steps:
@@ -158,10 +198,13 @@ Change the 'supports' parameter in the register_post_type function to include 'c
 
 == Changelog ==
 
+= 2.0.3 =
+* Fixed save_post action that was incorrectly failing nonce validation for post types other than post and page
+
 = 2.0.2 =
-* IMPORTANT: This release includes major changes to the User Interface. Please see the updated documentation:
-* http://www.lilaeamedia.com/plugins/intelliwidget
 * Fixed incorrect Nav Menu option values on both Parent and Child Profile forms.
+
+= 2.0.1 =
 * Overhauled most of the code to simplify logic flow and enable filter and action hooks for extensibility
 * Replaced 'Categories' with 'Terms' to include any taxonomies associated with selected post types
 * Reorganized User Interface to be more intuitive
@@ -295,8 +338,8 @@ Change the 'supports' parameter in the register_post_type function to include 'c
 
 == Upgrade Notice ==
 
-= 2.0.2 =
-* IMPORTANT: This release includes major changes to the User Interface. Please see the changelog and updated documentation:
+= 2.0.x =
+* IMPORTANT: This release includes major changes to the User Interface from version 1. Please see the changelog and updated documentation:
 * http://www.lilaeamedia.com/plugins/intelliwidget
 
 == Getting Started ==
