@@ -142,8 +142,8 @@ Here are the steps:
 2. Create a copy of "intelliwidget.css" (located in the "templates" directory of the plugin) and drop it into this directory.
 3. Adjust the styles as necessary.
 4. Review the documentation for more information:
-    * Templates: http://www.lilaeamedia.com/plugins/intelliwidget/#templates
-    * Stylesheet: http://www.lilaeamedia.com/plugins/intelliwidget/#stylesheet
+    * Templates: http://www.lilaeamedia.com/templates
+    * Stylesheet: http://www.lilaeamedia.com/intelliwidget-stylesheet
 
 = Why isn't IntelliWidget displaying the featured image? =
 
