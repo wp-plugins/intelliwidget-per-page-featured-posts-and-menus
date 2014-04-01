@@ -322,7 +322,9 @@ class IntelliWidgetAdmin {
             $widgets[$value] = $label;
         endforeach;
         foreach(wp_get_sidebars_widgets() as $sidebar_id => $sidebar_widgets): 
-            if (false === strpos($sidebar_id, 'wp_inactive') && false === strpos($sidebar_id, 'orphaned')):
+            if (false === strpos($sidebar_id, 'wp_inactive') 
+                && false === strpos($sidebar_id, 'orphaned')
+                && is_array($sidebar_widgets)):
                 $count = 0;
                 foreach ($sidebar_widgets as $sidebar_widget_id):
                     if (false !== strpos($sidebar_widget_id, 'intelliwidget') ):
