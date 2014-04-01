@@ -115,24 +115,24 @@ Docs can be found at http://www.lilaeamedia.com/plugins/intelliwidget/
 = How do I put a custom menu on one specific page? =
 
 *Method 1:*
- * Add a new IntelliWidget to one of your sidebars on the Widgets Admin. Check the "Placeholder only" box. This keeps the widget from appearing on all the pages.
- * Go to Pages and click the page to edit.
- * You will see a new meta box labeled "IntelliWidget Profiles."
- * Click "+ Add New Profile."
- * Select the sidebar to which you added the IntelliWidget in the first step from the "Parent Profile to replace" menu.
- * From the "Post Selection" panel, choose the "Menu" template.
- * Select the posts for your menu from the "specific posts" multi-select menu.
- * Click "Save Settings."
+* Add a new IntelliWidget to one of your sidebars on the Widgets Admin. Check the "Placeholder only" box. This keeps the widget from appearing on all the pages.
+* Go to Pages and click the page to edit.
+* You will see a new meta box labeled "IntelliWidget Profiles."
+* Click "+ Add New Profile."
+* Select the sidebar to which you added the IntelliWidget in the first step from the "Parent Profile to replace" menu.
+* From the "Post Selection" panel, choose the "Menu" template.
+* Select the posts for your menu from the "specific posts" multi-select menu.
+* Click "Save Settings."
 *Method 2:*
- * If you have a custom menu already set up in the "Appearance > Menus" you can use it instead of building it from scratch.
- * Follow the steps as before.
- * In the Child Profile, open the "General Settings" panel. Select "Nav Menu" from the "IntelliWidget Type" menu.
- * Select the menu you want to use from the "Menu to use" select menu.
- * Click "Save Settings."
+* If you have a custom menu already set up in the "Appearance > Menus" you can use it instead of building it from scratch.
+* Follow the steps as before.
+* In the Child Profile, open the "General Settings" panel. Select "Nav Menu" from the "IntelliWidget Type" menu.
+* Select the menu you want to use from the "Menu to use" select menu.
+* Click "Save Settings."
 *Method 3:*
- * Use the IntelliWidget Shortcode on the page. You don't need a Placeholder to do this option.
- * Set up a new Child Profile on the page like usual, but select "Shortcode in Post Content" as the "Profile to replace" option.
- * In the content, add the shortcode [intelliwidget section=#] where # is the number of the Child Profile tab.
+* Use the IntelliWidget Shortcode on the page. You don't need a Placeholder to use this option.
+* Set up a new Child Profile on the page like usual, but select "Shortcode in Post Content" as the "Profile to replace" option.
+* In the content, add the shortcode [intelliwidget section=#] where # is the number of the Child Profile tab.
 
 = Where do I put custom templates/stylesheets? =
 
