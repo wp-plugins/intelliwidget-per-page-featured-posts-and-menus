@@ -14,6 +14,8 @@ Combine custom page menus, featured posts, sliders and other content into any wi
 
 IntelliWidget is a versatile WordPress plugin that does the work of multiple plugins by allowing you to create custom "Profiles" for any page or post that can be used where the default widget would normally appear. Each profile can have its own set of rules to display content any way you wish.
 
+Use the Shortcode option to put the power of IntelliWidget into any post on your site.
+
 Because it is generated using active titles and permalinks, your sidebar content is always current with the latest versions.
 
 Select posts by date, category, tag, and many other ways. Combine with custom post types to create unlimited CMS-style content blocks. Combine with your favorite jQuery Slider plugin to display animated slideshows.
@@ -74,7 +76,6 @@ We've made IntelliWidget completely extensible by utilizing action and filter ho
 * Doubles as a Text Widget–customizable to any page
 * Use as many different instances on a single page as you wish
 * Saves hours setting up and maintaining your WordPress site
-* Supports shortcodes so you can put the power of Intelliwidget anywhere in your site
 * Set up one page and reuse settings on other pages
 * No new database tables
 * Clean uninstall
@@ -82,6 +83,8 @@ We've made IntelliWidget completely extensible by utilizing action and filter ho
 * Shows or hides content by date and time
 * Improves performance by retrieving Post data using a single query instead of multiple meta data function calls.
 IntelliWidget is flexible and versatile. Please read the documentation to see more ideas how to use it to its full potential.
+
+Spanish translation courtesy of Andrew Kurtis at WebHostingHub.com.
  
 == Installation ==
 
@@ -153,7 +156,7 @@ Here are the steps:
 = Why isn't IntelliWidget displaying the featured image? =
 
 By default, IntelliWidget does not display the featured image. To enable the featured image,
-choose an image size under Advanced Settings > Image Size in the IntelliWidget settings.
+open the "Appearance" panel in the IntelliWidget settings and choose an image size from the "Image Size" select menu.
 
 = Why are posts showing and hiding several hours before or after the time I entered? =
 
@@ -200,7 +203,7 @@ Change the 'supports' parameter in the register_post_type function to include 'c
 * Added autoloading to reduce memory footprint
 
 = 1.4.6 =
-* Added Spanish Translation by Jelena Kovacevic
+* Spanish translation courtesy of Andrew Kurtis at WebHostingHub.com
 * Changed page-specific widget to run only if is_singular (excluding search, archive and date queries)
 
 = 1.4.5 =
