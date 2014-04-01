@@ -187,6 +187,7 @@ Change the 'supports' parameter in the register_post_type function to include 'c
 
 = 2.0.3 =
 * Fixed save_post action that was incorrectly failing nonce validation for post types other than post and page
+* Moved Widget form object init to admin constructor
 
 = 2.0.2 =
 * Fixed incorrect Nav Menu option values on both Parent and Child Profile forms.

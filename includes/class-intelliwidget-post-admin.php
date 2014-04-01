@@ -130,8 +130,10 @@ class IntelliWidgetPostAdmin extends IntelliWidgetAdmin {
             || ( !empty($post) && !in_array($post->post_type, array('post','page')) )) return false;
 
         $post_id = isset($_POST['post_ID']) ? intval($_POST['post_ID']) : NULL;
-        if (empty($post_id) || 
-            !$this->validate_post('iwpage_' . $post_id, 'iwpage', 'edit_post', false, $post_id)) return false;
+        if (empty($post_id)
+            // skip nonce test on non-ajax post
+            //|| !$this->validate_post('iwpage_' . $post_id, 'iwpage', 'edit_post', false, $post_id)
+         ) return false;
 
         $this->admin_init('post', 'post_ID');
 
