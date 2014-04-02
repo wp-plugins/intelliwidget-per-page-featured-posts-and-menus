@@ -47,7 +47,7 @@ class IntelliWidgetMetaBox {
   <input type="hidden" id="<?php echo 'intelliwidget_' . $id . '_' . $box_id . '_category'; ?>" name="<?php echo 'intelliwidget_' . $box_id . '_category'; ?>" value="-1" /><?php /* Original Categories: <?php echo implode(',', $obj->val2array($instance['category'])); */ ?>
 <?php echo apply_filters('intelliwidget_nocopy_setting', '
   <label title="' . $obj->get_tip('nocopy') . '">
-    <input name="intelliwidget_' . $box_id . '_nocopy" id="intelliwidget_' . $id . '_' . $box_id . '_nocopy" type="checkbox" ' . checked($instance['nocopy'], 1) . ' value="1"/> ' . $obj->get_label('nocopy') . '
+    <input name="intelliwidget_' . $box_id . '_nocopy" id="intelliwidget_' . $id . '_' . $box_id . '_nocopy" type="checkbox" ' . checked($instance['nocopy'], 1, false) . ' value="1"/> ' . $obj->get_label('nocopy') . '
   </label>
 '); ?>
 </p>
