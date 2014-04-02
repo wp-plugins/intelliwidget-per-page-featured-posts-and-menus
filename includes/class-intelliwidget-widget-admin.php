@@ -10,8 +10,8 @@ if ( !defined('ABSPATH')) exit;
  * @copyright 2014 Lilaea Media LLC
  * @access public
  */
-        // lazy load UI
-        include_once('class-intelliwidget-form.php');
+
+include_once('class-intelliwidget-form.php');
 class IntelliWidget_WidgetAdmin extends IntelliWidgetAdmin {
 
     var $widget_form;
