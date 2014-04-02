@@ -190,6 +190,7 @@ Change the 'supports' parameter in the register_post_type function to include 'c
 
 = 2.0.4 =
 * Fixed bug affecting php 5.3 and lower that was causing get_meta() to return a truncated value when the value was a scalar.
+* Made both pages and posts available in the "Use Profiles from" menu
 
 = 2.0.3 =
 * Fixed save_post action that was incorrectly failing nonce validation for post types other than post and page
