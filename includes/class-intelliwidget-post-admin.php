@@ -43,7 +43,7 @@ class IntelliWidgetPostAdmin extends IntelliWidgetAdmin {
     function post_main_meta_box() {
         // set up meta boxes
         $this->metabox_init();
-        foreach ($this->post_types as $type):
+        foreach (array('post', 'page') as $type):
             add_meta_box( 
                 'intelliwidget_main_meta_box',
                 $this->get_label('metabox_title'),
@@ -61,7 +61,7 @@ class IntelliWidgetPostAdmin extends IntelliWidgetAdmin {
      */
     function post_cdf_meta_box() {
         global $post;
-        foreach ($this->post_types as $type):
+        foreach (array('post', 'page') as $type):
             add_meta_box( 
                 'intelliwidget_post_meta_box',
                 $this->get_label('cdf_title'),
@@ -99,7 +99,7 @@ class IntelliWidgetPostAdmin extends IntelliWidgetAdmin {
         return '
   <select style="width:75%" name="intelliwidget_widget_page_id" id="intelliwidget_widget_page_id">
     <option value="">' . __('This form', 'intelliwidget') . '</option>
-      ' . $this->get_posts_list(array('post_types' => array($post->post_type), 'page' => $copy_id)) . '
+      ' . $this->get_posts_list(array('post_types' => array('page', 'post'), 'page' => $copy_id)) . '
   </select>';
     }
     
@@ -127,11 +127,13 @@ class IntelliWidgetPostAdmin extends IntelliWidgetAdmin {
          * we must use the post_ID passed in the form data, and skip the revision. 
          */
         if ((defined('DOING_AUTOSAVE') && DOING_AUTOSAVE ) 
-            || ( !empty($post) && 'revision' == $post->post_type )) return false;
+            || ( !empty($post) && !in_array($post->post_type, array('post','page')) )) return false;
 
         $post_id = isset($_POST['post_ID']) ? intval($_POST['post_ID']) : NULL;
-        if (empty($post_id) || 
-            !$this->validate_post('iwpage_' . $post_id, 'iwpage', 'edit_post', false, $post_id)) return false;
+        if (empty($post_id)
+            // skip nonce test on non-ajax post
+            //|| !$this->validate_post('iwpage_' . $post_id, 'iwpage', 'edit_post', false, $post_id)
+         ) return false;
 
         $this->admin_init('post', 'post_ID');
 

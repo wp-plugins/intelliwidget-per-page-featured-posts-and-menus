@@ -76,6 +76,8 @@ class IntelliWidgetList {
 
             'skip_expired'      => __('Exclude expired posts', 'intelliwidget'),
 
+            'include_private'   => __('Include private posts', 'intelliwidget'),
+
             'nav_menu'          => __('Menu to display', 'intelliwidget'),
 
             'widget_page_id'    => __('Use Profiles from', 'intelliwidget'),
@@ -250,6 +252,7 @@ class IntelliWidgetList {
                     'filter', 
                     'future_only', 
                     'active_only', 
+                    'include_private',
                     'nocopy',
                 )
             ),

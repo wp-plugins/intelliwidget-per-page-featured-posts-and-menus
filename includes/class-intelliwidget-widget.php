@@ -216,10 +216,9 @@ class IntelliWidget_Widget extends WP_Widget {
                     )
                 );
             else:
-                $nav_menu =  wp_get_nav_menu_object( $instance['nav_menu'] );
                 wp_nav_menu( array( 
                     'fallback_cb'   => '', 
-                    'menu'          => $nav_menu, 
+                    'menu'          => $instance['nav_menu'], 
                     'menu_class'    => apply_filters('intelliwidget_menu_classes', 'iw-menu', $instance),
                     )
                 );

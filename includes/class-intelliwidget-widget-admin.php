@@ -10,6 +10,8 @@ if ( !defined('ABSPATH')) exit;
  * @copyright 2014 Lilaea Media LLC
  * @access public
  */
+
+include_once('class-intelliwidget-form.php');
 class IntelliWidget_WidgetAdmin extends IntelliWidgetAdmin {
 
     var $widget_form;
@@ -17,8 +19,9 @@ class IntelliWidget_WidgetAdmin extends IntelliWidgetAdmin {
      * Constructor
      */
     function __construct() {
-            add_action('load-widgets.php',                  array(&$this, 'load_widget_form') );
-            add_action('wp_ajax_iw_widget_menus',           array(&$this, 'ajax_get_widget_post_select_menus'));
+        add_action('load-widgets.php',                  array(&$this, 'load_widget_form') );
+        add_action('wp_ajax_iw_widget_menus',           array(&$this, 'ajax_get_widget_post_select_menus'));
+        $this->widget_form = new IntelliWidgetForm();
     }
     
     
@@ -65,9 +68,6 @@ class IntelliWidget_WidgetAdmin extends IntelliWidgetAdmin {
     
     function load_widget_form(){
         $this->admin_init();
-        // lazy load UI
-        include_once('class-intelliwidget-form.php');
-        $this->widget_form = new IntelliWidgetForm();
     }
     
     // widgets only

@@ -6,7 +6,7 @@ if ( !defined('ABSPATH')) exit;
     Plugin Name: IntelliWidget Per Page Featured Posts and Menus
     Plugin URI: http://www.lilaeamedia.com/plugins/intelliwidget
     Description: Combine custom page menus, featured posts, sliders and other content into any widget area that can be customized on a per-page or site-wide basis.
-    Version: 2.0.0
+    Version: 2.0.4
     Author: Lilaea Media
     Author URI: http://www.lilaeamedia.com/
     Text Domain: intelliwidget
@@ -80,8 +80,8 @@ class IntelliWidget {
                         endif;
                     endif;
             endswitch;
-            if (!empty($instance)):
-                if (!empty($instance['custom_text']))
+            if (isset($instance)):
+                if (is_array($instance) && isset($instance['custom_text']))
                     // base64 encoding saves us from markup serialization heartburn
                     $instance['custom_text'] = stripslashes(base64_decode($instance['custom_text']));
                 return $instance;
@@ -260,7 +260,7 @@ class IntelliWidget {
     
 }
 
-define('INTELLIWIDGET_VERSION', '2.0.0');
+define('INTELLIWIDGET_VERSION', '2.0.4');
 
 if (is_admin())
     include_once( 'includes/class-intelliwidget-admin.php' );

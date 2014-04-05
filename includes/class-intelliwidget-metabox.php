@@ -47,7 +47,7 @@ class IntelliWidgetMetaBox {
   <input type="hidden" id="<?php echo 'intelliwidget_' . $id . '_' . $box_id . '_category'; ?>" name="<?php echo 'intelliwidget_' . $box_id . '_category'; ?>" value="-1" /><?php /* Original Categories: <?php echo implode(',', $obj->val2array($instance['category'])); */ ?>
 <?php echo apply_filters('intelliwidget_nocopy_setting', '
   <label title="' . $obj->get_tip('nocopy') . '">
-    <input name="intelliwidget_' . $box_id . '_nocopy" id="intelliwidget_' . $id . '_' . $box_id . '_nocopy" type="checkbox" ' . checked($instance['nocopy'], 1) . ' value="1"/> ' . $obj->get_label('nocopy') . '
+    <input name="intelliwidget_' . $box_id . '_nocopy" id="intelliwidget_' . $id . '_' . $box_id . '_nocopy" type="checkbox" ' . checked($instance['nocopy'], 1, false) . ' value="1"/> ' . $obj->get_label('nocopy') . '
   </label>
 '); ?>
 </p>
@@ -295,6 +295,13 @@ class IntelliWidgetMetaBox {
         <?php echo $obj->get_label('skip_expired'); ?>
       </label>
     </p>
+    <p>
+      <label title="<?php echo $obj->get_tip('include_private'); ?>" for="<?php echo 'intelliwidget_' . $id . '_' . $box_id . '_include_private'; ?>">
+        <input id="<?php echo 'intelliwidget_' . $id . '_' . $box_id . '_include_private'; ?>" name="<?php echo 'intelliwidget_' . $box_id . '_include_private'; ?>" type="checkbox" <?php checked($instance['include_private'], 1); ?> value="1" />
+        &nbsp;
+        <?php echo $obj->get_label('include_private'); ?>
+      </label>
+    </p>    
   </div>
 </div>
 <?php
