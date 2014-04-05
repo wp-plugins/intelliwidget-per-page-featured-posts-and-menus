@@ -1,5 +1,5 @@
 === IntelliWidget Per Page Featured Posts and Menus ===
-Contributors: lilaeamedia, rolandp
+Contributors: lilaeamedia, support00
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=DE4W9KW7HQJNA
 Tags: featured posts, events, page menu, plugin, textwidget, widget, custom post types, custom sidebar
 Requires at least: 3.5
@@ -193,7 +193,7 @@ Change the 'supports' parameter in the register_post_type function to include 'c
 == Changelog ==
 
 = 2.0.5 =
-* New feature: include private posts option (visible to users that can read private posts) (thanks rolandp)
+* New feature: include private posts option (visible to users that can read private posts) (thanks support00)
 * New feature: setting excerpt length to first instance of <!--more--> if present or max words of not (thanks wakibu)
 * "Use Profiles From" menu now only shows posts that have existing IntelliWidget profiles
 * Fixed bug not saving multi-select values when no options selected
