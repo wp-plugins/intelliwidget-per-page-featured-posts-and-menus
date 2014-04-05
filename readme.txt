@@ -67,9 +67,9 @@ We've made IntelliWidget completely extensible by utilizing action and filter ho
 Now you can have custom IntelliWidgets on any Archive page! Choose the criteria and customize the Profiles for Blog pages, Categories, Tags and more.
 New Taxonomy Menu lets you browse hierarchical taxonomies, showing sibling and child terms based on the current page. See http://www.lilaeamedia.com/plugins/archive-taxonomy-extension for more information.
 
-= Coming Soon: New Premium Extension! =
+= Coming Soon: IntelliWidget Template Configurator Extension =
 
-* IntelliWidget Template Configurator Extension - Create your own custom templates right from the IntelliWidget admin.
+* Create your own custom templates right from the IntelliWidget admin.
 
 = More Reasons to use IntelliWidget for Featured Posts and Custom Menus =
 
