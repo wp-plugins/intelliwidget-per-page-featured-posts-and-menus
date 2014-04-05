@@ -104,17 +104,17 @@ LEFT JOIN {$wpdb->postmeta} pm1 ON pm1.post_id = p1.ID
 LEFT JOIN {$wpdb->postmeta} pm2 ON pm2.post_id = p1.ID
     AND pm2.meta_key = 'intelliwidget_event_date'
             ",);
-        if(!empty($instance['include_private']) && current_user_can('read_private_posts')){
+        if(!empty($instance['include_private']) && current_user_can('read_private_posts')):
             $clauses = array(
                 "(p1.post_status = 'publish' OR p1.post_status = 'private')",
                 "(p1.post_password = '' OR p1.post_password IS NULL)",
             );
-        }else{
+        else:
             $clauses = array(
                 "(p1.post_status = 'publish')",
                 "(p1.post_password = '' OR p1.post_password IS NULL)",
             );
-        }
+        endif;
         // taxonomies
         $prepargs = array();
         // backward compatibility: support category term ids
