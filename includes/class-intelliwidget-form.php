@@ -260,6 +260,15 @@ name="<?php echo $widgetobj->get_field_name('custom_text'); ?>">
         <?php echo $adminobj->get_label('skip_expired'); ?>
       </label>
     </p>
+<?php if (current_user_can('read_private_posts')): ?>
+    <p>
+      <label title="<?php echo $adminobj->get_tip('include_private');?>">
+        <input name="<?php echo $widgetobj->get_field_name('include_private'); ?>" id="<?php echo $widgetobj->get_field_id('include_private'); ?>" type="checkbox" <?php checked($instance['include_private'], 1); ?> value="1" />
+        &nbsp;
+        <?php echo $adminobj->get_label('include_private'); ?>
+      </label>
+    </p>   
+<?php endif; ?> 
   </div>
 </div>
 <?php

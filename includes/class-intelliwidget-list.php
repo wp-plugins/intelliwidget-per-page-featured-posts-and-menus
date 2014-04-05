@@ -76,6 +76,8 @@ class IntelliWidgetList {
 
             'skip_expired'      => __('Exclude expired posts', 'intelliwidget'),
 
+            'include_private'   => __('Include private posts', 'intelliwidget'),
+
             'nav_menu'          => __('Menu to display', 'intelliwidget'),
 
             'widget_page_id'    => __('Use Profiles from', 'intelliwidget'),
@@ -153,6 +155,8 @@ class IntelliWidgetList {
             'active_only'       => __('Check this box if you wish to exclude posts with a future start date from the selection list. Start dates are set for each individual post using IntelliWidget Custom Fields (see).', 'intelliwidget'),
 
             'skip_expired'      => __('Check this box if you wish to exclude posts with a past expire date from the selection list. Expire dates are set for each individual post using IntelliWidget Custom Fields (see).', 'intelliwidget'),
+
+            'include_private'   => __('Check this box if you wish to show privately published posts. Links will only be visible to logged in users that can read private content.', 'intelliwidget'),
 
             'nav_menu'          => __("This menu controls the Navigation Menu to be displayed in this IntelliWidget section. To show all pages (including a home page), use the 'Automatic Page Menu' option. Nav Menus are customized from Appearance > Menus in the WordPress admin.", 'intelliwidget'),
             
@@ -250,6 +254,7 @@ class IntelliWidgetList {
                     'filter', 
                     'future_only', 
                     'active_only', 
+                    'include_private',
                     'nocopy',
                 )
             ),

@@ -104,10 +104,17 @@ LEFT JOIN {$wpdb->postmeta} pm1 ON pm1.post_id = p1.ID
 LEFT JOIN {$wpdb->postmeta} pm2 ON pm2.post_id = p1.ID
     AND pm2.meta_key = 'intelliwidget_event_date'
             ",);
-        $clauses = array(
-            "(p1.post_status = 'publish')",
-            "(p1.post_password = '' OR p1.post_password IS NULL)",
-        );
+        if(!empty($instance['include_private']) && current_user_can('read_private_posts')):
+            $clauses = array(
+                "(p1.post_status = 'publish' OR p1.post_status = 'private')",
+                "(p1.post_password = '' OR p1.post_password IS NULL)",
+            );
+        else:
+            $clauses = array(
+                "(p1.post_status = 'publish')",
+                "(p1.post_password = '' OR p1.post_password IS NULL)",
+            );
+        endif;
         // taxonomies
         $prepargs = array();
         // backward compatibility: support category term ids
@@ -269,7 +276,7 @@ LEFT JOIN {$wpdb->postmeta} pm7 ON pm7.post_id = p1.ID
         FROM {$wpdb->posts}
             LEFT JOIN {$wpdb->postmeta} pm ON pm.meta_key = '_intelliwidget_map' and pm.post_id = ID 
         WHERE post_type IN (" . $this->prep_array($post_types, $args) . ")
-            AND (post_status = 'publish')
+            AND (post_status = 'publish' " . (current_user_can('read_private_posts') ? " or post_status = 'private'" : '') . ")
             AND (post_password = '' OR post_password IS NULL)
         ORDER BY post_type, post_title
         ";
