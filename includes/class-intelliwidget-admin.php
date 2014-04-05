@@ -207,9 +207,14 @@ class IntelliWidgetAdmin {
             foreach ($new_instance as $name => $value):
                 $old_instance[$name] = $value;
                 // make sure at least one post type exists
-                if ('post_types' == $name && empty($value))
-                    $old_instance[$name] = array('post');
-                if ('replace_widget' == $name) $box_map[$box_id] = $value;
+                if ('post_types' == $name && empty($new_instance[$name]))
+                    $old_instance['post_types'] = array('post');
+                if ('replace_widget' == $name) $box_map[$box_id] = $new_instance['replace_widget'];
+                // handle multi selects that may not be passed or may just be empty
+                if ('page_multi' == $name && empty($new_instance['page']))
+                    $old_instance['page'] = array();
+                if ('terms_multi' == $name && empty($new_instance['terms']))
+                    $old_instance['terms'] = array();
             endforeach;
             // special handling for checkboxes:
             foreach($checkbox_fields as $name)
@@ -365,8 +370,9 @@ class IntelliWidgetAdmin {
      * @param <array> $instance
      * @return <string> 
      */
-    function get_posts_list($instance = NULL) {
+    function get_posts_list($instance = NULL, $profiles = false) {
         $instance['page'] = $this->val2array(isset($instance['page']) ? $instance['page'] : '');
+        $instance['profiles_only'] = $profiles;
         $posts = array();
         if (!isset($this->posts)) $this->load_posts();
         foreach ($this->val2array($instance['post_types']) as $post_type):

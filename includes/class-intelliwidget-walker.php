@@ -34,6 +34,7 @@ class Walker_IntelliWidget extends Walker {
 	 * @param int $id
 	 */
 	function start_el(&$output, $page, $depth = 0, $args = array(), $id = 0) {
+        if (isset($args['profiles_only']) && $args['profiles_only'] && empty($page->has_profile)) return;
 		$pad = str_repeat('-&nbsp;', $depth);
 
 		$output .= "\t<option class=\"level-$depth\" value=\"$page->ID\"";

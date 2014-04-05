@@ -34,7 +34,7 @@ class IntelliWidgetMetaBox {
     function add_form($obj, $id) {
 ?>
 <div class="iw-copy-container"> <span class="spinner" id="intelliwidget_spinner"></span> </div>
-<a title="<?php echo $obj->get_tip('iw_add'); ?>" style="float:left;" href="<?php echo $obj->get_nonce_url($id, 'add'); ?>" id="iw_add_<?php $id; ?>" class="iw-add">
+<a title="<?php echo $obj->get_tip('iw_add'); ?>" style="float:left;" href="<?php echo $obj->get_nonce_url($id, 'add'); ?>" id="iw_add_<?php echo $id; ?>" class="iw-add">
 <?php echo $obj->get_label('iw_add'); ?>
 </a>
 <?php wp_nonce_field('iwpage_' . $id,'iwpage'); ?>
@@ -295,6 +295,7 @@ class IntelliWidgetMetaBox {
         <?php echo $obj->get_label('skip_expired'); ?>
       </label>
     </p>
+<?php if (current_user_can('read_private_posts')): ?>
     <p>
       <label title="<?php echo $obj->get_tip('include_private'); ?>" for="<?php echo 'intelliwidget_' . $id . '_' . $box_id . '_include_private'; ?>">
         <input id="<?php echo 'intelliwidget_' . $id . '_' . $box_id . '_include_private'; ?>" name="<?php echo 'intelliwidget_' . $box_id . '_include_private'; ?>" type="checkbox" <?php checked($instance['include_private'], 1); ?> value="1" />
@@ -302,6 +303,7 @@ class IntelliWidgetMetaBox {
         <?php echo $obj->get_label('include_private'); ?>
       </label>
     </p>    
+<?php endif; ?>
   </div>
 </div>
 <?php
@@ -312,6 +314,8 @@ class IntelliWidgetMetaBox {
         if (empty($instance['terms']) && isset($instance['category']) && '-1' != $instance['category'])
             $instance['terms'] = $obj->map_category_to_tax($instance['category']);
 ?>
+<input type="hidden" name="<?php echo 'intelliwidget_' . $box_id . '_page_multi'; ?>" id="<?php echo 'intelliwidget_' . $box_id . '_page_multi'; ?>" value="1" />
+<input type="hidden" name="<?php echo 'intelliwidget_' . $box_id . '_terms_multi'; ?>" id="<?php echo 'intelliwidget_' . $box_id . '_terms_multi'; ?>" value="1" />
     <p>
       <label title="<?php echo $obj->get_tip('page'); ?>">
         <?php echo $obj->get_label('page'); ?>

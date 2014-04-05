@@ -104,7 +104,7 @@ LEFT JOIN {$wpdb->postmeta} pm1 ON pm1.post_id = p1.ID
 LEFT JOIN {$wpdb->postmeta} pm2 ON pm2.post_id = p1.ID
     AND pm2.meta_key = 'intelliwidget_event_date'
             ",);
-        if(isset($instance['include_private'])){
+        if(!empty($instance['include_private']) && current_user_can('read_private_posts')){
             $clauses = array(
                 "(p1.post_status = 'publish' OR p1.post_status = 'private')",
                 "(p1.post_password = '' OR p1.post_password IS NULL)",
@@ -124,7 +124,7 @@ LEFT JOIN {$wpdb->postmeta} pm2 ON pm2.post_id = p1.ID
                 "INNER JOIN {$wpdb->term_taxonomy} tx2 ON tx2.term_taxonomy_id = tx1.term_taxonomy_id 
                     AND tx2.taxonomy = 'category'";
         // otherwise use new terms instead
-        elseif (isset($instance['terms']) && '' != $instance['terms'] && -1 != $instance['terms']):
+        elseif (isset($instance['terms']) && $instance['terms'] && -1 != $instance['terms']):
             $clauses[] = '( tx1.term_taxonomy_id IN ('. $this->prep_array($instance['terms'], $prepargs, 'd') . ') )';
             $joins[] = "INNER JOIN {$wpdb->term_relationships} tx1 ON p1.ID = tx1.object_id ";
         endif;
@@ -197,9 +197,6 @@ LEFT JOIN {$wpdb->postmeta} pm2 ON pm2.post_id = p1.ID
         $res      = $wpdb->get_results($wpdb->prepare($query, $prepargs));
         if (count($res)):
             $clauses = $prepargs = $ids = array();
-            foreach ($res as $obj)
-                $ids[] = $obj->ID;
-            $clauses[] = '(p1.ID IN ('. $this->prep_array($ids, $prepargs, 'd') . ') )';
 
             // now flesh out objects
             $select = "
@@ -207,7 +204,8 @@ SELECT DISTINCT
     p1.ID,
     p1.post_content, 
     p1.post_excerpt, 
-    p1.post_title,
+    COALESCE(NULLIF(TRIM(p1.post_title), ''), " 
+    . $this->prep_array(__('Untitled', 'intelliwidget'), $prepargs) . ") AS post_title,
     COALESCE(NULLIF(pm2.meta_value, ''), p1.post_date) AS post_date,
     p1.post_author,
     'raw' AS filter,
@@ -242,6 +240,9 @@ LEFT JOIN {$wpdb->postmeta} pm6 ON pm6.post_id = p1.ID
 LEFT JOIN {$wpdb->postmeta} pm7 ON pm7.post_id = p1.ID
     AND pm7.meta_key = '_thumbnail_id'
             ");
+            foreach ($res as $obj)
+                $ids[] = $obj->ID;
+            $clauses[] = '(p1.ID IN ('. $this->prep_array($ids, $prepargs, 'd') . ') )';
             $query = $select . implode(' ', $joins) . ' WHERE ' . implode("\n AND ", $clauses) . $orderby;
             $res      = $wpdb->get_results($wpdb->prepare($query, $prepargs), OBJECT);
         endif;
@@ -270,10 +271,12 @@ LEFT JOIN {$wpdb->postmeta} pm7 ON pm7.post_id = p1.ID
             ID,
             post_title,
             post_type,
-            post_parent
+            post_parent,
+            pm.meta_id as has_profile
         FROM {$wpdb->posts}
+            LEFT JOIN {$wpdb->postmeta} pm ON pm.meta_key = '_intelliwidget_map' and pm.post_id = ID 
         WHERE post_type IN (" . $this->prep_array($post_types, $args) . ")
-            AND (post_status = 'publish')
+            AND (post_status = 'publish' " . (current_user_can('read_private_posts') ? " or post_status = 'private'" : '') . ")
             AND (post_password = '' OR post_password IS NULL)
         ORDER BY post_type, post_title
         ";

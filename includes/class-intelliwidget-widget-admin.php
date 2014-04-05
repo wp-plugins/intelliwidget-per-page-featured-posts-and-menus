@@ -32,27 +32,30 @@ class IntelliWidget_WidgetAdmin extends IntelliWidgetAdmin {
      * @return <array>
      */
     function update($new_instance, $old_instance) {
+        global $intelliwidget;
         $textfields = $this->get_text_fields();
         foreach ($new_instance as $name => $value):
             // special handling for text inputs
-                if (in_array($name, $textfields)):
-                    if ( current_user_can('unfiltered_html') ):
-                        $old_instance[$name] =  $new_instance[$name];
-                    else:
-                        // raw html parser/cleaner-upper: see WP docs re: KSES
-                        $old_instance[$name] = stripslashes( 
-                            wp_filter_post_kses( addslashes($new_instance[$name]) ) ); 
-                    endif;
+            if (in_array($name, $textfields)):
+                if ( current_user_can('unfiltered_html') ):
+                    $old_instance[$name] =  $value;
                 else:
-                    $old_instance[$name] = $this->filter_sanitize_input($new_instance[$name]);
+                    // raw html parser/cleaner-upper: see WP docs re: KSES
+                    $old_instance[$name] = stripslashes( 
+                    wp_filter_post_kses( addslashes($value) ) ); 
                 endif;
-                if ('post_types' == $name && empty($value))
-                    $old_instance[$name] = array('post');
+            else:
+                $old_instance[$name] = $this->filter_sanitize_input($value);
+            endif;
+            // handle multi selects that may not be passed or may just be empty
+            if ('page_multi' == $name && empty($new_instance['page']))
+                $old_instance['page'] = array();
+            if ('terms_multi' == $name && empty($new_instance['terms']))
+                $old_instance['terms'] = array();
         endforeach;
-        // special handling for checkboxes:
-        foreach (  $this->get_checkbox_fields() as $name) :
+        foreach ($this->get_checkbox_fields() as $name)
             $old_instance[$name] = isset($new_instance[$name]);
-        endforeach;
+            
         return $old_instance;
     }
     /**

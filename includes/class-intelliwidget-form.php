@@ -11,6 +11,7 @@ if ( !defined('ABSPATH')) exit;
  * @access public
  */
 class IntelliWidgetForm {
+    
     function __construct() {
         add_action('intelliwidget_form_all_before', array($this, 'general_settings'), 10, 4);
         add_action('intelliwidget_form_post_list',  array($this, 'post_selection_settings'), 5, 4);
@@ -259,13 +260,15 @@ name="<?php echo $widgetobj->get_field_name('custom_text'); ?>">
         <?php echo $adminobj->get_label('skip_expired'); ?>
       </label>
     </p>
+<?php if (current_user_can('read_private_posts')): ?>
     <p>
       <label title="<?php echo $adminobj->get_tip('include_private');?>">
         <input name="<?php echo $widgetobj->get_field_name('include_private'); ?>" id="<?php echo $widgetobj->get_field_id('include_private'); ?>" type="checkbox" <?php checked($instance['include_private'], 1); ?> value="1" />
         &nbsp;
         <?php echo $adminobj->get_label('include_private'); ?>
       </label>
-    </p>    
+    </p>   
+<?php endif; ?> 
   </div>
 </div>
 <?php
@@ -277,6 +280,8 @@ name="<?php echo $widgetobj->get_field_name('custom_text'); ?>">
             $instance['terms'] = $adminobj->map_category_to_tax($instance['category']);
        
 ?>
+<input type="hidden" name="<?php echo $widgetobj->get_field_name('page_multi'); ?>" id="<?php echo $widgetobj->get_field_name('page_multi'); ?>" value="1" />
+<input type="hidden" name="<?php echo $widgetobj->get_field_name('terms_multi'); ?>" id="<?php echo $widgetobj->get_field_name('terms_multi'); ?>" value="1" />
     <p>
       <label title="<?php echo $adminobj->get_tip('page');?>">
         <?php echo $adminobj->get_label('page');?>
