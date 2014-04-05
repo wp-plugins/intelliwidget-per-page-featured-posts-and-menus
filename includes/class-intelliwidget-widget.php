@@ -50,7 +50,7 @@ class IntelliWidget_Widget extends WP_Widget {
      */
     function widget($args, $instance) {
         $instance = apply_filters('intelliwidget_extension_settings', $instance, $args);
-        // no page-specific settings, should we hide?
+        // should we hide?
         if (!empty($instance['hide_if_empty']))
             return;
         global $intelliwidget;
@@ -153,6 +153,7 @@ class IntelliWidget_Widget extends WP_Widget {
      * @return <string>
      */
     function filter_trim_excerpt($text, $this_instance) {
+        $moretag = '<!--more-->';
         $length = intval($this_instance['length']);
         $allowed_tags = '';
         if (isset($this_instance['allowed_tags'])):
@@ -161,20 +162,23 @@ class IntelliWidget_Widget extends WP_Widget {
                 $allowed_tags .= '<' . trim($tag) . '>';
             endforeach;          
         endif;
-        $text   = strip_shortcodes($text);
-        $text   = preg_replace( '@<(script|style)[^>]*?>.*?</\\1>@si', '', $text );
-        $text   = apply_filters('the_content', $text);
-        //$text   = str_replace(']]>', ']]&gt;', $text);
-        $text   = strip_tags($text, $allowed_tags);
-        if (empty($allowed_tags)):
+        $text       = strip_shortcodes($text);
+        $text       = preg_replace( '@<(script|style)[^>]*?>.*?</\\1>@si', '', $text );
+        $textarr    = explode($moretag, $text, 2);
+        $more       = (count($textarr) > 1);
+        $text       = apply_filters('the_content', $textarr[0]);
+        
+        //$text     = str_replace(']]>', ']]&gt;', $text);
+        $text       = strip_tags($text, $allowed_tags);
+        if (empty($allowed_tags) && !$more):
             $words  = preg_split('/[\r\n\t ]+/', $text, $length + 1);
-            if ( count($words) > $length ):
+            if ( count($words) > $length):
                 array_pop($words);
                 array_push($words, '...');
                 $text = implode(' ', $words);
             endif;
-        else:
-            $text = $this->get_words_html($text, $length);
+        elseif ($allowed_tags):
+            $text = $this->get_words_html($text, $length, $more);
         endif; 
         return $text;
     }
@@ -226,7 +230,7 @@ class IntelliWidget_Widget extends WP_Widget {
         endif;
     }
 
-    function get_words_html($text, $length) {
+    function get_words_html($text, $length, $more = false) {
         $opentags   = array();
         $excerpt    = '';
         $text       = preg_replace('/<(br|hr)[ \/]*>/', "<$1/>", $text);
@@ -245,14 +249,14 @@ class IntelliWidget_Widget extends WP_Widget {
                 foreach ($words as $word):
                     if (empty($word)) continue;
                     $count++;
-                    if ($count <= $length):
+                    if ($count <= $length || $more):
                         $excerpt .= $word . ' ';
                     else:
-                        $excerpt .= '...';
+                        $excerpt .= ' ...';
                         break;
                     endif;
                 endforeach;
-                if ($count > $length) break;
+                if ($count > $length && !$more) break;
             endforeach;
             while (count($opentags)):
                 $close = array_pop($opentags);

@@ -11,6 +11,7 @@ if ( !defined('ABSPATH')) exit;
  * @access public
  */
 class IntelliWidgetForm {
+    
     function __construct() {
         add_action('intelliwidget_form_all_before', array($this, 'general_settings'), 10, 4);
         add_action('intelliwidget_form_post_list',  array($this, 'post_selection_settings'), 5, 4);
@@ -270,6 +271,8 @@ name="<?php echo $widgetobj->get_field_name('custom_text'); ?>">
             $instance['terms'] = $adminobj->map_category_to_tax($instance['category']);
        
 ?>
+<input type="hidden" name="<?php echo $widgetobj->get_field_name('page_multi'); ?>" id="<?php echo $widgetobj->get_field_name('page_multi'); ?>" value="1" />
+<input type="hidden" name="<?php echo $widgetobj->get_field_name('terms_multi'); ?>" id="<?php echo $widgetobj->get_field_name('terms_multi'); ?>" value="1" />
     <p>
       <label title="<?php echo $adminobj->get_tip('page');?>">
         <?php echo $adminobj->get_label('page');?>

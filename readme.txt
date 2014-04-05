@@ -4,7 +4,7 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_i
 Tags: featured posts, events, page menu, plugin, textwidget, widget, custom post types, custom sidebar
 Requires at least: 3.5
 Tested up to: 3.8.1
-Stable tag: 2.0.4
+Stable tag: 2.0.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -188,21 +188,26 @@ Change the 'supports' parameter in the register_post_type function to include 'c
 
 == Changelog ==
 
+= 2.0.5 =
+* Fixed bug not saving multi-select values when no options selected
+* Fixed bug not applying meta box panel to post types other than page/post 
+* New feature: setting excerpt length to first instance of <!--more--> if present or max words of not (thanks wakibu)
+
 = 2.0.4 =
-* Fixed bug affecting php 5.3 and lower that was causing get_meta() to return a truncated value when the value was a scalar.
+* Fixed bug affecting php 5.3 and lower that was causing get_meta() to return a truncated value when the value was a scalar (thanks aschaevitz)
 * Made both pages and posts available in the "Use Profiles from" menu
 
 = 2.0.3 =
-* Fixed save_post action that was incorrectly failing nonce validation for post types other than post and page
+* Fixed save_post action that was incorrectly failing nonce validation for post types other than post and page (thanks janvbear)
 * Moved Widget form object init to admin constructor
 
 = 2.0.2 =
-* Fixed incorrect Nav Menu option values on both Parent and Child Profile forms.
+* Fixed incorrect Nav Menu option values on both Parent and Child Profile forms (thanks crzyhrse).
 
 = 2.0.1 =
 * Overhauled most of the code to simplify logic flow and enable filter and action hooks for extensibility
 * Replaced 'Categories' with 'Terms' to include any taxonomies associated with selected post types
-* Reorganized User Interface to be more intuitive
+* Reorganized User Interface to be more intuitive (thanks Paal)
 * Added new 'content' option to allow action hooks to replace default content
 * Added autoloading to reduce memory footprint
 

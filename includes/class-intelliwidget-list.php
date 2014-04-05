@@ -17,7 +17,7 @@ class IntelliWidgetList {
     var $fields;
     
     function __construct() {
-        $this->labels = array(
+        $this->labels = apply_filters('intelliwidget_labels', array(
             'metabox_title'     => __('IntelliWidget Profiles', 'intelliwidget'),
             
             'cdf_title'         => __('IntelliWidget Custom Fields', 'intelliwidget'),
@@ -97,9 +97,9 @@ class IntelliWidgetList {
             'replace_widget'    => __('Parent Profile to replace', 'intelliwidget'),
             
             'nocopy'            => __('Override profiles selected above with this Profile', 'intelliwidget'),
-);
+        ));
 
-        $this->tips = array(
+        $this->tips = apply_filters('intelliwidget_tips', array(
             'hide_if_empty'     => __('Check this box to restrict this IntelliWidget to pages/posts with custom settings. If the page or post being viewed has not been configured with its own Intelliwidget settings, this section will be hidden.', 'intelliwidget'),
 
             'generalsettings'   => __('These settings apply to all IntelliWidgets, including the type of IntelliWidget, the Section Title, HTML container id and CSS classes.', 'intelliwidget'),
@@ -174,8 +174,8 @@ class IntelliWidgetList {
             'replace_widget'    => __("This menu determines the IntelliWidget instance to replace with these settings. Options are labeled by Sidebar Name followed by the nth IntelliWidget in that sidebar. Even if there are other Widgets in the Sidebar, the number represents only the IntelliWidgets in the Sidebar. If you reorder the Widgets in the Sidebar, the number will reflect the change. To use these settings for a shortcode on the post, select 'Shortcode' and use the format [intelliwidget section=tab#], where 'tab#' corresponds to the number of the tab (above) containing the settings you wish to use.", 'intelliwidget'),
 
             'nocopy'            => __("Check this box to keep these settings even when using another profile from the menu above.", 'intelliwidget'),
-            
-);
+            )
+        );
 
         $this->menus = array(
             'content' => apply_filters('intelliwidget_content_menu', 
