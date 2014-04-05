@@ -2,10 +2,10 @@
 # This file is distributed under the same license as the IntelliWidget Per Page Featured Posts and Menus package.
 msgid ""
 msgstr ""
-"Project-Id-Version: IntelliWidget Per Page Featured Posts and Menus 2.0.0\n"
+"Project-Id-Version: IntelliWidget Per Page Featured Posts and Menus 2.0.5\n"
 "Report-Msgid-Bugs-To: http://wordpress.org/tag/intelliwidget-per-page-"
 "featured-posts-and-menus\n"
-"POT-Creation-Date: 2014-03-31 00:41:33+00:00\n"
+"POT-Creation-Date: 2014-04-05 20:19:40+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -25,14 +25,14 @@ msgstr ""
 msgid "Extended Settings"
 msgstr ""
 
-#: includes/class-intelliwidget-form.php:41
 #: includes/class-intelliwidget-form.php:42
-#: includes/class-intelliwidget-form.php:85
+#: includes/class-intelliwidget-form.php:43
 #: includes/class-intelliwidget-form.php:86
-#: includes/class-intelliwidget-form.php:121
+#: includes/class-intelliwidget-form.php:87
 #: includes/class-intelliwidget-form.php:122
-#: includes/class-intelliwidget-form.php:200
+#: includes/class-intelliwidget-form.php:123
 #: includes/class-intelliwidget-form.php:201
+#: includes/class-intelliwidget-form.php:202
 #: includes/class-intelliwidget-metabox.php:83
 #: includes/class-intelliwidget-metabox.php:126
 #: includes/class-intelliwidget-metabox.php:157
@@ -40,12 +40,12 @@ msgstr ""
 msgid "Click to toggle"
 msgstr ""
 
-#: includes/class-intelliwidget-form.php:138
+#: includes/class-intelliwidget-form.php:139
 #: includes/class-intelliwidget-metabox.php:174
 msgid "ASC"
 msgstr ""
 
-#: includes/class-intelliwidget-form.php:141
+#: includes/class-intelliwidget-form.php:142
 #: includes/class-intelliwidget-metabox.php:177
 msgid "DESC"
 msgstr ""
@@ -171,96 +171,100 @@ msgid "Exclude expired posts"
 msgstr ""
 
 #: includes/class-intelliwidget-list.php:79
-msgid "Menu to display"
+msgid "Include private posts"
 msgstr ""
 
 #: includes/class-intelliwidget-list.php:81
-msgid "Use Profiles from"
+msgid "Menu to display"
 msgstr ""
 
 #: includes/class-intelliwidget-list.php:83
-msgid "+ Add New Profile"
+msgid "Use Profiles from"
 msgstr ""
 
 #: includes/class-intelliwidget-list.php:85
-#: includes/class-intelliwidget-list.php:204
-msgid "Start Date"
+msgid "+ Add New Profile"
 msgstr ""
 
 #: includes/class-intelliwidget-list.php:87
-msgid "Expire Date"
+#: includes/class-intelliwidget-list.php:208
+msgid "Start Date"
 msgstr ""
 
 #: includes/class-intelliwidget-list.php:89
-msgid "Alt Title"
+msgid "Expire Date"
 msgstr ""
 
 #: includes/class-intelliwidget-list.php:91
-msgid "External URL"
+msgid "Alt Title"
 msgstr ""
 
 #: includes/class-intelliwidget-list.php:93
-msgid "Link Classes"
+msgid "External URL"
 msgstr ""
 
 #: includes/class-intelliwidget-list.php:95
-msgid "Link Target"
+msgid "Link Classes"
 msgstr ""
 
 #: includes/class-intelliwidget-list.php:97
-msgid "Parent Profile to replace"
+msgid "Link Target"
 msgstr ""
 
 #: includes/class-intelliwidget-list.php:99
+msgid "Parent Profile to replace"
+msgstr ""
+
+#: includes/class-intelliwidget-list.php:101
 msgid "Override profiles selected above with this Profile"
 msgstr ""
 
-#: includes/class-intelliwidget-list.php:103
+#: includes/class-intelliwidget-list.php:105
 msgid ""
 "Check this box to restrict this IntelliWidget to pages/posts with custom "
 "settings. If the page or post being viewed has not been configured with its "
 "own Intelliwidget settings, this section will be hidden."
 msgstr ""
 
-#: includes/class-intelliwidget-list.php:105
+#: includes/class-intelliwidget-list.php:107
 msgid ""
 "These settings apply to all IntelliWidgets, including the type of "
 "IntelliWidget, the Section Title, HTML container id and CSS classes."
 msgstr ""
 
-#: includes/class-intelliwidget-list.php:107
+#: includes/class-intelliwidget-list.php:109
 msgid ""
 "This menu controls the type of IntelliWidget to display and the other "
 "settings available. If you are using IntelliWidget extensions, they will "
 "appear as options here as well."
 msgstr ""
 
-#: includes/class-intelliwidget-list.php:109
+#: includes/class-intelliwidget-list.php:111
 msgid ""
 "Enter a title here if you want a heading above this IntelliWidget section, "
 "otherwise, leave it blank."
 msgstr ""
 
-#: includes/class-intelliwidget-list.php:111
+#: includes/class-intelliwidget-list.php:113
 msgid ""
 "Check this box to automatically link the title to another page. If you are "
 "using categories, tags or other taxonomies, the link will point to that "
 "archive, otherwise it will point to the first post that appears in the list."
 msgstr ""
 
-#: includes/class-intelliwidget-list.php:113
+#: includes/class-intelliwidget-list.php:115
 msgid ""
 "Enter a unique value if you wish to customize the IntelliWidget div "
 "container id attribute."
 msgstr ""
 
-#: includes/class-intelliwidget-list.php:115
+#: includes/class-intelliwidget-list.php:117
 msgid ""
 "Enter additional CSS class names if you wish to customize this section's "
 "styles."
 msgstr ""
 
-#: includes/class-intelliwidget-list.php:117
+#: includes/class-intelliwidget-list.php:119
 msgid ""
 "These settings allow you to add additional text to display above or below "
 "the IntelliWidget output. If your theme supports shortcodes in text widgets, "
@@ -268,31 +272,31 @@ msgid ""
 "you can enter HTML as well."
 msgstr ""
 
-#: includes/class-intelliwidget-list.php:119
+#: includes/class-intelliwidget-list.php:121
 msgid ""
 "This menu controls the position of the additional text. You can also choose "
 "to display only the text, skipping the post selection entirely."
 msgstr ""
 
-#: includes/class-intelliwidget-list.php:121
+#: includes/class-intelliwidget-list.php:123
 msgid ""
 "Check this box to insert paragraph breaks wherever blank lines appear in the "
 "text you enter."
 msgstr ""
 
-#: includes/class-intelliwidget-list.php:123
+#: includes/class-intelliwidget-list.php:125
 msgid ""
 "Control the number of posts displayed, excerpt length, featured image and "
 "other settings."
 msgstr ""
 
-#: includes/class-intelliwidget-list.php:125
+#: includes/class-intelliwidget-list.php:127
 msgid ""
 "This menu controls the IntelliWidget template used to display the output. If "
 "you are using custom templates, they will appear here as well."
 msgstr ""
 
-#: includes/class-intelliwidget-list.php:127
+#: includes/class-intelliwidget-list.php:129
 msgid ""
 "This menu controls the post attribute used to sort the posts that are "
 "selected. Select ascending or descending order with the second menu (does "
@@ -300,56 +304,56 @@ msgid ""
 "Custom Fields (see)."
 msgstr ""
 
-#: includes/class-intelliwidget-list.php:129
+#: includes/class-intelliwidget-list.php:131
 msgid ""
 "This setting controls the number of posts that are selected to appear in "
 "this IntelliWidget section."
 msgstr ""
 
-#: includes/class-intelliwidget-list.php:131
+#: includes/class-intelliwidget-list.php:133
 msgid ""
 "This setting controls the number of words to display for each post selected "
 "to appear in this IntelliWidget section."
 msgstr ""
 
-#: includes/class-intelliwidget-list.php:133
+#: includes/class-intelliwidget-list.php:135
 msgid ""
 "By default, HTML is stripped from the post content. Enter any HTML tags that "
 "you do not not wish to remove. Do not include &gt; or &lt; characters."
 msgstr ""
 
-#: includes/class-intelliwidget-list.php:135
+#: includes/class-intelliwidget-list.php:137
 msgid ""
 "Enter a value if you wish to customize the text that appears in the link to "
 "each post."
 msgstr ""
 
-#: includes/class-intelliwidget-list.php:137
+#: includes/class-intelliwidget-list.php:139
 msgid ""
 "If you are using a Template that includes the featured image, this menu "
 "controls how it is aligned relative to the post content."
 msgstr ""
 
-#: includes/class-intelliwidget-list.php:139
+#: includes/class-intelliwidget-list.php:141
 msgid ""
 "If you are using a Template that includes the featured image, this menu "
 "controls the display size of the image."
 msgstr ""
 
-#: includes/class-intelliwidget-list.php:141
+#: includes/class-intelliwidget-list.php:143
 msgid ""
 "These settings control the template used and the posts that are displayed. "
 "Select post type, taxonomy terms and date conditions. You can also restrict "
 "selection to specific posts."
 msgstr ""
 
-#: includes/class-intelliwidget-list.php:143
+#: includes/class-intelliwidget-list.php:145
 msgid ""
 "These checkboxes restrict the selection to specific Post Types, post and "
 "page by default. At least one must be checked."
 msgstr ""
 
-#: includes/class-intelliwidget-list.php:145
+#: includes/class-intelliwidget-list.php:147
 msgid ""
 "Restrict the output to specific categories, tags or other taxonomies by "
 "selecting them from the menu below. Only taxonomies related to the selected "
@@ -357,7 +361,7 @@ msgid ""
 "Mac) to select multiple options."
 msgstr ""
 
-#: includes/class-intelliwidget-list.php:147
+#: includes/class-intelliwidget-list.php:149
 msgid ""
 "Restrict the output to specific posts by selecting them from the menu below. "
 "Only posts of the types selected above will appear as options. The specific "
@@ -365,34 +369,40 @@ msgid ""
 "key (command on Mac) to select multiple options."
 msgstr ""
 
-#: includes/class-intelliwidget-list.php:149
+#: includes/class-intelliwidget-list.php:151
 msgid ""
 "Check this box if you wish to exclude the post currently being viewed in the "
 "main content from the selection list."
 msgstr ""
 
-#: includes/class-intelliwidget-list.php:151
+#: includes/class-intelliwidget-list.php:153
 msgid ""
 "Check this box if you wish to restrict the selection list to posts with a "
 "future start date. Start dates are set for each individual post using "
 "IntelliWidget Custom Fields (see)."
 msgstr ""
 
-#: includes/class-intelliwidget-list.php:153
+#: includes/class-intelliwidget-list.php:155
 msgid ""
 "Check this box if you wish to exclude posts with a future start date from "
 "the selection list. Start dates are set for each individual post using "
 "IntelliWidget Custom Fields (see)."
 msgstr ""
 
-#: includes/class-intelliwidget-list.php:155
+#: includes/class-intelliwidget-list.php:157
 msgid ""
 "Check this box if you wish to exclude posts with a past expire date from the "
 "selection list. Expire dates are set for each individual post using "
 "IntelliWidget Custom Fields (see)."
 msgstr ""
 
-#: includes/class-intelliwidget-list.php:157
+#: includes/class-intelliwidget-list.php:159
+msgid ""
+"Check this box if you wish to show privately published posts. Links will "
+"only be visible to logged in users that can read private content."
+msgstr ""
+
+#: includes/class-intelliwidget-list.php:161
 msgid ""
 "This menu controls the Navigation Menu to be displayed in this IntelliWidget "
 "section. To show all pages (including a home page), use the 'Automatic Page "
@@ -400,55 +410,55 @@ msgid ""
 "WordPress admin."
 msgstr ""
 
-#: includes/class-intelliwidget-list.php:159
+#: includes/class-intelliwidget-list.php:163
 msgid ""
 "Instead entering new settings below, you can reuse all the settings from "
 "another IntelliWidget Profile by selecting it from this menu."
 msgstr ""
 
-#: includes/class-intelliwidget-list.php:161
+#: includes/class-intelliwidget-list.php:165
 msgid "Click to add a new IntelliWidget section tab."
 msgstr ""
 
-#: includes/class-intelliwidget-list.php:163
+#: includes/class-intelliwidget-list.php:167
 msgid ""
 "This value represents the post's starting date. It is used in date-based "
 "templates, and to include or exclude posts by date in the 'Post Selection "
 "Settings.'"
 msgstr ""
 
-#: includes/class-intelliwidget-list.php:165
+#: includes/class-intelliwidget-list.php:169
 msgid ""
 "This value represents the post's ending date. It is used in date-based "
 "templates, and to exclude posts that have expired in the 'Post Selection "
 "Settings.'"
 msgstr ""
 
-#: includes/class-intelliwidget-list.php:166
+#: includes/class-intelliwidget-list.php:170
 msgid ""
 "Enter the value to be used as the title for the post in the IntelliWidget "
 "output. If no value is entered, the entire post title will be used."
 msgstr ""
 
-#: includes/class-intelliwidget-list.php:168
+#: includes/class-intelliwidget-list.php:172
 msgid ""
 "Enter an external URL if you wish for the title to link somewhere other than "
 "the post."
 msgstr ""
 
-#: includes/class-intelliwidget-list.php:170
+#: includes/class-intelliwidget-list.php:174
 msgid ""
 "Enter additional CSS class names if you wish to customize the title's link "
 "styles. This is often used for menu icons."
 msgstr ""
 
-#: includes/class-intelliwidget-list.php:172
+#: includes/class-intelliwidget-list.php:176
 msgid ""
 "Select a target attribute if you wish for the title link to open in a new "
 "window or tab."
 msgstr ""
 
-#: includes/class-intelliwidget-list.php:174
+#: includes/class-intelliwidget-list.php:178
 msgid ""
 "This menu determines the IntelliWidget instance to replace with these "
 "settings. Options are labeled by Sidebar Name followed by the nth "
@@ -460,99 +470,99 @@ msgid ""
 "number of the tab (above) containing the settings you wish to use."
 msgstr ""
 
-#: includes/class-intelliwidget-list.php:176
+#: includes/class-intelliwidget-list.php:180
 msgid ""
 "Check this box to keep these settings even when using another profile from "
 "the menu above."
 msgstr ""
 
-#: includes/class-intelliwidget-list.php:183
+#: includes/class-intelliwidget-list.php:187
 msgid "Posts (default)"
 msgstr ""
 
-#: includes/class-intelliwidget-list.php:184
+#: includes/class-intelliwidget-list.php:188
 msgid "Nav Menu"
 msgstr ""
 
-#: includes/class-intelliwidget-list.php:189
+#: includes/class-intelliwidget-list.php:193
 msgid "Unassigned"
 msgstr ""
 
-#: includes/class-intelliwidget-list.php:190
+#: includes/class-intelliwidget-list.php:194
 msgid "Shortcode in Post Content"
 msgstr ""
 
-#: includes/class-intelliwidget-list.php:195
-#: includes/class-intelliwidget-list.php:228
-#: includes/class-intelliwidget-list.php:237
+#: includes/class-intelliwidget-list.php:199
+#: includes/class-intelliwidget-list.php:232
+#: includes/class-intelliwidget-list.php:241
 msgid "None"
 msgstr ""
 
-#: includes/class-intelliwidget-list.php:196
+#: includes/class-intelliwidget-list.php:200
 msgid "Above Posts"
 msgstr ""
 
-#: includes/class-intelliwidget-list.php:197
+#: includes/class-intelliwidget-list.php:201
 msgid "Below Posts"
 msgstr ""
 
-#: includes/class-intelliwidget-list.php:198
+#: includes/class-intelliwidget-list.php:202
 msgid "This text only (no posts)"
 msgstr ""
 
-#: includes/class-intelliwidget-list.php:203
+#: includes/class-intelliwidget-list.php:207
 msgid "Post Date"
 msgstr ""
 
-#: includes/class-intelliwidget-list.php:205
+#: includes/class-intelliwidget-list.php:209
 msgid "Menu Order"
 msgstr ""
 
-#: includes/class-intelliwidget-list.php:206
+#: includes/class-intelliwidget-list.php:210
 msgid "Title"
 msgstr ""
 
-#: includes/class-intelliwidget-list.php:207
+#: includes/class-intelliwidget-list.php:211
 msgid "Random"
 msgstr ""
 
-#: includes/class-intelliwidget-list.php:212
+#: includes/class-intelliwidget-list.php:216
 msgid "No Image"
 msgstr ""
 
-#: includes/class-intelliwidget-list.php:213
+#: includes/class-intelliwidget-list.php:217
 msgid "Thumbnail"
 msgstr ""
 
-#: includes/class-intelliwidget-list.php:214
+#: includes/class-intelliwidget-list.php:218
 msgid "Medium"
 msgstr ""
 
-#: includes/class-intelliwidget-list.php:215
+#: includes/class-intelliwidget-list.php:219
 msgid "Large"
 msgstr ""
 
-#: includes/class-intelliwidget-list.php:216
+#: includes/class-intelliwidget-list.php:220
 msgid "Full"
 msgstr ""
 
-#: includes/class-intelliwidget-list.php:220
+#: includes/class-intelliwidget-list.php:224
 msgid "Auto"
 msgstr ""
 
-#: includes/class-intelliwidget-list.php:221
+#: includes/class-intelliwidget-list.php:225
 msgid "Left"
 msgstr ""
 
-#: includes/class-intelliwidget-list.php:222
+#: includes/class-intelliwidget-list.php:226
 msgid "Center"
 msgstr ""
 
-#: includes/class-intelliwidget-list.php:223
+#: includes/class-intelliwidget-list.php:227
 msgid "Right"
 msgstr ""
 
-#: includes/class-intelliwidget-list.php:238
+#: includes/class-intelliwidget-list.php:242
 msgid "Automatic Page Menu"
 msgstr ""
 
@@ -572,31 +582,35 @@ msgstr ""
 msgid "This form"
 msgstr ""
 
-#: includes/class-intelliwidget-post-admin.php:253
-#: includes/class-intelliwidget-post-admin.php:264
+#: includes/class-intelliwidget-post-admin.php:255
+#: includes/class-intelliwidget-post-admin.php:266
 msgid "Edit"
 msgstr ""
 
-#: includes/class-intelliwidget-post-admin.php:300
+#: includes/class-intelliwidget-post-admin.php:302
 msgid "Save Custom Fields"
 msgstr ""
 
 #. translators: 1: month input, 2: day input, 3: year input, 4: hour input, 5:
 #. minute input
-#: includes/class-intelliwidget-post-admin.php:347
+#: includes/class-intelliwidget-post-admin.php:349
 msgid "%1$s%2$s, %3$s @ %4$s : %5$s"
 msgstr ""
 
-#: includes/class-intelliwidget-post-admin.php:359
+#: includes/class-intelliwidget-post-admin.php:361
 msgid "OK"
 msgstr ""
 
-#: includes/class-intelliwidget-post-admin.php:361
+#: includes/class-intelliwidget-post-admin.php:363
 msgid "Clear"
 msgstr ""
 
-#: includes/class-intelliwidget-post-admin.php:363
+#: includes/class-intelliwidget-post-admin.php:365
 msgid "Cancel"
+msgstr ""
+
+#: includes/class-intelliwidget-query.php:208
+msgid "Untitled"
 msgstr ""
 
 #: includes/class-intelliwidget-widget.php:21

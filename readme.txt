@@ -62,9 +62,13 @@ Now all the admin functions are loaded on demand so WordPress doesn't work as ha
 
 We've made IntelliWidget completely extensible by utilizing action and filter hooks at key points of the execution.
 
-= Coming Soon: New Premium Extensions! =
+= Now Available: IntelliWidget Archive and Taxonomy Extension =
 
-* IntelliWidget Archive and Taxonomy Extension - Customize IntelliWidgets for any archive, blog, taxonomy or term page.
+Now you can have custom IntelliWidgets on any Archive page! Choose the criteria and customize the Profiles for Blog pages, Categories, Tags and more.
+New Taxonomy Menu lets you browse hierarchical taxonomies, showing sibling and child terms based on the current page. See http://www.lilaeamedia.com/plugins/archive-taxonomy-extension for more information.
+
+= Coming Soon: New Premium Extension! =
+
 * IntelliWidget Template Configurator Extension - Create your own custom templates right from the IntelliWidget admin.
 
 = More Reasons to use IntelliWidget for Featured Posts and Custom Menus =
@@ -191,12 +195,13 @@ Change the 'supports' parameter in the register_post_type function to include 'c
 = 2.0.5 =
 * New feature: include private posts option (visible to users that can read private posts) (thanks rolandp)
 * New feature: setting excerpt length to first instance of <!--more--> if present or max words of not (thanks wakibu)
+* "Use Profiles From" menu now only shows posts that have existing IntelliWidget profiles
 * Fixed bug not saving multi-select values when no options selected
-* Fixed bug not applying meta box panel to post types other than page/post 
+* Fixed bug not showing IW meta boxes on post types other than page/post 
 
 = 2.0.4 =
 * Fixed bug affecting php 5.3 and lower that was causing get_meta() to return a truncated value when the value was a scalar (thanks aschaevitz)
-* Made both pages and posts available in the "Use Profiles from" menu
+* Made all eligible post types available in the "Use Profiles from" menu
 
 = 2.0.3 =
 * Fixed save_post action that was incorrectly failing nonce validation for post types other than post and page (thanks janvbear)
