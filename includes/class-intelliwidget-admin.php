@@ -21,6 +21,7 @@ class IntelliWidgetAdmin {
     var $intelliwidgets;
     var $lists;
     var $objecttype;
+    var $tax_menu;
     /**
      * Object constructor
      * @param <string> $file
@@ -546,10 +547,27 @@ class IntelliWidgetAdmin {
             $nav_menus[$menu->term_id] = $menu->name;
         return $nav_menus;
     }
-    
+
+    function get_tax_menu() {
+        if (isset($this->tax_menu)) return $this->tax_menu;
+        if (!isset($this->terms)) $this->load_terms();
+        $menu = array('' => __('None', 'intelliwidget'));
+        foreach (array_keys($this->terms) as $name):
+            $taxonomy = get_taxonomy($name);
+            $menu[$name] = $taxonomy->label;
+        endforeach;
+        $this->tax_menu = $menu;
+        return $menu;
+    }
+
+    function get_tax_sortby_menu() {
+        return $this->lists->get_menu('tax_sortby');
+    }
+
     function get_label($key = '') {
         return $this->lists->get_label($key);
     }
+
     function get_tip($key = '') {
         return $this->lists->get_tip($key);
     }

@@ -17,6 +17,7 @@ class IntelliWidgetMetaBox {
         add_action('intelliwidget_metabox_post_list',   array($this, 'post_selection_settings'), 5, 4);
         add_action('intelliwidget_metabox_post_list',   array($this, 'appearance_settings'), 10, 4);
         add_action('intelliwidget_metabox_nav_menu',    array($this, 'nav_menu'), 10, 4);
+        add_action('intelliwidget_metabox_tax_menu',    array($this, 'tax_menu'), 10, 4);
         add_action('intelliwidget_metabox_all_after',   array($this, 'addl_text_settings'), 10, 4);
     }
 
@@ -350,5 +351,66 @@ class IntelliWidgetMetaBox {
 </p>
 <?php
     }
+
+    function tax_menu($obj, $id, $box_id, $instance){
+        ?>
+<div id="iw_taxmenusettings_<?php echo $id . '_' . $box_id; ?>" class="postbox closed iw-collapsible panel-taxmenu">
+  <div class="handlediv" title="<?php _e('Click to toggle', 'intelliwidget'); ?>"></div>
+  <h3 title="<?php echo $obj->get_tip('taxmenusettings'); ?>"><span> <?php echo $obj->get_label('taxmenusettings'); ?> </span></h3>
+  <div  id="iw_taxmenusettings_<?php echo $id . '_' . $box_id; ?>_inside" class="inside">
+    <p>
+      <label title="<?php echo $obj->get_tip('taxonomy'); ?>" for="<?php echo 'intelliwidget_' . $id . '_' . $box_id . '_taxonomy'; ?>"> <?php echo $obj->get_label('taxonomy'); ?> : </label>
+      <select id="<?php echo 'intelliwidget_' . $id . '_' . $box_id . '_taxonomy'; ?>" name="<?php echo 'intelliwidget_' . $box_id . '_taxonomy'; ?>">
+        <?php   // Get menus
+            foreach ( $obj->get_tax_menu() as $value => $label ): ?>
+        <option value="<?php echo $value; ?>" <?php selected($instance['taxonomy'], $value); ?>><?php echo $label; ?></option>
+        <?php endforeach; ?>
+      </select>
+    </p>
+    <p>
+      <label title="<?php echo $obj->get_tip('sortby_terms'); ?>" for="<?php echo 'intelliwidget_' . $id . '_' . $box_id . '_sortby'; ?>"> <?php echo $obj->get_label('sortby_terms'); ?> : </label>
+      <br/>
+      <select name="<?php echo 'intelliwidget_' . $box_id . '_sortby'; ?>" id="<?php echo 'intelliwidget_' . $id . '_' . $box_id . '_sortby'; ?>">
+        <?php foreach ($obj->get_tax_sortby_menu() as $value => $label): ?>
+        <option value="<?php echo $value; ?>" <?php selected($instance['sortby'], $value); ?>><?php echo $label; ?></option>
+        <?php endforeach; ?>
+      </select>
+    </p>
+    <p>
+      <label title="<?php echo $obj->get_tip('show_count'); ?>" for="<?php echo 'intelliwidget_' . $id . '_' . $box_id . '_show_count'; ?>">
+        <input id="<?php echo 'intelliwidget_' . $id . '_' . $box_id . '_show_count'; ?>" name="<?php echo 'intelliwidget_' . $box_id . '_show_count'; ?>" type="checkbox" <?php checked($instance['show_count'], 1); ?> value="1" />
+        &nbsp; <?php echo $obj->get_label('show_count'); ?> </label>
+    </p>
+    <p>
+      <label title="<?php echo $obj->get_tip('hierarchical'); ?>" for="<?php echo 'intelliwidget_' . $id . '_' . $box_id . '_hierarchical'; ?>">
+        <input id="<?php echo 'intelliwidget_' . $id . '_' . $box_id . '_hierarchical'; ?>" name="<?php echo 'intelliwidget_' . $box_id . '_hierarchical'; ?>" type="checkbox" <?php checked($instance['hierarchical'], 1); ?> value="1" />
+        &nbsp; <?php echo $obj->get_label('hierarchical'); ?> </label>
+    </p>
+    <p>
+      <label title="<?php echo $adminobj->get_tip('current_only_all');?>">
+        <input name="<?php echo 'intelliwidget_' . $box_id . '_current_only'; ?>" id="<?php echo 'intelliwidget_' . $id . '_' . $box_id . '_current_only_all'; ?>" type="radio" <?php checked($instance['current_only'], 0); ?> value="0" />
+        &nbsp; <?php echo $adminobj->get_label('current_only_all'); ?> </label><br/>
+      <label title="<?php echo $adminobj->get_tip('current_only_cur');?>">
+        <input name="<?php echo 'intelliwidget_' . $box_id . '_current_only'; ?>" id="<?php echo 'intelliwidget_' . $id . '_' . $box_id . '_current_only_cur'; ?>" type="radio" <?php checked($instance['current_only'], 1); ?> value="1" />
+        &nbsp; <?php echo $adminobj->get_label('current_only_cur'); ?> </label><br/>
+      <label title="<?php echo $adminobj->get_tip('current_only_sub');?>">
+        <input name="<?php echo 'intelliwidget_' . $box_id . '_current_only'; ?>" id="<?php echo 'intelliwidget_' . $id . '_' . $box_id . '_current_only_sub'; ?>" type="radio" <?php checked($instance['current_only'], 2); ?> value="2" />
+        &nbsp; <?php echo $adminobj->get_label('current_only_sub'); ?> </label>
+    </p>
+     <p>
+      <label title="<?php echo $adminobj->get_tip('show_descr');?>">
+        <input name="<?php echo 'intelliwidget_' . $id . '_' . $box_id . '_show_descr'; ?>" id="<?php echo 'intelliwidget_' . $id . '_' . $box_id . '_show_descr'; ?>" type="checkbox" <?php checked($instance['show_descr'], 1); ?> value="1" />
+        &nbsp; <?php echo $adminobj->get_label('show_descr'); ?> </label>
+    </p>
+   <p>
+      <label title="<?php echo $obj->get_tip('hide_empty'); ?>">
+        <input id="<?php echo 'intelliwidget_' . $id . '_' . $box_id . '_hide_empty'; ?>" name="<?php echo 'intelliwidget_' . $box_id . '_hide_empty'; ?>" type="checkbox" <?php checked($instance['hide_empty'], 1); ?> value="1" />
+        &nbsp; <?php echo $obj->get_label('hide_empty'); ?> </label>
+    </p>
+  </div>
+</div>
+<?php
+    }
+        
 }
 

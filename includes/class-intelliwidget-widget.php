@@ -26,11 +26,11 @@ class IntelliWidget_Widget extends WP_Widget {
         else:
             add_action('intelliwidget_action_post_list',    array(&$this, 'action_post_list'),      10, 3);
             add_action('intelliwidget_action_nav_menu',     array(&$this, 'action_nav_menu'),       10, 3);
+            add_action('intelliwidget_action_tax_menu',     array(&$this, 'action_taxonomy_menu'), 10, 3);
             add_filter('intelliwidget_before_widget',       array(&$this, 'filter_before_widget'),  10, 3);
             add_filter('intelliwidget_title',               array(&$this, 'filter_title'),          10, 3);
             add_filter('intelliwidget_custom_text',         array(&$this, 'filter_custom_text'),    10, 3);
             add_filter('intelliwidget_classes',             array(&$this, 'filter_classes'),        10, 3);
-            add_filter('intelliwidget_menu_classes',        array(&$this, 'filter_menu_classes'),   10, 3);
             add_filter('intelliwidget_trim_excerpt',        array(&$this, 'filter_trim_excerpt'),   10, 3);
             // default content actions
             add_action('intelliwidget_above_content',       array(&$this, 'action_addltext_above'), 10, 3);
@@ -118,10 +118,7 @@ class IntelliWidget_Widget extends WP_Widget {
         if (!empty($instance['container_id'])):
             $before_widget = preg_replace('/id=".+?"/', 'id="' . $instance['container_id'] . '"', $before_widget);
         endif;
-        // do not apply classes to widget wrapper, but rather to wordpress menu
-        if (!empty($instance['content']) && $instance['content'] != 'nav_menu'):
-            $before_widget = preg_replace('/class="/', 'class="' . apply_filters('intelliwidget_classes', $instance['classes']) . ' ', $before_widget);
-        endif;
+        $before_widget = preg_replace('/class="/', 'class="' . apply_filters('intelliwidget_classes', $instance['classes']) . ' ', $before_widget);
         return $before_widget;
     }
     
@@ -140,11 +137,7 @@ class IntelliWidget_Widget extends WP_Widget {
         }
         return $title;
     }
-        
-    function filter_menu_classes($classes, $instance = array()) {
-        return $classes . (empty($instance['classes']) ? '' : ' ' . $instance['classes']);
-    }
-    
+            
     /**
      * Trim the content to a set number of words.
      *
@@ -162,7 +155,7 @@ class IntelliWidget_Widget extends WP_Widget {
                 $allowed_tags .= '<' . trim($tag) . '>';
             endforeach;          
         endif;
-        $text       = strip_shortcodes($text);
+        //$text       = strip_shortcodes($text);
         $text       = preg_replace( '@<(script|style)[^>]*?>.*?</\\1>@si', '', $text );
         $textarr    = explode($moretag, $text, 2);
         $more       = (count($textarr) > 1);
@@ -209,6 +202,7 @@ class IntelliWidget_Widget extends WP_Widget {
             echo apply_filters('intelliwidget_custom_text', $instance['custom_text'], $instance, $args);
         endif;
     }
+    
     function action_nav_menu($instance = array(), $args = array(), $post_id = NULL) {
         // skip to after widget content if this is custom text only
         if ('only' == $instance['text_position']) return;
@@ -227,6 +221,55 @@ class IntelliWidget_Widget extends WP_Widget {
                     )
                 );
             endif;
+        endif;
+    }
+
+    function action_taxonomy_menu($instance = array(), $args = array(), $post_id = NULL) {
+        global $intelliwidget;
+        // skip to after widget content if this is custom text only
+        if (isset($instance['text_position']) && 'only' == $instance['text_position']) return;
+        if (!empty($instance['taxonomy']) && taxonomy_exists($instance['taxonomy'])):
+            $current_term_id = NULL;
+            $current_ancestors = array();
+            $queried_object = get_queried_object();
+            if (is_object($queried_object) 
+                && isset($queried_object->term_taxonomy_id)):
+                $current_term_id      = $queried_object->term_id;
+                $current_ancestors    = get_ancestors( $queried_object->term_id, $queried_object->taxonomy );
+            endif;
+
+            if ( is_singular() ):
+                global $post;
+                $terms = wp_get_object_terms( $post->ID, $instance['taxonomy'], array( 'orderby' => 'parent' ) );
+                if ( $terms ):
+                    $current_term   = end( $terms );
+                    $current_term_id = $current_term->term_id;
+                    $current_ancestors = get_ancestors( $current_term_id, $current_term->taxonomy );
+                endif;
+            endif;
+
+            include_once( $intelliwidget->dir . '/includes/class-intelliwidget-taxonomy-walker.php' );
+
+            echo '<ul class="intelliwidget-taxonomy-menu">';
+
+            wp_list_categories( apply_filters( 'intelliwidget_tax_menu_args', array( 
+                'walker'            => new IntelliWidgetTaxonomyWalker,
+                'title_li'          => '',
+                'pad_counts'        => 1,
+                'show_option_none'  => __('None', 'intelliwidget' ),
+                'current_term_id'   => $current_term_id,
+                'current_ancestors' => $current_ancestors,
+                'taxonomy'          => $instance['taxonomy'],
+                'hide_empty'        => $instance['hide_empty'],
+                'current_only'      => (isset($instance['current_only']) ? $instance['current_only']  : 0),
+                'show_count'        => (isset($instance['show_count'])      && $instance['show_count'])             ? 1         : 0, 
+                'hierarchical'      => (isset($instance['hierarchical'])    && $instance['hierarchical'])           ? true      : false, 
+                'show_descr'        => (isset($instance['show_descr'])      && $instance['show_descr'])             ? 1         : 0,
+                'menu_order'        => (isset($instance['sortby'])          && 'menu_order' == $instance['sortby']) ? 'asc'     : false,
+                'orderby'           => (isset($instance['sortby'])          && 'title' == $instance['sortby'])      ? 'title'   : NULL,
+            )));
+
+            echo '</ul>';
         endif;
     }
 

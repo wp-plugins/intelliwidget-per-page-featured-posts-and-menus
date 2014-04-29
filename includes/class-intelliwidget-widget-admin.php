@@ -2,7 +2,7 @@
 // Exit if accessed directly
 if ( !defined('ABSPATH')) exit;
 /**
- * class-widget-intelliwidget.php - IntelliWidget Widget Class
+ * class-intelliwidget-widget-admin.php - IntelliWidget Widget Admin Class
  *
  * @package IntelliWidget
  * @subpackage includes

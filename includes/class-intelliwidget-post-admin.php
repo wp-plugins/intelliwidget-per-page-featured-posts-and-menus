@@ -43,7 +43,7 @@ class IntelliWidgetPostAdmin extends IntelliWidgetAdmin {
     function post_main_meta_box() {
         // set up meta boxes
         $this->metabox_init();
-        foreach (array('post', 'page') as $type):
+        foreach ($this->post_types as $type):
             add_meta_box( 
                 'intelliwidget_main_meta_box',
                 $this->get_label('metabox_title'),
@@ -61,7 +61,7 @@ class IntelliWidgetPostAdmin extends IntelliWidgetAdmin {
      */
     function post_cdf_meta_box() {
         global $post;
-        foreach (array('post', 'page') as $type):
+        foreach ($this->post_types as $type):
             add_meta_box( 
                 'intelliwidget_post_meta_box',
                 $this->get_label('cdf_title'),
