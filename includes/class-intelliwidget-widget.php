@@ -30,7 +30,6 @@ class IntelliWidget_Widget extends WP_Widget {
             add_filter('intelliwidget_title',               array(&$this, 'filter_title'),          10, 3);
             add_filter('intelliwidget_custom_text',         array(&$this, 'filter_custom_text'),    10, 3);
             add_filter('intelliwidget_classes',             array(&$this, 'filter_classes'),        10, 3);
-            add_filter('intelliwidget_menu_classes',        array(&$this, 'filter_menu_classes'),   10, 3);
             add_filter('intelliwidget_trim_excerpt',        array(&$this, 'filter_trim_excerpt'),   10, 3);
             // default content actions
             add_action('intelliwidget_above_content',       array(&$this, 'action_addltext_above'), 10, 3);
@@ -118,10 +117,7 @@ class IntelliWidget_Widget extends WP_Widget {
         if (!empty($instance['container_id'])):
             $before_widget = preg_replace('/id=".+?"/', 'id="' . $instance['container_id'] . '"', $before_widget);
         endif;
-        // do not apply classes to widget wrapper, but rather to wordpress menu
-        if (!empty($instance['content']) && $instance['content'] != 'nav_menu'):
-            $before_widget = preg_replace('/class="/', 'class="' . apply_filters('intelliwidget_classes', $instance['classes']) . ' ', $before_widget);
-        endif;
+        $before_widget = preg_replace('/class="/', 'class="' . apply_filters('intelliwidget_classes', $instance['classes']) . ' ', $before_widget);
         return $before_widget;
     }
     
@@ -140,11 +136,7 @@ class IntelliWidget_Widget extends WP_Widget {
         }
         return $title;
     }
-        
-    function filter_menu_classes($classes, $instance = array()) {
-        return $classes . (empty($instance['classes']) ? '' : ' ' . $instance['classes']);
-    }
-    
+            
     /**
      * Trim the content to a set number of words.
      *
@@ -162,7 +154,7 @@ class IntelliWidget_Widget extends WP_Widget {
                 $allowed_tags .= '<' . trim($tag) . '>';
             endforeach;          
         endif;
-        $text       = strip_shortcodes($text);
+        //$text       = strip_shortcodes($text);
         $text       = preg_replace( '@<(script|style)[^>]*?>.*?</\\1>@si', '', $text );
         $textarr    = explode($moretag, $text, 2);
         $more       = (count($textarr) > 1);

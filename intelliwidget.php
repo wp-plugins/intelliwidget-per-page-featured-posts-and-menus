@@ -28,6 +28,7 @@ class IntelliWidget {
     var $templatesURL;
     var $admin_hook;
     var $dir;
+    var $shortcode_id = 0;
     /**
      * Object constructor
      * @param <string> $file
@@ -138,11 +139,13 @@ class IntelliWidget {
         global $post;
         // section parameter lets us use page-specific IntelliWidgets in shortcode without all the params
         if (is_object($post) && !empty($atts['section'])):
-            $atts = $this->get_meta($post->ID, '_intelliwidget_data_', 'post', intval($atts['section']));
+            $section = intval($atts['section']);
+            $atts = $this->get_meta($post->ID, '_intelliwidget_data_', 'post', $section);
             if (empty($atts)): 
                 return;
             endif;
         else:
+            $section = ++$this->shortcode_id;
             if (!empty($atts['custom_text'])) unset($atts['custom_text']);
             if (!empty($atts['text_position'])) unset($atts['text_position']);
             if (!empty($atts['title'])) $atts['title'] = strip_tags($atts['title']);
@@ -154,7 +157,7 @@ class IntelliWidget {
         $args = array(
             'before_title'  => '',
             'after_title'   => '',
-            'before_widget' => empty($atts['nav_menu']) ? '<div class="widget_intelliwidget">' : '',
+            'before_widget' => empty($atts['nav_menu']) ? '<div id="intelliwidget_' . $section . '" class="widget_intelliwidget">' : '',
             'after_widget'  => empty($atts['nav_menu']) ? '</div>' : '',
         );
         // buffer standard output
@@ -243,6 +246,7 @@ class IntelliWidget {
             'skip_post'         => 0,
             'future_only'       => 0,
             'active_only'       => 0,
+            'include_private'   => 0,
             // these apply to post_list items
             'length'            => 15,
             'link_text'         => __('Read More', 'intelliwidget'),
