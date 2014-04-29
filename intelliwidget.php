@@ -6,7 +6,7 @@ if ( !defined('ABSPATH')) exit;
     Plugin Name: IntelliWidget Per Page Featured Posts and Menus
     Plugin URI: http://www.lilaeamedia.com/plugins/intelliwidget
     Description: Combine custom page menus, featured posts, sliders and other content into any widget area that can be customized on a per-page or site-wide basis.
-    Version: 2.0.5
+    Version: 2.1.0
     Author: Lilaea Media
     Author URI: http://www.lilaeamedia.com/
     Text Domain: intelliwidget
@@ -253,6 +253,14 @@ class IntelliWidget {
             'allowed_tags'      => '',
             'imagealign'        => 'none',
             'image_size'        => 'none',
+            // these apply to taxonomy menus
+            'hide_empty'        => 1,
+            'show_count'        => 0,
+            'current_only'      => 0,
+            'show_descr'        => 0,
+            'taxonomy'          => '',
+            'hierarchical'      => 1,
+            'sortby'            => 'menu_order',
         ));
         // backwards compatibility: add content=nav_menu if nav_menu param set
         if (empty($instance['content']) && !empty($instance['nav_menu']) && '' != ($instance['nav_menu'])) 
@@ -264,7 +272,7 @@ class IntelliWidget {
     
 }
 
-define('INTELLIWIDGET_VERSION', '2.0.5');
+define('INTELLIWIDGET_VERSION', '2.1.0');
 
 if (is_admin())
     include_once( 'includes/class-intelliwidget-admin.php' );

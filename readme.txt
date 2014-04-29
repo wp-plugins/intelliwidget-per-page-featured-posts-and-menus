@@ -3,8 +3,8 @@ Contributors: lilaeamedia, support00
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=DE4W9KW7HQJNA
 Tags: featured posts, events, page menu, plugin, textwidget, widget, custom post types, custom sidebar
 Requires at least: 3.5
-Tested up to: 3.8.1
-Stable tag: 2.0.5
+Tested up to: 3.9
+Stable tag: 2.1.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -192,6 +192,9 @@ Change the 'supports' parameter in the register_post_type function to include 'c
 
 == Changelog ==
 
+= 2.1.0 =
+* New feature: taxonomy menu content option. Creates menu of terms from any taxonomy with multiple config options.
+
 = 2.0.5 =
 * New feature: include private posts option (visible to users that can read private posts) (thanks support00)
 * New feature: setting excerpt length to first instance of <!--more--> if present or max words of not (thanks wakibu)
@@ -344,9 +347,8 @@ Change the 'supports' parameter in the register_post_type function to include 'c
 
 == Upgrade Notice ==
 
-= 2.0.x =
-* IMPORTANT: This release includes major changes to the User Interface from version 1. Please see the changelog and updated documentation:
-* http://www.lilaeamedia.com/plugins/intelliwidget
+= 2.1.0 =
+* New feature: taxonomy menu content option. Creates menu of terms from any taxonomy with multiple config options.
 
 == Getting Started ==
 

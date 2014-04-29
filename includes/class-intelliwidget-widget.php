@@ -26,6 +26,7 @@ class IntelliWidget_Widget extends WP_Widget {
         else:
             add_action('intelliwidget_action_post_list',    array(&$this, 'action_post_list'),      10, 3);
             add_action('intelliwidget_action_nav_menu',     array(&$this, 'action_nav_menu'),       10, 3);
+            add_action('intelliwidget_action_tax_menu',     array(&$this, 'action_taxonomy_menu'), 10, 3);
             add_filter('intelliwidget_before_widget',       array(&$this, 'filter_before_widget'),  10, 3);
             add_filter('intelliwidget_title',               array(&$this, 'filter_title'),          10, 3);
             add_filter('intelliwidget_custom_text',         array(&$this, 'filter_custom_text'),    10, 3);
@@ -201,6 +202,7 @@ class IntelliWidget_Widget extends WP_Widget {
             echo apply_filters('intelliwidget_custom_text', $instance['custom_text'], $instance, $args);
         endif;
     }
+    
     function action_nav_menu($instance = array(), $args = array(), $post_id = NULL) {
         // skip to after widget content if this is custom text only
         if ('only' == $instance['text_position']) return;
@@ -219,6 +221,55 @@ class IntelliWidget_Widget extends WP_Widget {
                     )
                 );
             endif;
+        endif;
+    }
+
+    function action_taxonomy_menu($instance = array(), $args = array(), $post_id = NULL) {
+        global $intelliwidget;
+        // skip to after widget content if this is custom text only
+        if (isset($instance['text_position']) && 'only' == $instance['text_position']) return;
+        if (!empty($instance['taxonomy']) && taxonomy_exists($instance['taxonomy'])):
+            $current_term_id = NULL;
+            $current_ancestors = array();
+            $queried_object = get_queried_object();
+            if (is_object($queried_object) 
+                && isset($queried_object->term_taxonomy_id)):
+                $current_term_id      = $queried_object->term_id;
+                $current_ancestors    = get_ancestors( $queried_object->term_id, $queried_object->taxonomy );
+            endif;
+
+            if ( is_singular() ):
+                global $post;
+                $terms = wp_get_object_terms( $post->ID, $instance['taxonomy'], array( 'orderby' => 'parent' ) );
+                if ( $terms ):
+                    $current_term   = end( $terms );
+                    $current_term_id = $current_term->term_id;
+                    $current_ancestors = get_ancestors( $current_term_id, $current_term->taxonomy );
+                endif;
+            endif;
+
+            include_once( $intelliwidget->dir . '/includes/class-intelliwidget-taxonomy-walker.php' );
+
+            echo '<ul class="intelliwidget-taxonomy-menu">';
+
+            wp_list_categories( apply_filters( 'intelliwidget_tax_menu_args', array( 
+                'walker'            => new IntelliWidgetTaxonomyWalker,
+                'title_li'          => '',
+                'pad_counts'        => 1,
+                'show_option_none'  => __('None', 'intelliwidget' ),
+                'current_term_id'   => $current_term_id,
+                'current_ancestors' => $current_ancestors,
+                'taxonomy'          => $instance['taxonomy'],
+                'hide_empty'        => $instance['hide_empty'],
+                'current_only'      => (isset($instance['current_only']) ? $instance['current_only']  : 0),
+                'show_count'        => (isset($instance['show_count'])      && $instance['show_count'])             ? 1         : 0, 
+                'hierarchical'      => (isset($instance['hierarchical'])    && $instance['hierarchical'])           ? true      : false, 
+                'show_descr'        => (isset($instance['show_descr'])      && $instance['show_descr'])             ? 1         : 0,
+                'menu_order'        => (isset($instance['sortby'])          && 'menu_order' == $instance['sortby']) ? 'asc'     : false,
+                'orderby'           => (isset($instance['sortby'])          && 'title' == $instance['sortby'])      ? 'title'   : NULL,
+            )));
+
+            echo '</ul>';
         endif;
     }
 
