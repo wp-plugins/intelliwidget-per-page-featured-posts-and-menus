@@ -99,6 +99,23 @@ class IntelliWidgetList {
             'replace_widget'    => __('Parent Profile to replace', 'intelliwidget'),
             
             'nocopy'            => __('Override profiles selected above with this Profile', 'intelliwidget'),
+
+            'taxmenusettings'   => __('Taxonomy Menu', 'intelliwidget'),
+
+            'taxonomy'          => __('Taxonomy', 'intelliwidget'),
+
+            'hide_empty'        => __('Hide terms without posts', 'intelliwidget'),
+
+            'current_only_all'  => __('Show all terms and child terms', 'intelliwidget'),
+            'current_only_cur'  => __('Only show hierarchy for current term', 'intelliwidget'),
+            'current_only_sub'  => __('Only show children of current term', 'intelliwidget'),
+
+            'hierarchical'      => __('Show in hierarchical order', 'intelliwidget'),
+
+            'show_count'        => __('Show post count', 'intelliwidget'),
+            'show_descr'        => __('Show term description', 'intelliwidget'),
+
+            'sortby_terms'      => __('Sort terms by', 'intelliwidget'),
         ));
 
         $this->tips = apply_filters('intelliwidget_tips', array(
@@ -178,6 +195,24 @@ class IntelliWidgetList {
             'replace_widget'    => __("This menu determines the IntelliWidget instance to replace with these settings. Options are labeled by Sidebar Name followed by the nth IntelliWidget in that sidebar. Even if there are other Widgets in the Sidebar, the number represents only the IntelliWidgets in the Sidebar. If you reorder the Widgets in the Sidebar, the number will reflect the change. To use these settings for a shortcode on the post, select 'Shortcode' and use the format [intelliwidget section=tab#], where 'tab#' corresponds to the number of the tab (above) containing the settings you wish to use.", 'intelliwidget'),
 
             'nocopy'            => __("Check this box to keep these settings even when using another profile from the menu above.", 'intelliwidget'),
+
+            'taxmenusettings'   => __('These settings control the behavior of the Taxonomy Menu for this Profile.', 'intelliwidget'),
+
+            'taxonomy'          => __('Select the taxonomy to be displayed in the menu.', 'intelliwidget'),
+
+            'hide_empty'        => __('Exclude terms that have no posts assigned to them.', 'intelliwidget'),
+
+            'current_only_all'  => __('Show the child terms (sub-categories) of all terms.', 'intelliwidget'),
+            'current_only_cur'  => __('Show only the parent and child terms (sub-categories) of the current term. Show only the highest level of other terms.', 'intelliwidget'),
+            'current_only_sub'  => __('Show only the child terms (sub-categories) of the current term.', 'intelliwidget'),
+
+            'hierarchical'      => __('Display the menu organized by parent-child relationships.', 'intelliwidget'),
+
+            'show_count'        => __('Display the number of posts assigned to each term.', 'intelliwidget'),
+
+            'show_descr'        => __('Display the term description if it exists.', 'intelliwidget'),
+
+            'sortby_terms'      => __('This menu controls whether sort by Term Label or by the order configured on the Edit Taxonomy admin.', 'intelliwidget'),
             )
         );
 
@@ -186,6 +221,7 @@ class IntelliWidgetList {
                 array(
                     'post_list' => __('Posts (default)', 'intelliwidget'),
                     'nav_menu'  => __('Nav Menu', 'intelliwidget'),
+                    'tax_menu'  => __('Taxonomy Menu', 'intelliwidget'),
                     )
                 ),
             'replaces' => apply_filters('intelliwidget_replaces_menu', 
@@ -236,6 +272,12 @@ class IntelliWidgetList {
                     '_top'      => '_top',
                     )
                 ),
+            'tax_sortby' => apply_filters('intelliwidget_tax_sortby_menu',
+                array(
+                    'menu_order'    => __('Menu Order', 'intelliwidget'),
+                    'title'         => __('Title',      'intelliwidget'),
+                    )
+                ),
             'default_nav' => apply_filters('intelliwiget_default_nav_menu', 
                 array(
                     ''          => __('None', 'intelliwidget'),
@@ -256,6 +298,10 @@ class IntelliWidgetList {
                     'active_only', 
                     'include_private',
                     'nocopy',
+                    'show_count',
+                    'hide_empty',
+                    'hierarchical',
+                    'show_descr',
                 )
             ),
             'text' => apply_filters('intelliwidget_text_fields', 
