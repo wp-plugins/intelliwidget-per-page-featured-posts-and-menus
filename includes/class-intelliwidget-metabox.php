@@ -387,20 +387,20 @@ class IntelliWidgetMetaBox {
         &nbsp; <?php echo $obj->get_label('hierarchical'); ?> </label>
     </p>
     <p>
-      <label title="<?php echo $adminobj->get_tip('current_only_all');?>">
+      <label title="<?php echo $obj->get_tip('current_only_all');?>">
         <input name="<?php echo 'intelliwidget_' . $box_id . '_current_only'; ?>" id="<?php echo 'intelliwidget_' . $id . '_' . $box_id . '_current_only_all'; ?>" type="radio" <?php checked($instance['current_only'], 0); ?> value="0" />
-        &nbsp; <?php echo $adminobj->get_label('current_only_all'); ?> </label><br/>
-      <label title="<?php echo $adminobj->get_tip('current_only_cur');?>">
+        &nbsp; <?php echo $obj->get_label('current_only_all'); ?> </label><br/>
+      <label title="<?php echo $obj->get_tip('current_only_cur');?>">
         <input name="<?php echo 'intelliwidget_' . $box_id . '_current_only'; ?>" id="<?php echo 'intelliwidget_' . $id . '_' . $box_id . '_current_only_cur'; ?>" type="radio" <?php checked($instance['current_only'], 1); ?> value="1" />
-        &nbsp; <?php echo $adminobj->get_label('current_only_cur'); ?> </label><br/>
-      <label title="<?php echo $adminobj->get_tip('current_only_sub');?>">
+        &nbsp; <?php echo $obj->get_label('current_only_cur'); ?> </label><br/>
+      <label title="<?php echo $obj->get_tip('current_only_sub');?>">
         <input name="<?php echo 'intelliwidget_' . $box_id . '_current_only'; ?>" id="<?php echo 'intelliwidget_' . $id . '_' . $box_id . '_current_only_sub'; ?>" type="radio" <?php checked($instance['current_only'], 2); ?> value="2" />
-        &nbsp; <?php echo $adminobj->get_label('current_only_sub'); ?> </label>
+        &nbsp; <?php echo $obj->get_label('current_only_sub'); ?> </label>
     </p>
      <p>
-      <label title="<?php echo $adminobj->get_tip('show_descr');?>">
+      <label title="<?php echo $obj->get_tip('show_descr');?>">
         <input name="<?php echo 'intelliwidget_' . $id . '_' . $box_id . '_show_descr'; ?>" id="<?php echo 'intelliwidget_' . $id . '_' . $box_id . '_show_descr'; ?>" type="checkbox" <?php checked($instance['show_descr'], 1); ?> value="1" />
-        &nbsp; <?php echo $adminobj->get_label('show_descr'); ?> </label>
+        &nbsp; <?php echo $obj->get_label('show_descr'); ?> </label>
     </p>
    <p>
       <label title="<?php echo $obj->get_tip('hide_empty'); ?>">
