@@ -4,7 +4,7 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_i
 Tags: featured posts, events, page menu, plugin, textwidget, widget, custom post types, custom sidebar
 Requires at least: 3.5
 Tested up to: 3.9
-Stable tag: 2.1.1
+Stable tag: 2.1.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -192,8 +192,14 @@ Change the 'supports' parameter in the register_post_type function to include 'c
 
 == Changelog ==
 
+= 2.1.2 =
+* Bug fixed - not loading child profile meta box on new posts.
+* Bug fixed - not loading IntelliWidgetAdmin class when ajax call does not set is_admin before plugin execution
+* Thanks to NelClay for reporting these.
+
 = 2.1.1 =
-* Bux fixed - incorrect object reference in class-intelliwidget-metabox causing taxonomy menu to fail on child profile.
+* Bux fixed - incorrect object reference in class-intelliwidget-metabox causing taxonomy menu to fail on child profile
+* Thanks to Keith for reporting this.
 
 = 2.1.0 =
 * New feature: taxonomy menu content option. Creates menu of terms from any taxonomy with multiple config options.
@@ -350,9 +356,9 @@ Change the 'supports' parameter in the register_post_type function to include 'c
 
 == Upgrade Notice ==
 
-= 2.1.1 =
-* Bux fixed - incorrect object reference in class-intelliwidget-metabox causing taxonomy menu to fail on child profile.
-* New feature: taxonomy menu content option. Creates menu of terms from any taxonomy with multiple config options.
+= 2.1.2 =
+* Bug fixed - not loading child profile meta box on new posts.
+* Bug fixed - not loading IntelliWidgetAdmin class when ajax call does not set is_admin before plugin execution
 
 == Getting Started ==
 
