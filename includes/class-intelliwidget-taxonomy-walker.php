@@ -4,8 +4,7 @@
  *
  * @extends Walker
  * @class   IntelliWidgetTaxonomyWalker
- * @version 2.1.0
- * @package IntelliWidgetMultiPosts
+ * @package IntelliWidget
  * @author  Lilaea Media
  * portions adapted from Product Category List Walker Copyright 2011 WooThemes
  */

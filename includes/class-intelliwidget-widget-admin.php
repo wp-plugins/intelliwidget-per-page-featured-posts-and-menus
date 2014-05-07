@@ -11,6 +11,7 @@ if ( !defined('ABSPATH')) exit;
  * @access public
  */
 
+include_once('class-intelliwidget-admin.php');
 include_once('class-intelliwidget-form.php');
 class IntelliWidget_WidgetAdmin extends IntelliWidgetAdmin {
 
