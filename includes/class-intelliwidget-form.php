@@ -62,6 +62,10 @@ class IntelliWidgetForm {
         <input name="<?php echo $widgetobj->get_field_name('link_title'); ?>" id="<?php echo $widgetobj->get_field_id('link_title'); ?>" type="checkbox" <?php checked($instance['link_title'], 1); ?> value="1" />
         <?php echo $adminobj->get_label('link_title'); ?>
       </label>
+      <label title="<?php echo $adminobj->get_tip('hide_title');?>">
+        <input name="<?php echo $widgetobj->get_field_name('hide_title'); ?>" id="<?php echo $widgetobj->get_field_id('hide_title'); ?>" type="checkbox" <?php checked($instance['hide_title'], 1); ?> value="1" />
+        <?php echo $adminobj->get_label('hide_title'); ?>
+      </label>
       <br/>
       <input id="<?php echo $widgetobj->get_field_id('title'); ?>" name="<?php echo $widgetobj->get_field_name('title'); ?>" type="text" value="<?php echo esc_attr($instance['title']); ?>" />
     </p>

@@ -6,7 +6,7 @@ if ( !defined('ABSPATH')) exit;
     Plugin Name: IntelliWidget Per Page Featured Posts and Menus
     Plugin URI: http://www.lilaeamedia.com/plugins/intelliwidget
     Description: Combine custom page menus, featured posts, sliders and other content into any widget area that can be customized on a per-page or site-wide basis.
-    Version: 2.1.0
+    Version: 2.1.3
     Author: Lilaea Media
     Author URI: http://www.lilaeamedia.com/
     Text Domain: intelliwidget
@@ -187,7 +187,7 @@ class IntelliWidget {
         // render before widget argument
         echo apply_filters('intelliwidget_before_widget', $before_widget, $instance, $args);
         // handle title
-        if (!empty($instance['title'])):
+        if (!empty($instance['title']) && empty($instance['hide_title'])):
             echo apply_filters('intelliwidget_before_title', $before_title, $instance, $args);
             echo apply_filters('intelliwidget_title', $instance['title'], $instance, $args);
             echo apply_filters('intelliwidget_after_title', $after_title, $instance, $args);
@@ -261,6 +261,7 @@ class IntelliWidget {
             'taxonomy'          => '',
             'hierarchical'      => 1,
             'sortby'            => 'menu_order',
+            'hide_title'        => 0,
         ));
         // backwards compatibility: add content=nav_menu if nav_menu param set
         if (empty($instance['content']) && !empty($instance['nav_menu']) && '' != ($instance['nav_menu'])) 
@@ -272,12 +273,9 @@ class IntelliWidget {
     
 }
 
-define('INTELLIWIDGET_VERSION', '2.1.0');
+define('INTELLIWIDGET_VERSION', '2.1.3');
 
-if (is_admin())
-    include_once( 'includes/class-intelliwidget-admin.php' );
-else
-    include_once( 'includes/template-tags.php' );
+if (!is_admin()) include_once( 'includes/template-tags.php' );
 include_once( 'includes/class-intelliwidget-widget.php' );
 include_once( 'includes/class-intelliwidget-post.php' );
 include_once( 'includes/class-intelliwidget-query.php'  );
