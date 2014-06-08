@@ -282,7 +282,7 @@ if ( !function_exists('get_the_intelliwidget_date') ) {
     function get_the_intelliwidget_date($format = 'j') {
         global $intelliwidget_post;
         $date = empty($intelliwidget_post->event_date) ? $intelliwidget_post->post_date : $intelliwidget_post->event_date;
-        return date($format, strtotime($date));
+        return date_i18n($format, strtotime($date));
     }
 }
     /**
@@ -306,11 +306,11 @@ if ( !function_exists('get_the_intelliwidget_exp_date') ) {
     function get_the_intelliwidget_exp_date($format = 'j') {
         global $intelliwidget_post;
         if (empty($intelliwidget_post->expire_date) || 
-            (date('j', strtotime($intelliwidget_post->event_date)) == date('j', strtotime($intelliwidget_post->expire_date)) 
-                && date('m', strtotime($intelliwidget_post->event_date)) == date('m', strtotime($intelliwidget_post->expire_date)))):
+            (date_i18n('j', strtotime($intelliwidget_post->event_date)) == date('j', strtotime($intelliwidget_post->expire_date)) 
+                && date_i18n('m', strtotime($intelliwidget_post->event_date)) == date('m', strtotime($intelliwidget_post->expire_date)))):
             return false;
         else:
-            return date($format, strtotime($intelliwidget_post->expire_date));
+            return date_i18n($format, strtotime($intelliwidget_post->expire_date));
         endif;
     }
 }
@@ -324,3 +324,28 @@ if ( !function_exists('the_intelliwidget_exp_date') ) {
     }
 }
 
+if ( !function_exists('intelliwidget_post_classes') ) {
+
+    function intelliwidget_post_classes(&$obj, $cols = 1, $classes = array()) {
+        $seq = $obj->current_post + 1;
+        $classes[] = 'post-seq-' . $seq;
+        $classes[] = ($seq % 2 === 0) ? 'even' : 'odd';
+        if ($cols > 1):
+            $row_len = intval($cols);
+            $classes[] = 'cell';
+            $classes[] = 'width-1-' . (in_array($row_len, array(7,9,11)) ? --$row_len : $row_len);
+            if ($seq % $row_len === 0):
+                $classes[] = 'end';
+            elseif ($seq % $row_len === 1):
+                $classes[] = 'clear';
+            endif;
+        endif;
+        return implode(' ', $classes);
+    }
+}
+
+if ( !function_exists('the_intelliwidget_post_classes') ) {
+    function the_intelliwidget_post_classes(&$obj, $cols = 1, $classes = array()) {
+        echo intelliwidget_post_classes($obj, $cols, $classes);
+    }
+}

@@ -101,6 +101,9 @@ class IntelliWidgetMetaBox {
       <label title="<?php echo $obj->get_tip('link_title'); ?>">
         <input name="<?php echo 'intelliwidget_' . $box_id . '_link_title'; ?>" id="<?php echo 'intelliwidget_' . $id . '_' . $box_id . '_link_title'; ?>" type="checkbox" <?php checked($instance['link_title'], 1); ?> value="1" />
         <?php echo $obj->get_label('link_title'); ?>
+      </label>      <label title="<?php echo $obj->get_tip('hide_title'); ?>">
+        <input name="<?php echo 'intelliwidget_' . $box_id . '_hide_title'; ?>" id="<?php echo 'intelliwidget_' . $id . '_' . $box_id . '_hide_title'; ?>" type="checkbox" <?php checked($instance['hide_title'], 1); ?> value="1" />
+        <?php echo $obj->get_label('hide_title'); ?>
       </label><br/>
       <input id="<?php echo 'intelliwidget_' . $id . '_' . $box_id . '_title'; ?>" name="<?php echo 'intelliwidget_' . $box_id . '_title'; ?>" type="text" value="<?php echo esc_attr($instance['title']); ?>" />
     </p>

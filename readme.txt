@@ -3,8 +3,8 @@ Contributors: lilaeamedia, support00
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=DE4W9KW7HQJNA
 Tags: featured posts, events, page menu, plugin, textwidget, widget, custom post types, custom sidebar
 Requires at least: 3.5
-Tested up to: 3.9
-Stable tag: 2.1.2
+Tested up to: 3.9.1
+Stable tag: 2.1.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -192,6 +192,10 @@ Change the 'supports' parameter in the register_post_type function to include 'c
 
 == Changelog ==
 
+= 2.1.3 =
+* Bug fixed - menu template: get_the_ID creating endless loop when using shortcode.
+* New Feature - Hide Title - allows title to be entered to identify widget in admin without showing in output
+
 = 2.1.2 =
 * Bug fixed - not loading child profile meta box on new posts.
 * Bug fixed - not loading IntelliWidgetAdmin class when ajax call does not set is_admin before plugin execution
@@ -356,9 +360,9 @@ Change the 'supports' parameter in the register_post_type function to include 'c
 
 == Upgrade Notice ==
 
-= 2.1.2 =
-* Bug fixed - not loading child profile meta box on new posts.
-* Bug fixed - not loading IntelliWidgetAdmin class when ajax call does not set is_admin before plugin execution
+= 2.1.3 =
+* Bug fixed - menu template: get_the_ID creating endless loop when using shortcode.
+* New Feature - Hide Title - allows title to be entered to identify widget in admin without showing in output
 
 == Getting Started ==
 

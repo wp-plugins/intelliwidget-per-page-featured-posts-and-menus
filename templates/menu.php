@@ -12,7 +12,8 @@ if ( !defined('ABSPATH')) exit;
  * @copyright 2014 Lilaea Media LLC
  * @access public
  */
-$post_id    = have_posts() ? get_the_ID() : NULL;
+global $post;
+$post_id    = is_object($post)?$post->ID:NULL;//have_posts() ? get_the_ID() : NULL;
 $ancestors  = isset($post_id) ? get_post_ancestors($post_id) : array();
 $parent     = current($ancestors);
  ?>
