@@ -3,8 +3,8 @@ Contributors: lilaeamedia, support00
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=DE4W9KW7HQJNA
 Tags: featured posts, events, page menu, plugin, textwidget, widget, custom post types, custom sidebar
 Requires at least: 3.5
-Tested up to: 3.9
-Stable tag: 2.1.0
+Tested up to: 3.9.1
+Stable tag: 2.1.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -92,16 +92,16 @@ Spanish translation courtesy of Andrew Kurtis at WebHostingHub.com.
  
 == Installation ==
 
-1. To install from the Plugins Admin:
+1. To install from the Plugins repository:
     * In the WordPress Admin, go to "Plugins > Add New."
     * Type "intelliwidget" in the "Search" box and click "Search Plugins."
     * Locate "IntelliWidget Per Page Featured Posts and Menus" in the list and click "Install Now."
 
-2. To install via FTP:
-    * Download the IntelliWidget plugin archive from and unzip it.
-    * http://wordpress.org/plugins/intelliwidget-per-page-featured-posts-and-menus
-    * Upload the intelliwidget-per-page-featured-posts-and-menus directory to your WordPress plugins directory 
-    * (e.g., /path/to/wordpress/wp-content/plugins/)
+2. To install manually:
+    * Download the IntelliWidget plugin from http://wordpress.org/plugins/intelliwidget-per-page-featured-posts-and-menus
+    * In the WordPress Admin, go to "Plugins > Add New."
+    * Click the "Upload" link at the top of the page.
+    * Browse for the zip file, select and click "Install."
 
 3. In the WordPress Admin, go to "Plugins > Installed Plugins." Locate "IntelliWidget Per Page Featured Posts and Menus" in the list and click "Activate."
 
@@ -191,6 +191,22 @@ Change the 'supports' parameter in the register_post_type function to include 'c
 5. Example of the Custom Data Fields Panel.
 
 == Changelog ==
+
+= 2.1.4 =
+* Bug fixed - fatal error when widget form loaded outside of widgets admin page.
+
+= 2.1.3 =
+* Bug fixed - menu template: get_the_ID creating endless loop when using shortcode.
+* New Feature - Hide Title - allows title to be entered to identify widget in admin without showing in output
+
+= 2.1.2 =
+* Bug fixed - not loading child profile meta box on new posts.
+* Bug fixed - not loading IntelliWidgetAdmin class when ajax call does not set is_admin before plugin execution
+* Thanks to NelClay for reporting these.
+
+= 2.1.1 =
+* Bux fixed - incorrect object reference in class-intelliwidget-metabox causing taxonomy menu to fail on child profile
+* Thanks to Keith for reporting this.
 
 = 2.1.0 =
 * New feature: taxonomy menu content option. Creates menu of terms from any taxonomy with multiple config options.
@@ -347,8 +363,12 @@ Change the 'supports' parameter in the register_post_type function to include 'c
 
 == Upgrade Notice ==
 
-= 2.1.0 =
-* New feature: taxonomy menu content option. Creates menu of terms from any taxonomy with multiple config options.
+= 2.1.4 =
+* Bug fixed - fatal error when widget form loaded outside of widgets admin page.
+
+= 2.1.3 =
+* Bug fixed - menu template: get_the_ID creating endless loop when using shortcode.
+* New Feature - Hide Title - allows title to be entered to identify widget in admin without showing in output
 
 == Getting Started ==
 

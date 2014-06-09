@@ -273,6 +273,7 @@ jQuery(document).ready(function($) {
                 return false;  
             }, 'json'
         ).fail(function(){
+            //console.log('fail');
             // release button
             savebutton.prop('disabled', false);
             // hide spinner
