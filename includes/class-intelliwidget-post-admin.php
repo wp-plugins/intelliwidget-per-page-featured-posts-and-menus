@@ -10,6 +10,7 @@ if ( !defined('ABSPATH')) exit;
  * @copyright 2014 Lilaea Media LLC
  * @access public
  */
+include_once('class-intelliwidget-admin.php');
 
 class IntelliWidgetPostAdmin extends IntelliWidgetAdmin {
 
@@ -21,6 +22,7 @@ class IntelliWidgetPostAdmin extends IntelliWidgetAdmin {
     function __construct() {
             // these actions only apply to admin users
             add_action('load-post.php',                     array(&$this, 'post_metabox_actions') );
+            add_action('load-post-new.php',                 array(&$this, 'post_metabox_actions') );
             add_action('save_post',                         array(&$this, 'post_save_data'), 1, 2 );
             add_action('wp_ajax_iw_post_cdfsave',           array(&$this, 'ajax_post_save_cdf_data' ));
             add_action('wp_ajax_iw_post_save',              array(&$this, 'ajax_post_save_data' ));

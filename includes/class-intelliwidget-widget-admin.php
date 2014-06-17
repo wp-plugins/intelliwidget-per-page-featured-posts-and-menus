@@ -11,6 +11,7 @@ if ( !defined('ABSPATH')) exit;
  * @access public
  */
 
+include_once('class-intelliwidget-admin.php');
 include_once('class-intelliwidget-form.php');
 class IntelliWidget_WidgetAdmin extends IntelliWidgetAdmin {
 
@@ -65,6 +66,8 @@ class IntelliWidget_WidgetAdmin extends IntelliWidgetAdmin {
      */
     function render_form($obj, $instance) {
         global $intelliwidget;
+        // initialize admin object in case form is called outside of widgets page
+        if (!isset($this->objecttype)) $this->admin_init();
         $instance = $intelliwidget->defaults($instance);
         $this->widget_form->render_form($this, $obj, $instance);
     }

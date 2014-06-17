@@ -32,6 +32,8 @@ class IntelliWidgetList {
 
             'link_title'        => __('Link', 'intelliwidget'),
 
+            'hide_title'        => __('Hide', 'intelliwidget'),
+
             'container_id'      => __('Unique ID', 'intelliwidget'),
 
             'classes'           => __('Classes', 'intelliwidget'),
@@ -128,6 +130,8 @@ class IntelliWidgetList {
             'title'             => __('Enter a title here if you want a heading above this IntelliWidget section, otherwise, leave it blank.', 'intelliwidget'),
 
             'link_title'        => __('Check this box to automatically link the title to another page. If you are using categories, tags or other taxonomies, the link will point to that archive, otherwise it will point to the first post that appears in the list.', 'intelliwidget'),
+
+            'hide_title'        => __('Check this box to hide the title from widget output. This allows you to use the title to identify the widget in the Admin without affecting the presentation.', 'intelliwidget'),
 
             'container_id'      => __('Enter a unique value if you wish to customize the IntelliWidget div container id attribute.', 'intelliwidget'),
 
@@ -302,6 +306,7 @@ class IntelliWidgetList {
                     'hide_empty',
                     'hierarchical',
                     'show_descr',
+                    'hide_title',
                 )
             ),
             'text' => apply_filters('intelliwidget_text_fields', 
