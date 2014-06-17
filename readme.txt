@@ -4,7 +4,7 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_i
 Tags: featured posts, events, page menu, plugin, textwidget, widget, custom post types, custom sidebar
 Requires at least: 3.5
 Tested up to: 3.9.1
-Stable tag: 2.1.4
+Stable tag: 2.1.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -192,6 +192,9 @@ Change the 'supports' parameter in the register_post_type function to include 'c
 
 == Changelog ==
 
+= 2.1.5 =
+* Bug fixed - Shortcode not pulling "Use Profiles From..." values.
+
 = 2.1.4 =
 * Bug fixed - fatal error when widget form loaded outside of widgets admin page.
 
@@ -363,12 +366,8 @@ Change the 'supports' parameter in the register_post_type function to include 'c
 
 == Upgrade Notice ==
 
-= 2.1.4 =
-* Bug fixed - fatal error when widget form loaded outside of widgets admin page.
-
-= 2.1.3 =
-* Bug fixed - menu template: get_the_ID creating endless loop when using shortcode.
-* New Feature - Hide Title - allows title to be entered to identify widget in admin without showing in output
+= 2.1.5 =
+* Bug fixed - Shortcode not pulling "Use Profiles From..." values.
 
 == Getting Started ==
 
