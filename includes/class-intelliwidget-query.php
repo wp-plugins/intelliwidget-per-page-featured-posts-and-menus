@@ -23,6 +23,8 @@ class IntelliWidget_Query {
     
     var $current_post = -1;
     
+    var $postmeta;
+    
     function __construct() {
     }
     
