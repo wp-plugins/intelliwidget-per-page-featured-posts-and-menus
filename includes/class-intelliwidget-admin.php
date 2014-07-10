@@ -333,7 +333,7 @@ class IntelliWidgetAdmin {
                 && is_array($sidebar_widgets)):
                 $count = 0;
                 foreach ($sidebar_widgets as $sidebar_widget_id):
-                    if (false !== strpos($sidebar_widget_id, 'intelliwidget') ):
+                    if (false !== strpos($sidebar_widget_id, 'intelliwidget') && isset($wp_registered_sidebars[$sidebar_id])):
                         $widgets[$sidebar_widget_id] = $wp_registered_sidebars[$sidebar_id]['name'] . ' [' . ++$count . ']';
                     endif; 
                 endforeach; 

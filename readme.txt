@@ -4,7 +4,7 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_i
 Tags: featured posts, events, page menu, plugin, textwidget, widget, custom post types, custom sidebar
 Requires at least: 3.5
 Tested up to: 3.9.1
-Stable tag: 2.1.5
+Stable tag: 2.1.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -192,6 +192,9 @@ Change the 'supports' parameter in the register_post_type function to include 'c
 
 == Changelog ==
 
+= 2.1.6 =
+* New Feature - Added get_the_intelliwidget_postmeta() and the_intelliwidget_postmeta() template functions
+
 = 2.1.5 =
 * Bug fixed - Shortcode not pulling "Use Profiles From..." values.
 
@@ -366,8 +369,8 @@ Change the 'supports' parameter in the register_post_type function to include 'c
 
 == Upgrade Notice ==
 
-= 2.1.5 =
-* Bug fixed - Shortcode not pulling "Use Profiles From..." values.
+= 2.1.6 =
+* New Feature - Added get_the_intelliwidget_postmeta() and the_intelliwidget_postmeta() template functions
 
 == Getting Started ==
 
