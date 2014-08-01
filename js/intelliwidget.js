@@ -123,7 +123,7 @@ jQuery(document).ready(function($) {
     bind_events = function(el) {
         // since postbox.js does not delegate events, 
         // we have to rebind toggles on refresh
-        $(el).find('.postbox h3, .handlediv').on('click', function(e){
+        $(el).find('.postbox .hndle, .handlediv').on('click', function(e){
             var p = $(this).parent('.postbox'), id = p.attr('id');
             p.toggleClass('closed');
             if ( id ) {
