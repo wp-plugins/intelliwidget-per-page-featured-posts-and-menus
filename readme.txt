@@ -113,7 +113,7 @@ Spanish translation courtesy of Andrew Kurtis at WebHostingHub.com.
 
 See the "Getting Started" section or watch the Quick Start Tutorial:
 
-http://www.youtube.com/watch?v=XwESsBRK9hg
+http://www.youtube.com/watch?v=Ttw1xIZ2b-g
 
 = Where can I find full documentation? =
 
