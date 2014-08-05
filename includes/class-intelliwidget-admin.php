@@ -60,15 +60,17 @@ class IntelliWidgetAdmin {
      * @param <string> $idfield - the input field name to use as the object id
      */
     function admin_scripts($idfield) {
-        global $intelliwidget;
-        wp_enqueue_style('intelliwidget-js', $intelliwidget->pluginURL . 'templates/intelliwidget-admin.css', array(), INTELLIWIDGET_VERSION);
-        wp_enqueue_script('jquery-ui-tabs');
-        wp_enqueue_script('intelliwidget-js', $intelliwidget->pluginURL . 'js/intelliwidget.min.js', array('jquery'), INTELLIWIDGET_VERSION, false);
-        wp_localize_script( 'intelliwidget-js', 'IWAjax', array(
-            'ajaxurl'   => admin_url( 'admin-ajax.php' ),
-            'objtype'   => $this->objecttype,
-            'idfield'   => $idfield,
-        ));
+        if (!wp_script_is('intelliwidget-js', 'enqueued')): // prevent multiple initialization by other plugins
+            global $intelliwidget;
+            wp_enqueue_style('intelliwidget-js', $intelliwidget->pluginURL . 'templates/intelliwidget-admin.css', array(), INTELLIWIDGET_VERSION);
+            wp_enqueue_script('jquery-ui-tabs');
+            wp_enqueue_script('intelliwidget-js', $intelliwidget->pluginURL . 'js/intelliwidget.min.js', array('jquery'), INTELLIWIDGET_VERSION, false);
+            wp_localize_script( 'intelliwidget-js', 'IWAjax', array(
+                'ajaxurl'   => admin_url( 'admin-ajax.php' ),
+                'objtype'   => $this->objecttype,
+                'idfield'   => $idfield,
+            ));
+        endif;
     }
     
     function add_options_page() {

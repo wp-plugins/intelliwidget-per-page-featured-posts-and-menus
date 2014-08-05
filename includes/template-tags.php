@@ -37,10 +37,10 @@ if ( !function_exists('get_the_intelliwidget_image') ) {
      * @global <object> $intelliwidget_post
      * @return <string> image link if exists, <boolean> false if none
      */
-    function get_the_intelliwidget_image() {
+    function get_the_intelliwidget_image($link = TRUE) {
         global $this_instance, $intelliwidget_post;
         if ($this_instance['image_size'] != 'none' && has_intelliwidget_image() ) :
-            return apply_filters('intelliwidget_image', '<a title="' . strip_tags(get_the_intelliwidget_title()) . '" href="' . get_the_intelliwidget_url() . '">'
+            return apply_filters('intelliwidget_image', ($link ? '<a title="' . strip_tags(get_the_intelliwidget_title()) . '" href="' . get_the_intelliwidget_url() . '">' : '')
                 . get_the_post_thumbnail(
                     $intelliwidget_post->ID, 
                     $this_instance['image_size'], 
@@ -49,7 +49,7 @@ if ( !function_exists('get_the_intelliwidget_image') ) {
                         'class' =>'intelliwidget-image-'. $this_instance['image_size'],
                     )
                 )
-                . '</a>');
+                . ($link ? '</a>' : ''));
         endif;
         return false;
     }
@@ -72,8 +72,8 @@ if ( !function_exists('the_intelliwidget_image') ) {
     /**
      * Display the featured post image with link to the full image.
      */
-    function the_intelliwidget_image() {
-        echo get_the_intelliwidget_image();
+    function the_intelliwidget_image($link = TRUE) {
+        echo get_the_intelliwidget_image($link);
     }
 }
 
