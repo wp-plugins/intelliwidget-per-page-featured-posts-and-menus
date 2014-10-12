@@ -14,15 +14,10 @@ if ( !defined('ABSPATH')) exit;
 class IntelliWidget_Query {
     
     var $post;
-
     var $posts;
-    
     var $post_count   = 0;
-    
     var $in_the_loop  = false;
-    
     var $current_post = -1;
-    
     var $postmeta;
     
     function __construct() {
@@ -127,8 +122,18 @@ LEFT JOIN {$wpdb->postmeta} pm2 ON pm2.post_id = p1.ID
                     AND tx2.taxonomy = 'category'";
         // otherwise use new terms instead
         elseif (isset($instance['terms']) && $instance['terms'] && -1 != $instance['terms']):
-            $clauses[] = '( tx1.term_taxonomy_id IN ('. $this->prep_array($instance['terms'], $prepargs, 'd') . ') )';
-            $joins[] = "INNER JOIN {$wpdb->term_relationships} tx1 ON p1.ID = tx1.object_id ";
+            $terms = $this->prep_array($instance['terms'], $prepargs, 'd');
+            if (isset($instance['allterms']) && $instance['allterms']):
+    			$clauses[] = '((
+					SELECT COUNT(1)
+					FROM ' . $wpdb->term_relationships . '
+					WHERE term_taxonomy_id IN (' . $terms . ')
+					AND object_id = p1.ID
+				) = ' . count( $instance['terms'] ) . ')';
+            else:
+                $clauses[] = '( tx1.term_taxonomy_id IN ('. $terms . ') )';
+                $joins[] = "INNER JOIN {$wpdb->term_relationships} tx1 ON p1.ID = tx1.object_id ";
+            endif;
         endif;
         
         // specific posts

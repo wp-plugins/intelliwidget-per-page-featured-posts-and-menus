@@ -331,7 +331,18 @@ class IntelliWidgetMetaBox {
     <p>
       <label title="<?php echo $obj->get_tip('terms'); ?>">
         <?php echo $obj->get_label('terms'); ?>
-        :</label><br/>
+        </label><br/>
+      <select name="<?php echo 'intelliwidget_' . $box_id . '_allterms'; ?>" id="<?php echo 'intelliwidget_' . $id . '_' . $box_id . '_allterms'; ?>">
+        <option value="0"<?php selected( $instance['allterms'], 0 ); ?>>
+        <?php _e('any', 'intelliwidget'); ?>
+        </option>
+        <option value="1"<?php selected( $instance['allterms'], 1 ); ?>>
+        <?php _e('all', 'intelliwidget'); ?>
+        </option>
+      </select>
+      <label title="<?php echo $obj->get_tip('allterms'); ?>">
+        <?php echo $obj->get_label('allterms'); ?>
+        :</label>
       <select class="widefat intelliwidget-multiselect" name="<?php echo 'intelliwidget_' . $box_id . '_terms'; ?>[]" size="1" multiple="multiple" id="<?php echo 'intelliwidget_' . $id . '_' . $box_id . '_terms'; ?>">
         <?php echo $obj->get_terms_list($instance); ?>
       </select>

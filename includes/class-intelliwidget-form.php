@@ -298,6 +298,17 @@ name="<?php echo $widgetobj->get_field_name('custom_text'); ?>">
     <p>
       <label title="<?php echo $adminobj->get_tip('terms');?>">
         <?php echo $adminobj->get_label('terms');?>
+      </label>
+      <select name="<?php echo $widgetobj->get_field_name('allterms'); ?>" id="<?php echo $widgetobj->get_field_id('allterms'); ?>">
+        <option value="0"<?php if (isset($instance['allterms'])) selected( $instance['allterms'], 0 ); ?>>
+        <?php _e('any', 'intelliwidget'); ?>
+        </option>
+        <option value="1"<?php if (isset($instance['allterms'])) selected( $instance['allterms'], 1 ); ?>>
+        <?php _e('all', 'intelliwidget'); ?>
+        </option>
+      </select>
+      <label title="<?php echo $adminobj->get_tip('allterms'); ?>">
+        <?php echo $adminobj->get_label('allterms'); ?>
         :</label>
       <select class="widefat intelliwidget-multiselect" name="<?php echo $widgetobj->get_field_name('terms'); ?>[]" size="1" multiple="multiple" id="<?php echo $widgetobj->get_field_id('terms'); ?>">
         <?php echo $adminobj->get_terms_list($instance); ?>
