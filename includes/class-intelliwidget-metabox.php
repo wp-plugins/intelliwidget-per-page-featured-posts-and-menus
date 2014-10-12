@@ -82,7 +82,7 @@ class IntelliWidgetMetaBox {
         ?>
 <div id="iw_generalsettings_<?php echo $id . '_' . $box_id; ?>" class="postbox closed iw-collapsible panel-general">
   <div class="handlediv" title="<?php _e('Click to toggle', 'intelliwidget'); ?>"></div>
-  <h3 title="<?php echo $obj->get_tip('generalsettings'); ?>"><span>
+  <h3 class="hndle" class="hndle" title="<?php echo $obj->get_tip('generalsettings'); ?>"><span>
     <?php echo $obj->get_label('generalsettings'); ?>
     </span></h3>
   <div  id="iw_generalsettings_<?php echo $id . '_' . $box_id; ?>_inside" class="inside">
@@ -128,7 +128,7 @@ class IntelliWidgetMetaBox {
         ?>
 <div id="iw_addltext_<?php echo $id . '_' . $box_id; ?>" class="postbox closed iw-collapsible panel-addltext">
   <div class="handlediv" title="<?php _e('Click to toggle', 'intelliwidget'); ?>"></div>
-  <h3 title="<?php echo $obj->get_tip('addltext'); ?>"><span>
+  <h3 class="hndle" title="<?php echo $obj->get_tip('addltext'); ?>"><span>
     <?php echo $obj->get_label('addltext'); ?>
     </span></h3>
   <div  id="iw_addltext_<?php echo $id . '_' . $box_id; ?>_inside" class="inside">
@@ -159,7 +159,7 @@ class IntelliWidgetMetaBox {
         ?>
 <div id="iw_appearance_<?php echo $id . '_' . $box_id; ?>" class="postbox closed iw-collapsible panel-appearance">
   <div class="handlediv" title="<?php _e('Click to toggle', 'intelliwidget'); ?>"></div>
-  <h3 title="<?php echo $obj->get_tip('appearance'); ?>"><span>
+  <h3 class="hndle" title="<?php echo $obj->get_tip('appearance'); ?>"><span>
     <?php echo $obj->get_label('appearance'); ?>
     </span></h3>
   <div id="iw_appearance_<?php echo $id . '_' . $box_id; ?>_inside" class="inside">
@@ -238,7 +238,7 @@ class IntelliWidgetMetaBox {
         ?>
 <div id="iw_selection_<?php echo $id . '_' . $box_id; ?>" class="postbox closed iw-collapsible panel-selection">
   <div class="handlediv" title="<?php _e('Click to toggle', 'intelliwidget'); ?>"></div>
-  <h3 title="<?php echo $obj->get_tip('selection'); ?>"><span>
+  <h3 class="hndle" title="<?php echo $obj->get_tip('selection'); ?>"><span>
     <?php echo $obj->get_label('selection'); ?>
     </span></h3>
   <div id="iw_selection_<?php echo $id . '_' . $box_id; ?>_inside" class="inside">
@@ -331,7 +331,18 @@ class IntelliWidgetMetaBox {
     <p>
       <label title="<?php echo $obj->get_tip('terms'); ?>">
         <?php echo $obj->get_label('terms'); ?>
-        :</label><br/>
+        </label><br/>
+      <select name="<?php echo 'intelliwidget_' . $box_id . '_allterms'; ?>" id="<?php echo 'intelliwidget_' . $id . '_' . $box_id . '_allterms'; ?>">
+        <option value="0"<?php selected( $instance['allterms'], 0 ); ?>>
+        <?php _e('any', 'intelliwidget'); ?>
+        </option>
+        <option value="1"<?php selected( $instance['allterms'], 1 ); ?>>
+        <?php _e('all', 'intelliwidget'); ?>
+        </option>
+      </select>
+      <label title="<?php echo $obj->get_tip('allterms'); ?>">
+        <?php echo $obj->get_label('allterms'); ?>
+        :</label>
       <select class="widefat intelliwidget-multiselect" name="<?php echo 'intelliwidget_' . $box_id . '_terms'; ?>[]" size="1" multiple="multiple" id="<?php echo 'intelliwidget_' . $id . '_' . $box_id . '_terms'; ?>">
         <?php echo $obj->get_terms_list($instance); ?>
       </select>
@@ -359,7 +370,7 @@ class IntelliWidgetMetaBox {
         ?>
 <div id="iw_taxmenusettings_<?php echo $id . '_' . $box_id; ?>" class="postbox closed iw-collapsible panel-taxmenu">
   <div class="handlediv" title="<?php _e('Click to toggle', 'intelliwidget'); ?>"></div>
-  <h3 title="<?php echo $obj->get_tip('taxmenusettings'); ?>"><span> <?php echo $obj->get_label('taxmenusettings'); ?> </span></h3>
+  <h3 class="hndle" title="<?php echo $obj->get_tip('taxmenusettings'); ?>"><span> <?php echo $obj->get_label('taxmenusettings'); ?> </span></h3>
   <div  id="iw_taxmenusettings_<?php echo $id . '_' . $box_id; ?>_inside" class="inside">
     <p>
       <label title="<?php echo $obj->get_tip('taxonomy'); ?>" for="<?php echo 'intelliwidget_' . $id . '_' . $box_id . '_taxonomy'; ?>"> <?php echo $obj->get_label('taxonomy'); ?> : </label>

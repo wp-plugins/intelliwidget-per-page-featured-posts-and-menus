@@ -37,10 +37,10 @@ if ( !function_exists('get_the_intelliwidget_image') ) {
      * @global <object> $intelliwidget_post
      * @return <string> image link if exists, <boolean> false if none
      */
-    function get_the_intelliwidget_image() {
+    function get_the_intelliwidget_image($link = TRUE) {
         global $this_instance, $intelliwidget_post;
         if ($this_instance['image_size'] != 'none' && has_intelliwidget_image() ) :
-            return '<a title="' . strip_tags(get_the_intelliwidget_title()) . '" href="' . get_the_intelliwidget_url() . '">'
+            return apply_filters('intelliwidget_image', ($link ? '<a title="' . strip_tags(get_the_intelliwidget_title()) . '" href="' . get_the_intelliwidget_url() . '">' : '')
                 . get_the_post_thumbnail(
                     $intelliwidget_post->ID, 
                     $this_instance['image_size'], 
@@ -49,7 +49,7 @@ if ( !function_exists('get_the_intelliwidget_image') ) {
                         'class' =>'intelliwidget-image-'. $this_instance['image_size'],
                     )
                 )
-                . '</a>';
+                . ($link ? '</a>' : ''));
         endif;
         return false;
     }
@@ -72,8 +72,8 @@ if ( !function_exists('the_intelliwidget_image') ) {
     /**
      * Display the featured post image with link to the full image.
      */
-    function the_intelliwidget_image() {
-        echo get_the_intelliwidget_image();
+    function the_intelliwidget_image($link = TRUE) {
+        echo get_the_intelliwidget_image($link);
     }
 }
 
@@ -115,7 +115,7 @@ if ( !function_exists('get_the_intelliwidget_excerpt') ) {
         global $intelliwidget, $this_instance, $intelliwidget_post;
         // use excerpt text if it exists otherwise parse the main content
         $excerpt = empty($intelliwidget_post->post_excerpt) ?
-            get_the_intelliwidget_content() : $intelliwidget_post->post_excerpt;
+            get_the_intelliwidget_content() : apply_filters('intelliwidget_content', $intelliwidget_post->post_excerpt);
         return apply_filters('intelliwidget_trim_excerpt', $excerpt, $this_instance);
     }
 }
@@ -138,16 +138,7 @@ if ( !function_exists('get_the_intelliwidget_content') ) {
      */
     function get_the_intelliwidget_content() {
         global $intelliwidget_post;
-        $content = $intelliwidget_post->post_content;
-        if ( strpos( $content, '<!--nextpage-->' ) ) {
-            $content = preg_replace("#\s*<!\-\-nextpage\-\->.*#s", '', $content);
-        }
-        // remove intelliwidget shortcode to stop endless recursion
-        if ( strpos( $content, '[intelliwidget' )) {
-            $content = preg_replace("#\[intelliwidget.*?\]#s", '', $content);
-        }
-        // otherwise, parse shortcodes
-        return do_shortcode($content);
+        return apply_filters('intelliwidget_content', $intelliwidget_post->post_content);
     }
 }
     
@@ -182,7 +173,7 @@ if ( !function_exists('get_the_intelliwidget_link') ) {
         $classes = empty($intelliwidget_post->link_classes) ? '' :  ' class="' . $intelliwidget_post->link_classes . '"';
         $target  = empty($intelliwidget_post->link_target) ? '' : ' target="' . $intelliwidget_post->link_target . '"';
         $content = '<a title="' . $title_text . '" href="' . $url . '"' . $classes . $target . '>' . $link_text .  '</a>';
-        return $content;
+        return apply_filters('intelliwidget_link', $content, $title_text, $classes, $target);
     }
 }
 
@@ -347,5 +338,19 @@ if ( !function_exists('intelliwidget_post_classes') ) {
 if ( !function_exists('the_intelliwidget_post_classes') ) {
     function the_intelliwidget_post_classes(&$obj, $cols = 1, $classes = array()) {
         echo intelliwidget_post_classes($obj, $cols, $classes);
+    }
+}
+
+if (!function_exists('get_the_intelliwidget_postmeta')) {
+    function get_the_intelliwidget_postmeta($meta = NULL) {
+        global $intelliwidget_post;
+        if ($meta && ($value = get_post_meta($intelliwidget_post->ID, $meta, TRUE))) return $value;
+        return false;
+    }
+}
+
+if (!function_exists('the_intelliwidget_postmeta')) {
+    function the_intelliwidget_postmeta($meta = NULL) {
+        echo get_the_intelliwidget_postmeta($meta);
     }
 }

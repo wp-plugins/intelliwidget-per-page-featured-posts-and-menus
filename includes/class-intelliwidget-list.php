@@ -66,7 +66,7 @@ class IntelliWidgetList {
 
             'post_types'        => __('Select from these Post Types', 'intelliwidget'),
 
-            'terms'             => __('Terms: Select by Category, Tag, etc.', 'intelliwidget'),
+            'terms'             => __('Select posts identified by', 'intelliwidget'),
 
             'page'              => __('Select specific posts', 'intelliwidget'),
 
@@ -118,6 +118,7 @@ class IntelliWidgetList {
             'show_descr'        => __('Show term description', 'intelliwidget'),
 
             'sortby_terms'      => __('Sort terms by', 'intelliwidget'),
+            'allterms'          => __('of these terms'),
         ));
 
         $this->tips = apply_filters('intelliwidget_tips', array(
@@ -217,6 +218,7 @@ class IntelliWidgetList {
             'show_descr'        => __('Display the term description if it exists.', 'intelliwidget'),
 
             'sortby_terms'      => __('This menu controls whether sort by Term Label or by the order configured on the Edit Taxonomy admin.', 'intelliwidget'),
+            'allterms'          => __('Select whether the post must be a member of all the selected terms or just one of them.', 'intelliwidget'),
             )
         );
 
