@@ -34,12 +34,10 @@ class IntelliWidgetAdmin {
      * Configures the admin object for this request
      */
     function admin_init($objecttype = '', $idfield = '') {
-            include_once( 'class-intelliwidget-list.php' );
+            include_once( 'class-intelliwidget-strings.php' );
             include_once( 'class-intelliwidget-walker.php' );
             // this property tells IW how to set/get options (post uses post_meta, others use options table)
             $this->objecttype       = $objecttype;
-            // cache lists and labels
-            $this->lists            = new IntelliWidgetList();
             // cache post types
             $this->post_types       = $this->get_eligible_post_types();
             // cache menus
@@ -498,47 +496,47 @@ class IntelliWidgetAdmin {
     
     
     function get_content_menu() {
-        return $this->lists->get_menu('content');
+        return IntelliWidgetStrings::get_menu('content');
     }
     
     function get_replaces_menu() {
-        return $this->lists->get_menu('replaces');
+        return IntelliWidgetStrings::get_menu('replaces');
     }
     
     function get_text_position_menu() {
-        return $this->lists->get_menu('text_position');
+        return IntelliWidgetStrings::get_menu('text_position');
     }
 
     function get_sortby_menu() {
-        return $this->lists->get_menu('sortby');
+        return IntelliWidgetStrings::get_menu('sortby');
     }
 
     function get_image_size_menu() {
-        return $this->lists->get_menu('image_size');
+        return IntelliWidgetStrings::get_menu('image_size');
     }
 
     function get_imagealign_menu() {
-        return $this->lists->get_menu('imagealign');
+        return IntelliWidgetStrings::get_menu('imagealign');
     }
 
     function get_link_target_menu() {
-        return $this->lists->get_menu('link_target');
+        return IntelliWidgetStrings::get_menu('link_target');
     }
 
     function get_checkbox_fields() {
-        return $this->lists->get_fields('checkbox');
+        return IntelliWidgetStrings::get_fields('checkbox');
     }
     
     function get_text_fields() {
-        return $this->lists->get_fields('text');
+        return IntelliWidgetStrings::get_fields('text');
     }
     
     function get_custom_fields() {
-        return $this->lists->get_fields('custom');
+        return IntelliWidgetStrings::get_fields('custom');
     }
     
     function get_nav_menu() {
-        $defaults = $this->lists->get_menu('default_nav');
+        $defaults = IntelliWidgetStrings::get_menu('default_nav');
         return $defaults + $this->menus;
     }
     
@@ -563,15 +561,15 @@ class IntelliWidgetAdmin {
     }
 
     function get_tax_sortby_menu() {
-        return $this->lists->get_menu('tax_sortby');
+        return IntelliWidgetStrings::get_menu('tax_sortby');
     }
 
     function get_label($key = '') {
-        return $this->lists->get_label($key);
+        return IntelliWidgetStrings::get_label($key);
     }
 
     function get_tip($key = '') {
-        return $this->lists->get_tip($key);
+        return IntelliWidgetStrings::get_tip($key);
     }
     /**
      * Stub for data validation
