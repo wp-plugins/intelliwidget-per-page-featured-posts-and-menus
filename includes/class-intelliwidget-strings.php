@@ -177,6 +177,7 @@ class IntelliWidgetStrings {
         endswitch;
         return apply_filters('intelliwidget_labels', $value, $key);
     }
+    
     static function get_tip($key = '') {
         $value = FALSE;
         switch ($key):
@@ -325,6 +326,7 @@ class IntelliWidgetStrings {
         endswitch;
         return apply_filters('intelliwidget_tips', $value, $key);
     }
+    
     static function get_menu($key = '') {
         $value = FALSE;
         switch ($key):
