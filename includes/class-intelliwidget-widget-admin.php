@@ -12,7 +12,6 @@ if ( !defined('ABSPATH')) exit;
  */
 
 include_once('class-intelliwidget-admin.php');
-include_once('class-intelliwidget-form.php');
 class IntelliWidget_WidgetAdmin extends IntelliWidgetAdmin {
 
     var $widget_form;
@@ -22,7 +21,7 @@ class IntelliWidget_WidgetAdmin extends IntelliWidgetAdmin {
     function __construct() {
         add_action('load-widgets.php',                  array(&$this, 'load_widget_form') );
         add_action('wp_ajax_iw_widget_menus',           array(&$this, 'ajax_get_widget_post_select_menus'));
-        $this->widget_form = new IntelliWidgetForm();
+        $this->form_init();
     }
     
     
@@ -69,7 +68,7 @@ class IntelliWidget_WidgetAdmin extends IntelliWidgetAdmin {
         // initialize admin object in case form is called outside of widgets page
         if (!isset($this->objecttype)) $this->admin_init();
         $instance = $intelliwidget->defaults($instance);
-        $this->widget_form->render_form($this, $obj, $instance);
+        $this->form->render_form($this, $obj, $instance, TRUE);
     }
     
     function load_widget_form(){
@@ -93,9 +92,9 @@ class IntelliWidget_WidgetAdmin extends IntelliWidgetAdmin {
                     $settings = $widget->get_settings($widget_id);
                     $instance = $settings[$params['number']];
                     include_once('class-intelliwidget-form.php');
-                    $this->widget_form = new IntelliWidgetForm();
+                    $this->form_init();
                     ob_start();
-                    $this->widget_form->post_selection_menus($this, $widget, $instance);
+                    $this->form->post_selection_menus($this, $widget, $instance);
                     $form = ob_get_contents();
                     ob_end_clean();
                     die($form);

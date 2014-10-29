@@ -4,7 +4,7 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_i
 Tags: featured posts, events, page menu, plugin, textwidget, widget, custom post types, custom sidebar
 Requires at least: 3.5
 Tested up to: 4.0 
-Stable tag: 2.1.8
+Stable tag: 2.1.9
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -191,6 +191,10 @@ Change the 'supports' parameter in the register_post_type function to include 'c
 5. Example of the Custom Data Fields Panel.
 
 == Changelog ==
+
+= 2.1.9 =
+* Added any/all option to term selection
+* replaced the_content filter with custom filter for excerpts 
 
 = 2.1.8 =
 * Check if admin script is enqueued to prevent multiple instance of localization object
@@ -380,12 +384,9 @@ Change the 'supports' parameter in the register_post_type function to include 'c
 
 == Upgrade Notice ==
 
-= 2.1.8 =
-* Check if admin script is enqueued to prevent multiple instance of localization object
-* Added link boolean to get_the_intelliwidget_image args to allow featured images with or without links to post
-* Default is TRUE (link image)
-* Bug fixed - corrected clear attribute in intelliwidget-title style.
-* Bug fixed - added hndle selector to metabox h3 to accommodate change to postbox.js in WP 4.0 core.
+* Added any/all option to term selection
+* replaced the_content filter with custom filter for excerpts 
+
 
 == Getting Started ==
 

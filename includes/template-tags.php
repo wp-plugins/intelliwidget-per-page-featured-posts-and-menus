@@ -115,7 +115,7 @@ if ( !function_exists('get_the_intelliwidget_excerpt') ) {
         global $intelliwidget, $this_instance, $intelliwidget_post;
         // use excerpt text if it exists otherwise parse the main content
         $excerpt = empty($intelliwidget_post->post_excerpt) ?
-            get_the_intelliwidget_content() : $intelliwidget_post->post_excerpt;
+            get_the_intelliwidget_content() : apply_filters('intelliwidget_content', $intelliwidget_post->post_excerpt);
         return apply_filters('intelliwidget_trim_excerpt', $excerpt, $this_instance);
     }
 }
@@ -138,16 +138,7 @@ if ( !function_exists('get_the_intelliwidget_content') ) {
      */
     function get_the_intelliwidget_content() {
         global $intelliwidget_post;
-        $content = $intelliwidget_post->post_content;
-        if ( strpos( $content, '<!--nextpage-->' ) ) {
-            $content = preg_replace("#\s*<!\-\-nextpage\-\->.*#s", '', $content);
-        }
-        // remove intelliwidget shortcode to stop endless recursion
-        if ( strpos( $content, '[intelliwidget' )) {
-            $content = preg_replace("#\[intelliwidget.*?\]#s", '', $content);
-        }
-        // otherwise, parse shortcodes
-        return apply_filters('intelliwidget_content', do_shortcode($content));
+        return apply_filters('intelliwidget_content', $intelliwidget_post->post_content);
     }
 }
     

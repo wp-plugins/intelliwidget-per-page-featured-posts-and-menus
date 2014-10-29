@@ -558,6 +558,7 @@ jQuery(document).ready(function($) {
                 return false;  
             }
         ).fail(function(){
+            //console.log('FAIL :(');
             // release button
             savebutton.prop('disabled', false);
             // hide spinner

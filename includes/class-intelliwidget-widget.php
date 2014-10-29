@@ -31,11 +31,12 @@ class IntelliWidget_Widget extends WP_Widget {
             add_filter('intelliwidget_title',               array(&$this, 'filter_title'),          10, 3);
             add_filter('intelliwidget_custom_text',         array(&$this, 'filter_custom_text'),    10, 3);
             add_filter('intelliwidget_classes',             array(&$this, 'filter_classes'),        10, 3);
+            add_filter('intelliwidget_content',             array(&$this, 'filter_content'),   10, 3);
             add_filter('intelliwidget_trim_excerpt',        array(&$this, 'filter_trim_excerpt'),   10, 3);
             // default content actions
             add_action('intelliwidget_above_content',       array(&$this, 'action_addltext_above'), 10, 3);
             add_action('intelliwidget_below_content',       array(&$this, 'action_addltext_below'), 10, 3);
-            add_action( 'wp_enqueue_scripts',               array(&$this, 'enqueue_styles'));
+            add_action( 'wp_enqueue_scripts',               array(&$this, 'enqueue_styles'), 5);
             add_shortcode('intelliwidget',                  array(&$this, 'intelliwidget_shortcode'));
         endif;  
         $this->WP_Widget('intelliwidget', $intelliwidget->pluginName, $widget_ops, $control_ops);
@@ -137,6 +138,15 @@ class IntelliWidget_Widget extends WP_Widget {
         }
         return $title;
     }
+    
+    function filter_content($content) {
+        if ( strpos( $content, '<!--nextpage-->' ) ) {
+            $content = preg_replace("#\s*<!\-\-nextpage\-\->.*#s", '', $content);
+        }
+        // remove intelliwidget shortcode to stop endless recursion
+        // otherwise, parse shortcodes
+        return do_shortcode(preg_replace("#\[intelliwidget.*?\]#s", '', $content));
+    }
             
     /**
      * Trim the content to a set number of words.
@@ -159,7 +169,7 @@ class IntelliWidget_Widget extends WP_Widget {
         $text       = preg_replace( '@<(script|style)[^>]*?>.*?</\\1>@si', '', $text );
         $textarr    = explode($moretag, $text, 2);
         $more       = (count($textarr) > 1);
-        $text       = apply_filters('the_content', $textarr[0]);
+        $text       = $textarr[0];
         
         //$text     = str_replace(']]>', ']]&gt;', $text);
         $text       = strip_tags($text, $allowed_tags);

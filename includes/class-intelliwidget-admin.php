@@ -13,7 +13,7 @@ if ( !defined('ABSPATH')) exit;
 class IntelliWidgetAdmin {
 
     var $docsLink;
-    var $metabox;
+    var $form;
     var $menus;
     var $posts;
     var $terms;
@@ -34,12 +34,10 @@ class IntelliWidgetAdmin {
      * Configures the admin object for this request
      */
     function admin_init($objecttype = '', $idfield = '') {
-            include_once( 'class-intelliwidget-list.php' );
+            include_once( 'class-intelliwidget-strings.php' );
             include_once( 'class-intelliwidget-walker.php' );
             // this property tells IW how to set/get options (post uses post_meta, others use options table)
             $this->objecttype       = $objecttype;
-            // cache lists and labels
-            $this->lists            = new IntelliWidgetList();
             // cache post types
             $this->post_types       = $this->get_eligible_post_types();
             // cache menus
@@ -64,7 +62,7 @@ class IntelliWidgetAdmin {
             global $intelliwidget;
             wp_enqueue_style('intelliwidget-js', $intelliwidget->pluginURL . 'templates/intelliwidget-admin.css', array(), INTELLIWIDGET_VERSION);
             wp_enqueue_script('jquery-ui-tabs');
-            wp_enqueue_script('intelliwidget-js', $intelliwidget->pluginURL . 'js/intelliwidget.min.js', array('jquery'), INTELLIWIDGET_VERSION, false);
+            wp_enqueue_script('intelliwidget-js', $intelliwidget->pluginURL . 'js/intelliwidget.js', array('jquery'), INTELLIWIDGET_VERSION, false);
             wp_localize_script( 'intelliwidget-js', 'IWAjax', array(
                 'ajaxurl'   => admin_url( 'admin-ajax.php' ),
                 'objtype'   => $this->objecttype,
@@ -110,58 +108,6 @@ class IntelliWidgetAdmin {
 </div>
 <?php
 
-    }
-    
-    function metabox_init() {
-        include_once('class-intelliwidget-metabox.php');
-        $this->metabox = new IntelliWidgetMetaBox();
-    }
-    
-    function begin_tab_container() {
-        echo apply_filters('intelliwidget_start_tab_container', 
-            '<div class="iw-tabbed-sections"><a class="iw-larr">&#171</a><a class="iw-rarr">&#187;</a><ul class="iw-tabs">');
-    }
-    
-    function end_tab_container() {
-        echo apply_filters('intelliwidget_end_tab_container', '</ul>');
-    }
-    
-    function begin_section_container() {
-        echo apply_filters('intelliwidget_start_section_container', '');
-    }
-    
-    function end_section_container() {
-        echo apply_filters('intelliwidget_end_section_container', '</div>');
-    }
-    
-    function begin_section($id, $box_id) {
-        return apply_filters('intelliwidget_begin_section', '<div id="iw_tabbed_section_' . $id . '_' . $box_id . '" class="iw-tabbed-section">');
-    }
-    
-    function end_section() {
-        return apply_filters('intelliwidget_end_section', '</div>');
-    }
-    
-    function render_tabbed_sections($id) {
-        global $intelliwidget;
-        $this->metabox->add_form($this, $id);
-        // box_map contains map of meta boxes to their related widgets
-        $box_map = $intelliwidget->get_box_map($id, $this->objecttype);
-        if (is_array($box_map)):
-            ksort($box_map);
-            $tabs = $section = '';
-            foreach($box_map as $box_id => $sidebar_widget_id):
-                list($tab, $form) = $this->get_section($id, $box_id);
-                $tabs .= $tab . "\n";
-                $section .= $form . "\n";
-            endforeach;
-            $this->begin_tab_container();
-            echo $tabs;
-            $this->end_tab_container();
-            $this->begin_section_container();
-            echo $section;
-            $this->end_section_container();
-        endif;
     }
     
     function save_data($id) {
@@ -247,76 +193,6 @@ class IntelliWidgetAdmin {
             );
     }
     
-    function delete_tabbed_section($id, $box_id) {
-        global $intelliwidget;
-        $box_map = $intelliwidget->get_box_map($id, $this->objecttype);
-        $this->delete_meta($id, '_intelliwidget_data_', $box_id);
-        unset($box_map[NULL == $box_id ? '' : $box_id]);
-        $this->update_meta($id, '_intelliwidget_', $box_map, 'map');
-    }
-
-    function add_tabbed_section($id) {
-        global $intelliwidget;
-        $box_map = $intelliwidget->get_box_map($id, $this->objecttype);
-
-        if (count($box_map)): 
-            $newkey = max(array_keys($box_map)) + 1;
-        else: 
-            $newkey = 1;
-        endif;
-        $box_map[$newkey] = '';
-        $this->update_meta($id, '_intelliwidget_', $box_map, 'map');
-        return $newkey;
-        //return false;
-    }
-    
-    // use this for all saves
-    function ajax_save_data($id, $box_id) {
-        if (false === $this->save_data($id)) die('fail'); 
-        global $intelliwidget;
-        $this->metabox_init();
-        add_action('intelliwidget_post_selection_menus', array($this->metabox, 'post_selection_menus'), 10, 4);
-        $instance = $intelliwidget->defaults($intelliwidget->get_meta($id, '_intelliwidget_data_', $this->objecttype, $box_id));
-        die(json_encode(array(
-            'tab'   => $this->get_tab($id, $box_id, $instance['replace_widget']),
-            'form'  => $this->get_metabox($id, $box_id, $instance),
-        )));
-    }
-    
-    // use this for all adds
-    function ajax_add_tabbed_section($id) {
-        if (!($box_id = $this->add_tabbed_section($id))) die('fail');
-        global $intelliwidget;
-        $this->metabox_init();
-        $instance = $intelliwidget->defaults();
-        $response = array(
-                'tab'   => $this->get_tab($id, $box_id, $instance['replace_widget']),
-                'form'  => $this->begin_section($id, $box_id) . $this->get_metabox($id, $box_id, $instance) . $this->end_section(),
-            );
-        die(json_encode($response));
-    }
-    /*
-     * ajax_get_hierarchical_menus
-     * This is an important improvement to the application for performance.
-     * We now dynamically load all walker-generated menus when the panel is opened
-     * and reuse the same DOM element to render them on the page. Since only one panel
-     * is ever in use at a time, we remove them from any panels not currently in use
-     * and reload them when they are focus()ed again. The reused DOM element also prevents
-     * memory leakage from multiple xhr refreshes of multiple copies of the same huge lists.
-     */
-
-    // use this for all gets
-    function ajax_get_post_select_menus($id, $box_id) {
-        global $intelliwidget;
-        $this->metabox_init();
-        $instance = $intelliwidget->defaults($intelliwidget->get_meta($id, '_intelliwidget_data_', $this->objecttype, $box_id));
-        ob_start();
-        $this->metabox->post_selection_menus($this, $id, $box_id, $instance);
-        $form = ob_get_contents();
-        ob_end_clean();
-        die($form);
-    }
-    
     function get_nonce_url($id, $action, $box_id = NULL) {
         global $pagenow; 
         $val = 'delete' == $action ? $box_id : 1;
@@ -342,28 +218,6 @@ class IntelliWidgetAdmin {
             endif; 
         endforeach;
         return $widgets;
-    }
-
-    function get_tab($id, $box_id, $replace_widget = '') {
-        $title = (empty($this->intelliwidgets[$replace_widget]) ? $this->intelliwidgets['none'] : $this->intelliwidgets[$replace_widget]);
-        return apply_filters('intelliwidget_tab', '<li id="iw_tab_' . $id . '_' . $box_id . '" class="iw-tab">
-        <a href="#iw_tabbed_section_' . $id . '_' . $box_id . '" title="' . $title . '">' . $box_id . '</a></li>', $id, $box_id);
-    }
-    
-    function get_section($id, $box_id) {
-        global $intelliwidget;
-        $instance   = $intelliwidget->defaults($intelliwidget->get_meta($id, '_intelliwidget_data_', $this->objecttype, $box_id));
-        $tab        = $this->get_tab($id, $box_id, $instance['replace_widget']);
-        $section    = $this->begin_section($id, $box_id) . $this->get_metabox($id, $box_id, $instance) . $this->end_section();
-        return array($tab, $section);
-    }
-
-    function get_metabox($id, $box_id, $instance) {
-        ob_start();
-        $this->metabox->metabox($this, $id, $box_id, $instance);
-        $form = ob_get_contents();
-        ob_end_clean();
-        return $form;
     }
     
     /**
@@ -498,47 +352,47 @@ class IntelliWidgetAdmin {
     
     
     function get_content_menu() {
-        return $this->lists->get_menu('content');
+        return IntelliWidgetStrings::get_menu('content');
     }
     
     function get_replaces_menu() {
-        return $this->lists->get_menu('replaces');
+        return IntelliWidgetStrings::get_menu('replaces');
     }
     
     function get_text_position_menu() {
-        return $this->lists->get_menu('text_position');
+        return IntelliWidgetStrings::get_menu('text_position');
     }
 
     function get_sortby_menu() {
-        return $this->lists->get_menu('sortby');
+        return IntelliWidgetStrings::get_menu('sortby');
     }
 
     function get_image_size_menu() {
-        return $this->lists->get_menu('image_size');
+        return IntelliWidgetStrings::get_menu('image_size');
     }
 
     function get_imagealign_menu() {
-        return $this->lists->get_menu('imagealign');
+        return IntelliWidgetStrings::get_menu('imagealign');
     }
 
     function get_link_target_menu() {
-        return $this->lists->get_menu('link_target');
+        return IntelliWidgetStrings::get_menu('link_target');
     }
 
     function get_checkbox_fields() {
-        return $this->lists->get_fields('checkbox');
+        return IntelliWidgetStrings::get_fields('checkbox');
     }
     
     function get_text_fields() {
-        return $this->lists->get_fields('text');
+        return IntelliWidgetStrings::get_fields('text');
     }
     
     function get_custom_fields() {
-        return $this->lists->get_fields('custom');
+        return IntelliWidgetStrings::get_fields('custom');
     }
     
     function get_nav_menu() {
-        $defaults = $this->lists->get_menu('default_nav');
+        $defaults = IntelliWidgetStrings::get_menu('default_nav');
         return $defaults + $this->menus;
     }
     
@@ -563,15 +417,15 @@ class IntelliWidgetAdmin {
     }
 
     function get_tax_sortby_menu() {
-        return $this->lists->get_menu('tax_sortby');
+        return IntelliWidgetStrings::get_menu('tax_sortby');
     }
 
     function get_label($key = '') {
-        return $this->lists->get_label($key);
+        return IntelliWidgetStrings::get_label($key);
     }
 
     function get_tip($key = '') {
-        return $this->lists->get_tip($key);
+        return IntelliWidgetStrings::get_tip($key);
     }
     /**
      * Stub for data validation
@@ -634,5 +488,12 @@ class IntelliWidgetAdmin {
         sort($value);
         return $value;
     }
+
+    function form_init() {
+        if (isset($this->form)) return;
+        include_once( 'class-intelliwidget-form.php' );
+        $this->form = new IntelliWidgetForm();
+    }
+    
     
 }
