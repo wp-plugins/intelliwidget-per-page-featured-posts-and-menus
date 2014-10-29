@@ -62,7 +62,7 @@ class IntelliWidgetAdmin {
             global $intelliwidget;
             wp_enqueue_style('intelliwidget-js', $intelliwidget->pluginURL . 'templates/intelliwidget-admin.css', array(), INTELLIWIDGET_VERSION);
             wp_enqueue_script('jquery-ui-tabs');
-            wp_enqueue_script('intelliwidget-js', $intelliwidget->pluginURL . 'js/intelliwidget.js', array('jquery'), INTELLIWIDGET_VERSION, false);
+            wp_enqueue_script('intelliwidget-js', $intelliwidget->pluginURL . 'js/intelliwidget.min.js', array('jquery'), INTELLIWIDGET_VERSION, false);
             wp_localize_script( 'intelliwidget-js', 'IWAjax', array(
                 'ajaxurl'   => admin_url( 'admin-ajax.php' ),
                 'objtype'   => $this->objecttype,
