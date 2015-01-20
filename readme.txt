@@ -1,7 +1,7 @@
 === IntelliWidget Per Page Featured Posts and Menus ===
 Contributors: lilaeamedia, support00
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=DE4W9KW7HQJNA
-Tags: featured posts, events, page menu, plugin, textwidget, widget, custom post types, custom sidebar
+Tags: featured posts, featured post, page menu, custom menu, taxonomy menu, text widget, textwidget, per page menu, per page widget, post types, custom sidebar
 Requires at least: 3.5
 Tested up to: 4.0 
 Stable tag: 2.1.9

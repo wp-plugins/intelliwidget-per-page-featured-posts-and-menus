@@ -155,6 +155,16 @@ name="<?php echo $widgetobj->get_field_name('custom_text'); ?>"><?php echo esc_t
         global $_wp_additional_image_sizes;
         $this->section_header($adminobj, $widgetobj, 'appearance', $is_widget); ?>
     <p>
+      <label title="<?php echo $adminobj->get_tip('template');?>" for="<?php echo $widgetobj->get_field_id('template'); ?>">
+        <?php echo $adminobj->get_label('template'); ?>
+        :</label>
+      <select name="<?php echo $widgetobj->get_field_name('template'); ?>" id="<?php echo $widgetobj->get_field_id('template'); ?>">
+        <?php foreach ( $adminobj->templates as $template => $name ) : ?>
+        <option value="<?php echo $template; ?>" <?php selected($instance['template'], $template); ?>><?php echo $name; ?></option>
+        <?php endforeach; ?>
+      </select>
+    </p>
+    <p>
       <label title="<?php echo $adminobj->get_tip('sortby');?>" for="<?php echo $widgetobj->get_field_id('sortby'); ?>">
         <?php echo $adminobj->get_label('sortby'); ?>
         : </label>
@@ -226,16 +236,6 @@ name="<?php echo $widgetobj->get_field_name('custom_text'); ?>"><?php echo esc_t
 
     function post_selection_settings($adminobj, $widgetobj, $instance, $is_widget = FALSE) { 
         $this->section_header($adminobj, $widgetobj, 'selection', $is_widget); ?>
-    <p>
-      <label title="<?php echo $adminobj->get_tip('template');?>" for="<?php echo $widgetobj->get_field_id('template'); ?>">
-        <?php echo $adminobj->get_label('template'); ?>
-        :</label>
-      <select name="<?php echo $widgetobj->get_field_name('template'); ?>" id="<?php echo $widgetobj->get_field_id('template'); ?>">
-        <?php foreach ( $adminobj->templates as $template => $name ) : ?>
-        <option value="<?php echo $template; ?>" <?php selected($instance['template'], $template); ?>><?php echo $name; ?></option>
-        <?php endforeach; ?>
-      </select>
-    </p>
     <p>
       <label title="<?php echo $adminobj->get_tip('post_types');?>" style="display:block">
         <?php echo $adminobj->get_label('post_types'); ?>

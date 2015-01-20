@@ -14,7 +14,7 @@ if ( !defined('ABSPATH')) exit;
     License: GPLv2
     * *************************************************************************
     Copyright (C) 2014 Lilaea Media LLC
-    Portions adapted from Featured Page Widget 
+    Portions inspired by Featured Page Widget 
     Copyright (C) 2009-2011 GrandSlambert http://grandslambert.com/
 */
 class IntelliWidget {
@@ -29,6 +29,7 @@ class IntelliWidget {
     var $admin_hook;
     var $dir;
     var $shortcode_id = 0;
+    var $pro_link;
     /**
      * Object constructor
      * @param <string> $file
@@ -47,9 +48,10 @@ class IntelliWidget {
         $this->menuName     = 'intelliwidget';
         $this->pluginURL     = plugin_dir_url($file);// . '/';
         $this->templatesPath = $this->pluginPath . 'templates/';
-        $this->templatesURL  = $this->pluginURL . 'templates/';        
+        $this->templatesURL  = $this->pluginURL . 'templates/';   
+        $this->pro_link          = '<a href="' . LILAEAMEDIA_URL . '" target="_blank">' . __('our website', 'intelliwidget') . '</a>';     
         add_shortcode('intelliwidget',  array(&$this, 'intelliwidget_shortcode'));
-        register_activation_hook($file, array(&$this, 'intelliwidget_activate'));
+        add_action('plugins_loaded',    array(&$this, 'intelliwidget_activate'));
         add_action('after_setup_theme', array(&$this, 'ensure_post_thumbnails_support' ) );
     }
 
@@ -57,9 +59,34 @@ class IntelliWidget {
      * Stub for plugin activation
      */
     function intelliwidget_activate() {
-        
+        // notice to upgrade to IntelliWidget Pro if using old ATX plugin
+        if (defined('INTELLIWIDGET_ATX_VERSION') && INTELLIWIDGET_ATX_VERSION < '1.1.0'):
+            add_action('admin_notices',         array(&$this, 'install_warning'));
+            add_action('network_admin_notices', array(&$this, 'install_warning'));
+            // disable ATX as it will cause errors
+            add_action('admin_init',            array(&$this, 'deactivate_atx'));
+            
+        endif;
     }
 
+    function install_warning() {
+?>
+<div class="error">
+  <p>
+<?php printf(__('IntelliWidget for Multi Post Pages is not compatible with this version of IntelliWidget. Please visit %s for a free upgrade to IntelliWidget Pro.','intelliwidget'), $this->pro_link); ?>
+  </p>
+</div>
+<?php
+    }
+    
+    function deactivate_atx() {
+        if (isset($_GET['action']) && 'activate' == $_GET['action'] && 'intelliwidget-multi-post/intelliwidget-multi-post.php' == $_GET['plugin'])
+            unset($_GET['action']);
+        elseif (isset($_GET['activate']))
+            unset($_GET['activate']);
+        if (current_user_can('activate_plugins'))
+            deactivate_plugins('intelliwidget-multi-post/intelliwidget-multi-post.php');
+    }
     // semaphore to create options page once
     function set_admin_hook($hook) {
         $this->admin_hook = $hook;
@@ -277,6 +304,7 @@ class IntelliWidget {
 }
 
 define('INTELLIWIDGET_VERSION', '2.1.9');
+defined('LILAEAMEDIA_URL') || define('LILAEAMEDIA_URL', 'http://www.lilaeamedia.com');
 
 if (!is_admin()) include_once( 'includes/template-tags.php' );
 include_once( 'includes/class-intelliwidget-widget.php' );

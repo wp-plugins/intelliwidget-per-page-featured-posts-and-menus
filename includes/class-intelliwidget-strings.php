@@ -214,7 +214,7 @@ class IntelliWidgetStrings {
                 $value = __('Check this box to insert paragraph breaks wherever blank lines appear in the text you enter.', 'intelliwidget'); 
                 break;
             case 'appearance': 
-                $value = __('Control the number of posts displayed, excerpt length, featured image and other settings.', 'intelliwidget'); 
+                $value = __('Control the template used, number of posts displayed, excerpt length, featured image and other settings.', 'intelliwidget'); 
                 break;
             case 'template': 
                 $value = __('This menu controls the IntelliWidget template used to display the output. If you are using custom templates, they will appear here as well.', 'intelliwidget'); 
@@ -241,7 +241,7 @@ class IntelliWidgetStrings {
                 $value = __('If you are using a Template that includes the featured image, this menu controls the display size of the image.', 'intelliwidget'); 
                 break;
             case 'selection': 
-                $value = __('These settings control the template used and the posts that are displayed. Select post type, taxonomy terms and date conditions. You can also restrict selection to specific posts.', 'intelliwidget'); 
+                $value = __('These settings control the posts that are displayed. Select post type, taxonomy terms and date conditions. You can also restrict selection to specific posts.', 'intelliwidget'); 
                 break;
             case 'post_types': 
                 $value = __('These checkboxes restrict the selection to specific Post Types, post and page by default. At least one must be checked.', 'intelliwidget'); 

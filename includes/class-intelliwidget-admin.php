@@ -22,6 +22,8 @@ class IntelliWidgetAdmin {
     var $lists;
     var $objecttype;
     var $tax_menu;
+    var $metabox;       // backwards compatability
+    var $post_admin;    // backwards compatability
     /**
      * Object constructor
      * @param <string> $file
@@ -50,7 +52,11 @@ class IntelliWidgetAdmin {
             $this->admin_scripts($idfield);
             // FIXME: should this go here???
             $this->docsLink         = '<a href="http://www.lilaeamedia.com/plugins/intelliwidget/" target="_blank" title="' . __('Hover labels for more info or click here to view documentation.', 'intelliwidget') . '" style="float:right">' . __('Help', 'intelliwidget') . '</a>';
-        
+            // backward compatibility support for multi post (pro) < 1.1.0
+            if ('IntelliWidgetMultiPostAdmin' == get_class($this)):
+                $this->post_admin = new IntelliWidgetPostAdmin();
+            endif;
+                   
     }
 
     /**
@@ -62,52 +68,13 @@ class IntelliWidgetAdmin {
             global $intelliwidget;
             wp_enqueue_style('intelliwidget-js', $intelliwidget->pluginURL . 'templates/intelliwidget-admin.css', array(), INTELLIWIDGET_VERSION);
             wp_enqueue_script('jquery-ui-tabs');
-            wp_enqueue_script('intelliwidget-js', $intelliwidget->pluginURL . 'js/intelliwidget.min.js', array('jquery'), INTELLIWIDGET_VERSION, false);
+            wp_enqueue_script('intelliwidget-js', $intelliwidget->pluginURL . 'js/intelliwidget.js', array('jquery'), INTELLIWIDGET_VERSION, false);
             wp_localize_script( 'intelliwidget-js', 'IWAjax', array(
                 'ajaxurl'   => admin_url( 'admin-ajax.php' ),
                 'objtype'   => $this->objecttype,
                 'idfield'   => $idfield,
             ));
         endif;
-    }
-    
-    function add_options_page() {
-        global $intelliwidget;
-        if (empty($intelliwidget->admin_hook)):
-            $hook = add_theme_page(
-                $intelliwidget->pluginName, 
-                $intelliwidget->shortName, 
-                'edit_theme_options', 
-                $intelliwidget->menuName, 
-                array(&$this, 'options_page') 
-            );
-            $intelliwidget->set_admin_hook($hook);
-            // only load plugin-specific data 
-            // when options page is loaded
-            if (has_action('intelliwidget_options_init'))
-                add_action( 'load-' . $hook, array(&$this, 'options_init') );
-        endif;
-    }
-
-    function options_init() {
-        do_action('intelliwidget_options_init');
-    }
-
-    function options_page() {
-        global $intelliwidget;
-        $active_tab = isset( $_GET[ 'tab' ] ) ? sanitize_text_field($_GET[ 'tab' ]) : '';
-?>
-<div class="wrap">
-  <div id="icon-appearance" class="icon32"></div>
-  <h2><?php echo $intelliwidget->pluginName . ' ' . __('Extended Settings', 'intelliwidget'); ?></h2>
-  <div id="intelliwidget_error_notice">
-    <?php echo apply_filters('intelliwidget_options_errors', ''); ?>
-  </div>
-  <h2 class="nav-tab-wrapper"><?php do_action('intelliwidget_options_tab', $active_tab); ?></h2>
-  <div class="intelliwidget-option-panel-container"><?php do_action('intelliwidget_options_panel'); ?></div>
-</div>
-<?php
-
     }
     
     function save_data($id) {
@@ -495,5 +462,16 @@ class IntelliWidgetAdmin {
         $this->form = new IntelliWidgetForm();
     }
     
+    /**
+     * backward compatability functions 
+     */
+    function metabox_init() {
+        $this->post_admin->form_init();
+        $this->metabox = $this->post_admin->form;
+    }
+    
+    function render_tabbed_sections($id) {
+        $this->post_admin->render_tabbed_sections($id);
+    }
     
 }

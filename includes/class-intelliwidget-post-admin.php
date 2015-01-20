@@ -22,8 +22,8 @@ class IntelliWidgetPostAdmin extends IntelliWidgetAdmin {
      */
     function __construct() {
             // these actions only apply to admin users
-            add_action('load-post.php',                     array(&$this, 'post_metabox_actions') );
-            add_action('load-post-new.php',                 array(&$this, 'post_metabox_actions') );
+            add_action('load-post.php',                     array(&$this, 'post_form_actions') );
+            add_action('load-post-new.php',                 array(&$this, 'post_form_actions') );
             add_action('save_post',                         array(&$this, 'post_save_data'), 1, 2 );
             add_action('wp_ajax_iw_post_cdfsave',           array(&$this, 'ajax_post_save_cdf_data' ));
             add_action('wp_ajax_iw_post_save',              array(&$this, 'ajax_post_save_data' ));
@@ -33,7 +33,7 @@ class IntelliWidgetPostAdmin extends IntelliWidgetAdmin {
             add_action('wp_ajax_iw_post_menus',             array(&$this, 'ajax_post_get_select_menus' ));
     }
 
-    function post_metabox_actions() {
+    function post_form_actions() {
         if (!isset($this->objecttype)) $this->admin_init('post', 'post_ID');
         add_action('add_meta_boxes',            array(&$this, 'post_main_meta_box'));
         add_action('add_meta_boxes',            array(&$this, 'post_cdf_meta_box'));

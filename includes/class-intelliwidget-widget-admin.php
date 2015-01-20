@@ -14,12 +14,11 @@ if ( !defined('ABSPATH')) exit;
 include_once('class-intelliwidget-admin.php');
 class IntelliWidget_WidgetAdmin extends IntelliWidgetAdmin {
 
-    var $widget_form;
     /**
      * Constructor
      */
     function __construct() {
-        add_action('load-widgets.php',                  array(&$this, 'load_widget_form') );
+        add_action('load-widgets.php',                  array(&$this, 'admin_init') );
         add_action('wp_ajax_iw_widget_menus',           array(&$this, 'ajax_get_widget_post_select_menus'));
         $this->form_init();
     }
@@ -70,11 +69,7 @@ class IntelliWidget_WidgetAdmin extends IntelliWidgetAdmin {
         $instance = $intelliwidget->defaults($instance);
         $this->form->render_form($this, $obj, $instance, TRUE);
     }
-    
-    function load_widget_form(){
-        $this->admin_init();
-    }
-    
+        
     // widgets only
     function ajax_get_widget_post_select_menus() {
         global $wp_registered_widgets;
