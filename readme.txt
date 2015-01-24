@@ -1,14 +1,14 @@
-=== IntelliWidget Per Page Featured Posts and Menus ===
+=== IntelliWidget Featured Posts and Custom Menus ===
 Contributors: lilaeamedia, support00
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=DE4W9KW7HQJNA
-Tags: featured posts, events, page menu, plugin, textwidget, widget, custom post types, custom sidebar
+Tags: content driven, featured post, featured post, page menu, custom menu, taxonomy menu, text widget, textwidget, per page, post types, custom sidebar, dynamic sidebar
 Requires at least: 3.5
-Tested up to: 4.0 
-Stable tag: 2.1.9
+Tested up to: 4.1 
+Stable tag: 2.2.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Combine custom page menus, featured posts, sliders and other content into any widget area that can be customized on a per-page or site-wide basis.
+Display custom menus, featured posts, custom post types, metadata and other content on a per-page/post or site-wide basis.
 
 == Description ==
 
@@ -24,19 +24,11 @@ Reuse the settings from existing profiles to save hours of setup time.
 
 With IntelliWidget you can add just a few sidebar areas and create unlimited page-specific content.
 
-= What's New in Version 2: =
-
-We've completely revised the Admin Interface to make setup easier and more intuitive.
-
 = Tabbed Profile Panels =
 
 All of the IntelliWidget Profile settings panels have been combined into a single tab menu on the Edit Post admin pages. You can hover over the tab to see the IntelliWidget the Profile replaces.
 
-= Less Confusing Save Button =
-
-We changed the save buttons to a more subdued gray to prevent confusing it with the Edit Post primary save button.
-
-= Improved Settings Panels =
+= Intuitive Settings Panels =
 
 Settings have been organized into collapsible sections so the settings you use most can be found in one place.
 
@@ -54,24 +46,24 @@ You can control the way posts are sorted, post sort order, number posts shown, e
 
 You can add a block of text or HTML and control where it appears relative to the featured post content. You can even use any shortcodes your theme supports.
 
-= Revised code for stability and performance =
+= Written for stability and performance =
 
-Now all the admin functions are loaded on demand so WordPress doesn't work as hard for front-end users. Long menus are now loaded dynamically to reduce admin page size.
+Admin functions are loaded on demand. Long menus are now loaded dynamically to reduce admin page size.
 
 = Actions and Filters =
 
 We've made IntelliWidget completely extensible by utilizing action and filter hooks at key points of the execution.
 
-= Now Available: IntelliWidget Archive and Taxonomy Extension =
+= Introducing IntelliWidget Pro =
 
 Now you can have custom IntelliWidgets on any Archive page! Choose the criteria and customize the Profiles for Blog pages, Categories, Tags and more.
-New Taxonomy Menu lets you browse hierarchical taxonomies, showing sibling and child terms based on the current page. See http://www.lilaeamedia.com/plugins/archive-taxonomy-extension for more information.
+See http://www.lilaeamedia.com/plugins/intelliwidget-pro for more information.
 
-= Coming Soon: IntelliWidget Template Configurator Extension =
+= Coming Soon to Pro: IntelliWidget Template Configurator =
 
 * Create your own custom templates right from the IntelliWidget admin.
 
-= More Reasons to use IntelliWidget for Featured Posts and Custom Menus =
+= More Reasons to use IntelliWidget for Content Driven Featured Posts and Custom Menus =
 
 * Powerful and extensible, does the work of multiple plugins
 * No new sidebars necessary–uses the sidebars you already have
@@ -103,7 +95,7 @@ Spanish translation courtesy of Andrew Kurtis at WebHostingHub.com.
     * Click the "Upload" link at the top of the page.
     * Browse for the zip file, select and click "Install."
 
-3. In the WordPress Admin, go to "Plugins > Installed Plugins." Locate "IntelliWidget Per Page Featured Posts and Menus" in the list and click "Activate."
+3. In the WordPress Admin, go to "Plugins > Installed Plugins." Locate "Content Driven Featured Posts and Menus (IntelliWidget)" in the list and click "Activate."
 
 4. Follow the "Quick Introduction" below.
 
@@ -191,6 +183,9 @@ Change the 'supports' parameter in the register_post_type function to include 'c
 5. Example of the Custom Data Fields Panel.
 
 == Changelog ==
+
+= 2.2.0 =
+* Reorganized form includes into single class.
 
 = 2.1.9 =
 * Added any/all option to term selection

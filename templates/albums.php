@@ -1,5 +1,5 @@
 <?php
-if ( !defined('ABSPATH')) exit;
+if ( !defined( 'ABSPATH' ) ) exit;
 /**
  * albums.php - Template for album covers
  *
@@ -9,17 +9,17 @@ if ( !defined('ABSPATH')) exit;
  * @package IntelliWidget
  * @subpackage templates
  * @author Jason C Fleming
- * @copyright 2014 Lilaea Media LLC
+ * @copyright 2014-2015 Lilaea Media LLC
  * @access public
  */
 ?>
 <?php
-if ( $selected->have_posts() ) : while ($selected->have_posts()) : $selected->the_post();
+if ( $selected->have_posts() ) : while ( $selected->have_posts() ) : $selected->the_post();
 ?>
 
 <div id="intelliwidget_<?php the_intelliwidget_ID(); ?>" class="intelliwidget-album-container">
   <?php if ( has_intelliwidget_image() ) : ?>
-  <div class="intelliwidget-album-container-<?php echo $instance['image_size'];?> intelliwidget-align-<?php echo $instance['imagealign']; ?>">
+  <div class="intelliwidget-album-container-<?php echo $instance[ 'image_size' ];?> intelliwidget-align-<?php echo $instance[ 'imagealign' ]; ?>">
     <?php the_intelliwidget_image(); ?>
   </div>
   <?php endif; ?>

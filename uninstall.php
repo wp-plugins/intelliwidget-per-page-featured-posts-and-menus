@@ -7,7 +7,7 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) )
  *
  * @package IntelliWidget
  * @author Jason C Fleming
- * @copyright 2014 Lilaea Media LLC
+ * @copyright 2014-2015 Lilaea Media LLC
  * @access public
  */
 function intelliwidget_delete_plugin() {
