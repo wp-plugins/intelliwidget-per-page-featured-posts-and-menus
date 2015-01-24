@@ -4,7 +4,7 @@
  * @package IntelliWidget
  * @subpackage js
  * @author Jason C Fleming
- * @copyright 2014 Lilaea Media LLC
+ * @copyright 2014-2015 Lilaea Media LLC
  * @access public
  *
  */
@@ -156,7 +156,7 @@ jQuery(document).ready(function($) {
         });
         // add wp ajax action to array
         postData['action'] = 'iw_' + IWAjax.objtype + '_cdfsave';
-        //console.log(postData);
+        console.log(postData);
         // send to wp
         $.post(  
             // get ajax url from localized object
@@ -165,7 +165,7 @@ jQuery(document).ready(function($) {
             postData,
             //on success function  
             function(response){
-                //console.log(response);
+                console.log(response);
                 // release button
                 $('#iw_cdfsave').prop('disabled', false);
                 // hide spinner
@@ -240,7 +240,7 @@ jQuery(document).ready(function($) {
         });
         // add wp ajax action to array
         postData['action'] = 'iw_' + IWAjax.objtype + '_save';
-        //console.log(postData);
+        console.log(postData);
         // send to wp
         $.post(  
             // get ajax url from localized object
@@ -249,7 +249,7 @@ jQuery(document).ready(function($) {
             postData,
             //on success function  
             function(response){
-                //console.log(response);
+                console.log(response);
                 if ('fail' == response) {
                     // show red X
                     savecontainer.addClass('failure');
@@ -273,7 +273,7 @@ jQuery(document).ready(function($) {
                 return false;  
             }, 'json'
         ).fail(function(){
-            //console.log('fail');
+            console.log('fail');
             // release button
             savebutton.prop('disabled', false);
             // hide spinner
@@ -308,7 +308,7 @@ jQuery(document).ready(function($) {
         postData['intelliwidget_widget_page_id'] = $('#intelliwidget_widget_page_id').val();
         // add wp ajax action to array
         postData['action'] = 'iw_' + IWAjax.objtype + '_copy';
-        //console.log(postData);
+        console.log(postData);
         // send to wp
         $.post(  
             // get ajax url from localized object
@@ -317,7 +317,7 @@ jQuery(document).ready(function($) {
             postData,
             //on success function  
             function(response){
-                //console.log(response);
+                console.log(response);
                 // release button
                 $('#iw_copy').prop('disabled', false);
                 // hide spinner
@@ -329,6 +329,7 @@ jQuery(document).ready(function($) {
                 return false;  
             }
         ).fail(function(){
+            console.log('fail');
             // release button
             $('#iw_copy').prop('disabled', false);
             // hide spinner
@@ -374,7 +375,7 @@ jQuery(document).ready(function($) {
         // add wp ajax action to array
         postData['action'] = 'iw_' + IWAjax.objtype + '_add';
         // send to wp
-        //console.log(postData);
+        console.log(postData);
         $.post(  
             // get ajax url from localized object
             IWAjax.ajaxurl,  
@@ -382,7 +383,7 @@ jQuery(document).ready(function($) {
             postData,
             //on success function  
             function(response){
-                //console.log(response);
+                console.log(response);
                 sel.removeClass('disabled');
                 $('#intelliwidget_spinner').hide();
                 if ('fail' == response) {
@@ -404,6 +405,7 @@ jQuery(document).ready(function($) {
                 return false;  
             }, 'json'
         ).fail(function(){
+            console.log('fail');
             // release button
             sel.removeClass('disabled');
             // hide spinner
@@ -452,7 +454,7 @@ jQuery(document).ready(function($) {
         $('.intelliwidget_' + pre + '_spinner').show();
         // add wp ajax action to array
         postData['action'] = 'iw_' + IWAjax.objtype + '_delete';
-        //console.log(postData);
+        console.log(postData);
         // send to wp
         $.post(  
         // get ajax url from localized object
@@ -461,7 +463,7 @@ jQuery(document).ready(function($) {
             postData,
             //on success function  
             function(response){
-                //console.log(response);
+                console.log(response);
                 sel.removeClass('disabled');
                 $('.intelliwidget_' + pre + '_spinner').hide();
                 if ('success' == response ) {
@@ -480,6 +482,7 @@ jQuery(document).ready(function($) {
                 return false;  
             }
         ).fail(function(){
+            console.log('fail');
             // release button
             sel.removeClass('disabled');
             // hide spinner
@@ -558,6 +561,7 @@ jQuery(document).ready(function($) {
                 return false;  
             }
         ).fail(function(){
+            //console.log('FAIL :(');
             // release button
             savebutton.prop('disabled', false);
             // hide spinner
