@@ -174,6 +174,9 @@ class IntelliWidgetStrings {
             case 'allterms': 
                 $value = __( 'of these terms', 'intelliwidget' ); 
                 break;
+            case 'menu_location':
+                $value = __( 'Menu Location', 'intelliwidget' ); 
+                break;
         endswitch;
         return apply_filters( 'intelliwidget_labels', $value, $key );
     }
@@ -322,6 +325,9 @@ class IntelliWidgetStrings {
                 break;
             case 'allterms': 
                 $value = __( 'Select whether the post must be a member of all the selected terms or just one of them.', 'intelliwidget' ); 
+                break;
+            case 'menu_location':
+                $value = __( 'If replacing a registered Nav Menu Location, select the location to replace.', 'intelliwidget' ); 
                 break;
         endswitch;
         return apply_filters( 'intelliwidget_tips', $value, $key );

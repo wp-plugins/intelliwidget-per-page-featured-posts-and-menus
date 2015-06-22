@@ -10,24 +10,18 @@
  */
 
 jQuery(document).ready(function($) {
-    /*
-     * Use localization object to store tab and panel data
-     */
-    IWAjax.openPanels   = {};
-    IWAjax.ajaxSemaphore   = false;
-    var     
     /* 
      * BEGIN FUNCTIONS -- FIXME: can we combine these ajax calls???
      */
      // store panel open state so it can persist across ajax refreshes
-    updateOpenPanels = function(container) {
+    function updateOpenPanels(container) {
         container.find('.inside').each(function(){
             var inside = $(this).prop('id');
             //console.log('update panels: ' + inside);
             IWAjax.openPanels[inside] = $(this).parent('.postbox').hasClass('closed') ? 0 : 1;
         });
-    },
-    refreshOpenPanels = function(a,b,c) {
+    }
+    function refreshOpenPanels(a,b,c) {
         // only process IW responses
         if ('undefined' == typeof b.responseText || !b.responseText.match(/intelliwidget/)) return;
         
@@ -43,8 +37,8 @@ jQuery(document).ready(function($) {
                 $('#' + key).show();
             }
         }
-    },
-    initTabs = function() {
+    }
+    function initTabs() {
         $('.iw-tabbed-sections').each(function(){
             var container = $(this);
             container.data('viewWidth', 0);
@@ -59,8 +53,8 @@ jQuery(document).ready(function($) {
             });
         });
         reflowTabs();
-    },
-    reflowTabs = function() {
+    }
+    function reflowTabs() {
         $('.iw-tabbed-sections').each(function(){
             var container = $(this);
             container.data('viewWidth', container.find('.iw-tabs').width() - 24); // minus space for arrows
@@ -77,8 +71,8 @@ jQuery(document).ready(function($) {
             }
         });
         setArrows();
-    },
-    rightShiftTabs = function(el) {
+    }
+    function rightShiftTabs(el) {
         // left arrow clicked, shift all tabs to the right
         var container = el.parent('.iw-tabbed-sections'),
             rightMost;
@@ -93,8 +87,8 @@ jQuery(document).ready(function($) {
             container.data('visTabs').unshift(rightMost);
         }
         setArrows();
-    },
-    leftShiftTabs = function(el) {
+    }
+    function leftShiftTabs(el) {
         // right arrow clicked, shift all tabs to the left
         var container = el.parent('.iw-tabbed-sections'),
             leftMost;
@@ -109,8 +103,8 @@ jQuery(document).ready(function($) {
             container.data('visTabs').push(leftMost);
         }
         setArrows();
-    },
-    setArrows = function() {
+    }
+    function setArrows() {
         $('.iw-larr, .iw-rarr').css('visibility', 'hidden');
         $('.iw-tabbed-sections').each(function(){
             var container = $(this);
@@ -119,8 +113,8 @@ jQuery(document).ready(function($) {
             // if leftTabs, show <<
             if (container.data('leftTabs').length) container.find('.iw-larr').css('visibility', 'visible');
         });
-    },
-    bind_events = function(el) {
+    }
+    function bind_events(el) {
         // since postbox.js does not delegate events, 
         // we have to rebind toggles on refresh
         $(el).find('.postbox .hndle, .handlediv').on('click', function(e){
@@ -133,11 +127,11 @@ jQuery(document).ready(function($) {
                     postboxes.pbhide(id);
             }
         });
-    },
+    }
     /**
      * Ajax Save Custom Post Type Data
      */
-    save_cdfdata = function(){
+    function save_cdfdata(){
         // disable the button until ajax returns
         $(this).prop('disabled', true);
         // clear previous success/fail icons
@@ -156,7 +150,7 @@ jQuery(document).ready(function($) {
         });
         // add wp ajax action to array
         postData['action'] = 'iw_' + IWAjax.objtype + '_cdfsave';
-        console.log(postData);
+        // console.log(postData);
         // send to wp
         $.post(  
             // get ajax url from localized object
@@ -165,7 +159,7 @@ jQuery(document).ready(function($) {
             postData,
             //on success function  
             function(response){
-                console.log(response);
+                // console.log(response);
                 // release button
                 $('#iw_cdfsave').prop('disabled', false);
                 // hide spinner
@@ -184,18 +178,18 @@ jQuery(document).ready(function($) {
             return false;  
         });  
         return false;  
-    },
-    parse_ids = function(id) {
+    }
+    function parse_ids(id) {
             // parse id to get section number
         var idparts         = id.split('_'),
             boxid           = idparts.pop(),
             objid           = idparts.pop();
         return objid + '_' + boxid;
-    },
+    }
     /**
      * Ajax Save IntelliWidget Meta Box Data
      */
-    save_postdata = function (){ 
+    function save_postdata (){ 
         // don't allow add/delete section while saving
         if (true === IWAjax.ajaxSemaphore) return false;
         IWAjax.ajaxSemaphore   = true;
@@ -237,10 +231,14 @@ jQuery(document).ready(function($) {
                 // otherwise add to post data
                 postData[fieldID] = $(this).val();
             }
+            if ( fieldID.indexOf('_menu_location') > 0 ) {
+                // special case for menu_location
+                if ( '' != $( this ).val() ) postData[ 'intelliwidget_' + pre + '_replace_widget' ] = 'nav_menu_location-' + $( this ).val();
+            }
         });
         // add wp ajax action to array
         postData['action'] = 'iw_' + IWAjax.objtype + '_save';
-        console.log(postData);
+        // console.log(postData);
         // send to wp
         $.post(  
             // get ajax url from localized object
@@ -249,7 +247,7 @@ jQuery(document).ready(function($) {
             postData,
             //on success function  
             function(response){
-                console.log(response);
+                // console.log(response);
                 if ('fail' == response) {
                     // show red X
                     savecontainer.addClass('failure');
@@ -273,7 +271,7 @@ jQuery(document).ready(function($) {
                 return false;  
             }, 'json'
         ).fail(function(){
-            console.log('fail');
+            // console.log('fail');
             // release button
             savebutton.prop('disabled', false);
             // hide spinner
@@ -287,11 +285,11 @@ jQuery(document).ready(function($) {
         // release ajax 
         IWAjax.ajaxSemaphore   = false;
         return false;  
-    },
+    }
     /**
      * Ajax Save Copy Page Input
      */
-    copy_profile = function (){ 
+    function copy_profile (){ 
         // disable the button until ajax returns
         $(this).prop('disabled', true);
         // clear previous success/fail icons
@@ -308,7 +306,7 @@ jQuery(document).ready(function($) {
         postData['intelliwidget_widget_page_id'] = $('#intelliwidget_widget_page_id').val();
         // add wp ajax action to array
         postData['action'] = 'iw_' + IWAjax.objtype + '_copy';
-        console.log(postData);
+        // console.log(postData);
         // send to wp
         $.post(  
             // get ajax url from localized object
@@ -317,7 +315,7 @@ jQuery(document).ready(function($) {
             postData,
             //on success function  
             function(response){
-                console.log(response);
+                // console.log(response);
                 // release button
                 $('#iw_copy').prop('disabled', false);
                 // hide spinner
@@ -329,7 +327,7 @@ jQuery(document).ready(function($) {
                 return false;  
             }
         ).fail(function(){
-            console.log('fail');
+            // console.log('fail');
             // release button
             $('#iw_copy').prop('disabled', false);
             // hide spinner
@@ -343,11 +341,11 @@ jQuery(document).ready(function($) {
         // release ajax
         IWAjax.ajaxSemaphore   = false;
         return false;  
-    },
+    }
     /**
      * Ajax Add new IntelliWidget Tab Section
      */
-    add_tabbed_section = function (e){ 
+    function add_tabbed_section (e){ 
         // don't allow add/delete section while saving
         if (true === IWAjax.ajaxSemaphore) return false;
         IWAjax.ajaxSemaphore   = true;
@@ -375,7 +373,7 @@ jQuery(document).ready(function($) {
         // add wp ajax action to array
         postData['action'] = 'iw_' + IWAjax.objtype + '_add';
         // send to wp
-        console.log(postData);
+        // console.log(postData);
         $.post(  
             // get ajax url from localized object
             IWAjax.ajaxurl,  
@@ -383,7 +381,7 @@ jQuery(document).ready(function($) {
             postData,
             //on success function  
             function(response){
-                console.log(response);
+                // console.log(response);
                 sel.removeClass('disabled');
                 $('#intelliwidget_spinner').hide();
                 if ('fail' == response) {
@@ -405,7 +403,7 @@ jQuery(document).ready(function($) {
                 return false;  
             }, 'json'
         ).fail(function(){
-            console.log('fail');
+            // console.log('fail');
             // release button
             sel.removeClass('disabled');
             // hide spinner
@@ -419,11 +417,11 @@ jQuery(document).ready(function($) {
         // release ajax
         IWAjax.ajaxSemaphore   = false;
         return false;  
-    },
+    }
     /**
      * Ajax Delete IntelliWidget Tab Section
      */
-    delete_tabbed_section = function (e){ 
+    function delete_tabbed_section (e){ 
         // don't allow add/delete section while saving
         if (true === IWAjax.ajaxSemaphore) return false;
         IWAjax.ajaxSemaphore   = true;
@@ -454,7 +452,7 @@ jQuery(document).ready(function($) {
         $('.intelliwidget_' + pre + '_spinner').show();
         // add wp ajax action to array
         postData['action'] = 'iw_' + IWAjax.objtype + '_delete';
-        console.log(postData);
+        // console.log(postData);
         // send to wp
         $.post(  
         // get ajax url from localized object
@@ -463,7 +461,7 @@ jQuery(document).ready(function($) {
             postData,
             //on success function  
             function(response){
-                console.log(response);
+                // console.log(response);
                 sel.removeClass('disabled');
                 $('.intelliwidget_' + pre + '_spinner').hide();
                 if ('success' == response ) {
@@ -482,7 +480,7 @@ jQuery(document).ready(function($) {
                 return false;  
             }
         ).fail(function(){
-            console.log('fail');
+            // console.log('fail');
             // release button
             sel.removeClass('disabled');
             // hide spinner
@@ -495,11 +493,11 @@ jQuery(document).ready(function($) {
         // release ajax
         IWAjax.ajaxSemaphore   = false;
         return false;  
-    },
+    }
     /**
      * Ajax Fetch multiselect menus
      */
-    get_menus = function (){ 
+    function get_menus (){ 
         $('.iw-copy-container,.iw-save-container,.iw-cdf-container').removeClass('success failure');
         var sectionform     = $(this).parents('.iw-tabbed-section').first(),
             // parse id to get section number
@@ -571,12 +569,11 @@ jQuery(document).ready(function($) {
             return false;  
         });  
         return false;  
-    },
-
+    }
     /**
      * Ajax Fetch widget multiselect menus
      */
-    get_widget_menus = function (){ 
+    function get_widget_menus (){ 
         var sectionform     = $(this).parents('.widget').first(),
             // parse id to get section number
             thisID          = sectionform.find('.widget-id').val(),
@@ -628,12 +625,11 @@ jQuery(document).ready(function($) {
             return false;  
         });  
         return false;  
-    },
-
+    }
     /**
      * nice little url -> name:value pairs codex
      */
-    url_to_array = function(url) {
+    function url_to_array(url) {
         var pair, i, request = {},
             pairs = url.substring(url.indexOf('?') + 1).split('&');
         for (i = 0; i < pairs.length; i++) {
@@ -641,11 +637,11 @@ jQuery(document).ready(function($) {
             request[decodeURIComponent(pair[0])] = decodeURIComponent(pair[1]);
         }
         return request;
-    },
+    }
     // set visible timestamp and timestamp hidden inputs to form inputs 
     // only validates form if validate param is true
     // this allows values to be reset/cleared
-    iwUpdateTimestampText = function(field, validate) {
+    function iwUpdateTimestampText(field, validate) {
         // retrieve values from form
         var attemptedDate, 
             div         = '#' + field + '_div', 
@@ -710,9 +706,15 @@ jQuery(document).ready(function($) {
             );
         }
         return true;
-    };
-    /* END OF FUNCTIONS
-     *
+    }
+    /* END OF FUNCTIONS */
+
+    /*
+     * Use localization object to store tab and panel data
+     */
+    IWAjax.openPanels   = {};
+    IWAjax.ajaxSemaphore   = false;
+    /*
      * START EVENT BINDINGS (delegate where posible)
      */
     // if panels were open before ajax save, reopen
