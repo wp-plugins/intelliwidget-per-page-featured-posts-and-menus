@@ -262,6 +262,13 @@ name="<?php echo $widgetobj->get_field_name( 'custom_text' ); ?>"><?php echo esc
       </label>
     </p>
     <p>
+      <label title="<?php echo $adminobj->get_tip( 'same_tax' );?>">
+        <input name="<?php echo $widgetobj->get_field_name( 'same_tax' ); ?>" id="<?php echo $widgetobj->get_field_id( 'same_tax' ); ?>" type="checkbox" <?php checked( $instance[ 'same_tax' ], 1 ); ?> value="1" />
+        &nbsp;
+        <?php echo $adminobj->get_label( 'same_tax' ); ?>
+      </label>
+    </p>
+    <p>
       <label title="<?php echo $adminobj->get_tip( 'future_only' );?>">
         <input name="<?php echo $widgetobj->get_field_name( 'future_only' ); ?>" id="<?php echo $widgetobj->get_field_id( 'future_only' ); ?>" type="checkbox" <?php checked( $instance[ 'future_only' ], 1 ); ?> value="1" />
         &nbsp;

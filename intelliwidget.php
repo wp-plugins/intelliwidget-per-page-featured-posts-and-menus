@@ -6,7 +6,7 @@ if ( !defined( 'ABSPATH' ) ) exit;
     Plugin Name: IntelliWidget Featured Posts and Custom Menus
     Plugin URI: http://www.lilaeamedia.com/plugins/intelliwidget
     Description: Display custom menus, featured posts, custom post types, metadata and other content on a per-page/post or site-wide basis.
-    Version: 2.2.1
+    Version: 2.2.2.1
     Author: Lilaea Media
     Author URI: http://www.lilaeamedia.com/
     Text Domain: intelliwidget
@@ -284,6 +284,7 @@ class IntelliWidget {
             'sortby'            => 'menu_order',
             'hide_title'        => 0,
             'allterms'          => 0,
+            'same_tax'          => 0,
         ) );
         // backwards compatibility: add content=nav_menu if nav_menu param set
         if ( empty( $instance[ 'content' ] ) && !empty( $instance[ 'nav_menu' ] ) && '' != ( $instance[ 'nav_menu' ] ) ) 
@@ -295,7 +296,7 @@ class IntelliWidget {
     
 }
 
-define( 'INTELLIWIDGET_VERSION', '2.2.1' );
+define( 'INTELLIWIDGET_VERSION', '2.2.2.1' );
 defined( 'LILAEAMEDIA_URL' ) || define( 'LILAEAMEDIA_URL', 'http://www.lilaeamedia.com' );
 define( 'INTELLIWIDGET_DIR', dirname( __FILE__ ) );
 define( 'INTELLIWIDGET_URL', plugin_dir_url( __FILE__ ) );

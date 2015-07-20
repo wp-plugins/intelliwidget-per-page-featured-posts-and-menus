@@ -114,6 +114,18 @@ LEFT JOIN {$wpdb->postmeta} pm2 ON pm2.post_id = p1.ID
         endif;
         // taxonomies
         $prepargs = array();
+        // constrain results to current queried taxonomy
+        if ( $instance[ 'same_tax' ] ):
+            // get terms from wp_query object and add to terms array
+            $t = get_queried_object();
+            if ( isset( $t->term_taxonomy_id ) ):
+                if ( -1 == $instance[ 'terms' ] ) $instance[ 'terms' ] = array();
+                $instance[ 'terms' ] = array( $t->term_taxonomy_id );
+            else:
+                $instance[ 'terms' ] = wp_get_post_terms( $post->ID, get_object_taxonomies( $instance[ 'post_types' ] ), array( 'fields' => 'tt_ids' ) );
+            endif;
+        endif;
+        
         // backward compatibility: support category term ids
         if ( isset( $instance[ 'category' ] ) && '' != $instance[ 'category' ] && -1 != $instance[ 'category' ] ):
             $clauses[] = '( tx2.term_id IN ('. $this->prep_array( $instance[ 'category' ], $prepargs, 'd' ) . ') )';
@@ -140,6 +152,7 @@ LEFT JOIN {$wpdb->postmeta} pm2 ON pm2.post_id = p1.ID
         if ( !empty( $instance[ 'page' ] ) ):
             $clauses[] = '(p1.ID IN ('. $this->prep_array( $instance[ 'page' ], $prepargs, 'd' ) . ') )';
         endif;
+        
         /* Remove current page from list of pages if set */
         if ( $instance[ 'skip_post' ] && !empty( $post ) ):
             $clauses[] = "(p1.ID != %d )";

@@ -177,6 +177,9 @@ class IntelliWidgetStrings {
             case 'menu_location':
                 $value = __( 'Menu Location', 'intelliwidget' ); 
                 break;
+            case 'same_tax':
+                $value = __( 'Include Current Taxonomy', 'intelliwidget' ); 
+                break;
         endswitch;
         return apply_filters( 'intelliwidget_labels', $value, $key );
     }
@@ -329,6 +332,9 @@ class IntelliWidgetStrings {
             case 'menu_location':
                 $value = __( 'If replacing a registered Nav Menu Location, select the location to replace.', 'intelliwidget' ); 
                 break;
+            case 'same_tax':
+                $value = __( 'Show posts from the current taxonomy.', 'intelliwidget' ); 
+                break;
         endswitch;
         return apply_filters( 'intelliwidget_tips', $value, $key );
     }
@@ -428,6 +434,7 @@ class IntelliWidgetStrings {
                     'hierarchical',
                     'show_descr',
                     'hide_title',
+                    'same_tax',
                 ); 
                 break;
             case 'text': 
