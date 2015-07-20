@@ -4,7 +4,7 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_i
 Tags: content driven, featured post, featured post, page menu, custom menu, taxonomy menu, text widget, textwidget, per page, post types, custom sidebar, dynamic sidebar
 Requires at least: 3.5
 Tested up to: 4.2 
-Stable tag: 2.2.1
+Stable tag: 2.2.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -183,6 +183,9 @@ Change the 'supports' parameter in the register_post_type function to include 'c
 5. Example of the Custom Data Fields Panel.
 
 == Changelog ==
+= 2.2.2 =
+* New feature - include current taxonomy in widget post results
+
 = 2.2.1 =
 * Updated strings class
 * Cleaned up minified admin script
