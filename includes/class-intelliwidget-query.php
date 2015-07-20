@@ -121,6 +121,8 @@ LEFT JOIN {$wpdb->postmeta} pm2 ON pm2.post_id = p1.ID
             if ( isset( $t->term_taxonomy_id ) ):
                 if ( -1 == $instance[ 'terms' ] ) $instance[ 'terms' ] = array();
                 $instance[ 'terms' ] = array( $t->term_taxonomy_id );
+            else:
+                $instance[ 'terms' ] = wp_get_post_terms( $post->ID, get_object_taxonomies( $instance[ 'post_types' ] ), array( 'fields' => 'tt_ids' ) );
             endif;
         endif;
         
