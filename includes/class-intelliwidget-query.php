@@ -119,8 +119,14 @@ LEFT JOIN {$wpdb->postmeta} pm2 ON pm2.post_id = p1.ID
             // get terms from wp_query object and add to terms array
             $t = get_queried_object();
             if ( isset( $t->term_taxonomy_id ) ):
-                if ( -1 == $instance[ 'terms' ] ) $instance[ 'terms' ] = array();
-                $instance[ 'terms' ] = array( $t->term_taxonomy_id );
+                $instance[ 'terms' ] = array();
+                if ( $termchildren = get_term_children( $t->term_id, $t->taxonomy ) ):
+                    foreach ( $termchildren as $term_id ):
+	                    $term = get_term_by( 'id', $term_id, $t->taxonomy );
+                        $instance[ 'terms' ][] = $term->term_taxonomy_id;
+                    endforeach;
+                endif;
+                $instance[ 'terms' ][] = $t->term_taxonomy_id;
             else:
                 $instance[ 'terms' ] = wp_get_post_terms( $post->ID, get_object_taxonomies( $instance[ 'post_types' ] ), array( 'fields' => 'tt_ids' ) );
             endif;
