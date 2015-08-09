@@ -101,7 +101,7 @@ class IntelliWidgetPostAdmin extends IntelliWidgetAdmin {
         return '
   <select style="width:75%" name="intelliwidget_widget_page_id" id="intelliwidget_widget_page_id">
     <option value="">' . __( 'This form', 'intelliwidget' ) . '</option>
-      ' . $this->get_posts_list( array( 'post_types' => $this->post_types, 'page' => $copy_id ), TRUE ) . '
+      ' . $this->get_menu_list( array( 'post_types' => $this->post_types, 'page' => $copy_id ), 'posts', TRUE, 0, 1000 ) . '
   </select>';
     }
     

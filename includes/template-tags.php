@@ -111,11 +111,11 @@ if ( !function_exists( 'get_the_intelliwidget_excerpt' ) ) {
      * @global <object> $intelliwidget_post
      * @return <string>
      */
-    function get_the_intelliwidget_excerpt() {
+    function get_the_intelliwidget_excerpt( $custom = 1 ) {
         global $this_instance, $intelliwidget_post;
         // use excerpt text if it exists otherwise parse the main content
-        $excerpt = empty( $intelliwidget_post->post_excerpt ) ?
-            get_the_intelliwidget_content() : apply_filters( 'intelliwidget_content', $intelliwidget_post->post_excerpt );
+        $excerpt = ( $custom && !empty( $intelliwidget_post->post_excerpt ) ) ?
+            apply_filters( 'intelliwidget_content', $intelliwidget_post->post_excerpt ) : get_the_intelliwidget_content();
         return apply_filters( 'intelliwidget_trim_excerpt', $excerpt, $this_instance );
     }
 }
@@ -124,8 +124,8 @@ if ( !function_exists( 'the_intelliwidget_excerpt' ) ) {
     /**
      * Display the excerpt for the featured post.
      */
-    function the_intelliwidget_excerpt() {
-        echo get_the_intelliwidget_excerpt();
+    function the_intelliwidget_excerpt( $custom = 1 ) {
+        echo get_the_intelliwidget_excerpt( $custom );
     }
 }
 

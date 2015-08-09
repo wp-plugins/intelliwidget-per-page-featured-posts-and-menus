@@ -1,6 +1,7 @@
 <?php
 // Exit if accessed directly
 if ( !defined( 'ABSPATH' ) ) exit;
+
 /**
  * class-intelliwidget-admin.php - Administration class
  *
@@ -10,6 +11,7 @@ if ( !defined( 'ABSPATH' ) ) exit;
  * @copyright 2014-2015 Lilaea Media LLC
  * @access public
  */
+
 class IntelliWidgetAdmin {
 
     var $docsLink;
@@ -28,32 +30,32 @@ class IntelliWidgetAdmin {
     function iw() {
         return IntelliWidget::$instance;
     }
+    
     /**
      * Configures the admin object for this request
      */
     function admin_init( $objecttype = '', $idfield = '' ) {
-            include_once( 'class-intelliwidget-strings.php' );
-            include_once( 'class-intelliwidget-walker.php' );
-            // this property tells IW how to set/get options ( post uses post_meta, others use options table )
-            $this->objecttype       = $objecttype;
-            // cache post types
-            $this->post_types       = $this->get_eligible_post_types();
-            // cache menus
-            $this->menus            = $this->get_nav_menus();
-            // cache templates
-            $this->templates        = $this->get_widget_templates();
-            // cache intelliwidgets
-            $this->intelliwidgets   = $this->get_intelliwidgets();
-            // enqueue JS and CSS
-            $this->admin_scripts( $idfield );
-            // FIXME: should this go here???
-            $this->docsLink         = ( !defined( 'INTELLIWIDGET_PRO_VERSION' ) ? '<a href="' . LILAEAMEDIA_URL . '/intelliwidget-pro/" target="_blank" title="' . __( 'Learn more about IntelliWidget Pro', 'intelliwidget' ) . '" style="float:right;margin-left:1em">' . __( 'Get Pro', 'intelliwidget' ) . '</a>' : '' )
-                . '<a href="' . LILAEAMEDIA_URL . '/plugins/intelliwidget/" target="_blank" title="' . __( 'Hover labels for more info or click here to view documentation.', 'intelliwidget' ) . '" style="float:right;margin-left:1em">' . __( 'Help', 'intelliwidget' ) . '</a>';
-            // backward compatibility support for multi post ( pro ) < 1.1.0
-            if ( 'IntelliWidgetMultiPostAdmin' == get_class( $this ) ):
-                $this->post_admin = new IntelliWidgetPostAdmin();
-            endif;
-                   
+        include_once( 'class-intelliwidget-strings.php' );
+        include_once( 'class-intelliwidget-walker.php' );
+        // this property tells IW how to set/get options ( post uses post_meta, others use options table )
+        $this->objecttype       = $objecttype;
+        // cache post types
+        $this->post_types       = $this->get_eligible_post_types();
+        // cache menus
+        $this->menus            = $this->get_nav_menus();
+        // cache templates
+        $this->templates        = $this->get_widget_templates();
+        // cache intelliwidgets
+        $this->intelliwidgets   = $this->get_intelliwidgets();
+        // enqueue JS and CSS
+        $this->admin_scripts( $idfield );
+        // FIXME: should this go here???
+        $this->docsLink         = ( !defined( 'INTELLIWIDGET_PRO_VERSION' ) ? '<a href="' . LILAEAMEDIA_URL . '/intelliwidget-pro/" target="_blank" title="' . __( 'Learn more about IntelliWidget Pro', 'intelliwidget' ) . '" style="float:right;margin-left:1em">' . __( 'Get Pro', 'intelliwidget' ) . '</a>' : '' )
+            . '<a href="' . LILAEAMEDIA_URL . '/plugins/intelliwidget/" target="_blank" title="' . __( 'Hover labels for more info or click here to view documentation.', 'intelliwidget' ) . '" style="float:right;margin-left:1em">' . __( 'Help', 'intelliwidget' ) . '</a>';
+        // backward compatibility support for multi post ( pro ) < 1.1.0
+        if ( 'IntelliWidgetMultiPostAdmin' == get_class( $this ) ):
+            $this->post_admin = new IntelliWidgetPostAdmin();
+        endif;
     }
 
     /**
@@ -83,7 +85,7 @@ class IntelliWidgetAdmin {
         // allow customization of input fields
         $checkbox_fields = $this->get_checkbox_fields();
         $text_fields = $this->get_text_fields();
-        /***
+        /**
          * Here is some perlesque string handling. Using grep gives us a subset of relevant data fields
          * quickly. We then iterate through the fields, parsing out the actual data field name and the 
          * box_id from the input key.
@@ -189,42 +191,98 @@ class IntelliWidgetAdmin {
      * @param <array> $instance
      * @return <string> 
      */
-    function get_posts_list( $instance = NULL, $profiles = FALSE ) {
-        $instance[ 'page' ] = $this->val2array( isset( $instance[ 'page' ] ) ? $instance[ 'page' ] : '' );
-        $instance[ 'profiles_only' ] = $profiles;
-        $posts = array();
-        if ( !isset( $this->posts ) ) $this->load_posts();
-        foreach ( $this->val2array( $instance[ 'post_types' ] ) as $post_type ):
-            if ( isset( $this->posts[ $post_type ] ) )
-                $posts = array_merge( $posts, $this->posts[ $post_type ] );
+    function get_menu_list( $instance = NULL, $obj = 'post', $profiles = FALSE, $offset = 0, $limit = NULL, $query = NULL ) {
+        $types      = $this->get_object_groups( $obj, $this->val2array( $instance[ 'post_types' ] ) );
+        $selected   = '/value="(' . implode("|", $this->val2array( 'post' == $obj ? $instance[ 'page' ] : $instance[ 'terms' ] ) ) . ')"/';
+        $output     = '';
+        $options    = 0;
+        foreach ( $types as $type ):
+            foreach ( $this->get_list( $obj, $type, TRUE, $profiles ) as $option ):
+                if ( $flagged = preg_replace( $regex, "selected=\"selected\" value=\"$1\"", $option ) ):
+                    if ( $offset ):
+                        continue;
+                    else:
+                        $output .= $flagged . "\n";
+                    endif;
+                else:
+                    if ( $query ):
+                        $value = preg_replace( "/<.*?>/", '', $option );
+                        if ( !strstr( $value, $query ) ) continue;
+                    endif;
+                    if ( ++$options > $offset && $options < $offset + $limit ):
+                        $output .= $option . "\n";
+                    else:
+                        continue;
+                    endif;
+                endif;
+            endforeach;
         endforeach;
-    	$output = '';
-	    if ( ! empty( $posts ) ) {
-            $args = array( $posts, 0, $instance );
-            $walker = new Walker_IntelliWidget(); 
-	        $output .= call_user_func_array( array( $walker, 'walk' ), $args );
-	    }
-
 	    return $output;
     }
     
-    function get_terms_list( $instance = NULL ) {
-        if ( !isset( $this->terms ) ) $this->load_terms();
-    	$output = '';
-        $post_types = $this->val2array( isset( $instance[ 'post_types' ] ) ? $instance[ 'post_types' ] : '' );
-        $instance[ 'terms' ]   = $this->val2array( isset( $instance[ 'terms' ] ) ? $instance[ 'terms' ] : '' );
-        $terms = array();
-        foreach ( $this->val2array( preg_grep( '/post_format/', get_object_taxonomies( $post_types ), PREG_GREP_INVERT ) ) as $tax ):
-            if ( isset( $this->terms[ $tax ] ) )
-                $terms = array_merge( $terms, $this->terms[ $tax ] );
-        endforeach;
-	    if ( ! empty( $terms ) ) {
-            $args = array( $terms, 0, $instance );
-            $walker = new Walker_IntelliWidget_Terms(); 
-            
-	        $output .= call_user_func_array( array( $walker, 'walk' ), $args );
-	    }
-	    return $output;
+    function get_list( $obj, $type = NULL, $walk = FALSE, $profiles = FALSE ) {
+        if ( !isset( $this->{ $obj } ) ):
+            call_user_func( array( $this, 'load_' . $obj ) );
+        endif;
+        if ( $type ):
+            if ( isset( $this->{ $obj }[ $type ] ) ):
+                if ( $walk ):
+                        $class = 'Walker_IntelliWidget_' . ucfirst( $obj );
+                        $walker = new $class();
+                        $list = call_user_func_array( 
+                            array( $walker, 'walk' ), 
+                            array( 
+                                $this->{ $obj }[ $type ], 
+                                0, 
+                                array( 
+                                    'profiles_only' => $profiles 
+                                ) 
+                            ) 
+                        );
+                        $list = explode( "\t", $list );
+                    return $list;
+                else:
+                    return $this->{ $obj }[ $type ];
+                endif;
+            else:
+                return array();
+            endif;
+        endif;
+        return $this->{ $obj };
+    }
+    
+    function load_posts() {
+        // cache all available posts ( Lightweight IW objects )
+        if ( $this->posts = get_transient( 'intelliwidget_posts' ) ) return;
+        $iwq = new IntelliWidget_Query();
+        if ( $data = $iwq->post_list_query( $this->post_types ) )
+            foreach ( $data as $record )
+                $this->posts[ $record->{ 'post_type' } ][] = $record;
+        else $this->posts = array();
+        set_transient( 'intelliwidget_posts', $this->posts, 3600 );
+    }
+    
+    function load_terms() {
+        // cache all available terms
+        if ( $this->terms = get_transient( 'intelliwidget_terms' ) ) return;
+        if ( $data = get_terms( $this->get_object_groups( 'terms', $this->post_types ), array( 'hide_empty' => FALSE ) ) )
+            foreach ( $data as $object )
+                $this->terms[ $object->{ 'taxonomy' } ][] = $object;
+        else $this->terms = array();
+        set_transient( 'intelliwidget_terms', $this->terms, 3600 );
+    }
+
+    function get_object_groups( $obj, $types ) {
+        if ( 'post' == $obj ) return $types;
+        return array_intersect(
+            preg_grep( '/post_format/', get_object_taxonomies( $types ), PREG_GREP_INVERT ), 
+            get_taxonomies( 
+                array( 
+                    'public' => TRUE, 
+                    'query_var' => TRUE 
+                )
+            )
+        );
     }
     
     /**
@@ -311,7 +369,6 @@ class IntelliWidgetAdmin {
         endswitch;
     }
     
-    
     function get_content_menu() {
         return IntelliWidgetStrings::get_menu( 'content' );
     }
@@ -367,9 +424,8 @@ class IntelliWidgetAdmin {
 
     function get_tax_menu() {
         if ( isset( $this->tax_menu ) ) return $this->tax_menu;
-        if ( !isset( $this->terms ) ) $this->load_terms();
         $menu = array( '' => __( 'None', 'intelliwidget' ) );
-        foreach ( array_keys( $this->terms ) as $name ):
+        foreach ( array_keys( $this->get_list( 'terms' ) ) as $name ):
             $taxonomy = get_taxonomy( $name );
             $menu[ $name ] = $taxonomy->label;
         endforeach;
@@ -388,6 +444,7 @@ class IntelliWidgetAdmin {
     function get_tip( $key = '' ) {
         return IntelliWidgetStrings::get_tip( $key );
     }
+    
     /**
      * Stub for data validation
      * @param <string> $unclean - data to parse
@@ -405,41 +462,14 @@ class IntelliWidgetAdmin {
     function map_category_to_tax( $category ) {
         $catarr = $this->val2array( $category );
         $tax = array( 'category' );
-        if ( !isset( $this->terms ) ) $this->load_terms();
         return array_map( array( $this, 'lookup_term' ), $catarr, $tax );
     }
     
     function lookup_term( $id, $tax ) {
-        foreach( $this->terms[ $tax ] as $term ):
+        foreach( $this->get_list( 'terms', $tax ) as $term ):
             if ( $term->term_id == $id ) return $term->term_taxonomy_id;
         endforeach;
         return -1;
-    }
-    
-
-    function load_posts() {
-        // cache all available posts ( Lightweight IW objects )
-        $iwq = new IntelliWidget_Query();
-        $this->index_query_objects( 'posts', 'post_type', $iwq->post_list_query( $this->post_types ) );
-    }
-    
-    function load_terms() {
-        // cache all available posts ( Lightweight IW objects )
-        $iwq = new IntelliWidget_Query();
-        $this->index_query_objects( 'terms', 'taxonomy', get_terms( array_intersect(
-            preg_grep( '/post_format/', get_object_taxonomies( $this->post_types ), PREG_GREP_INVERT ), 
-                get_taxonomies( array( 'public' => TRUE, 'query_var' => TRUE ) )
-            ), array( 'hide_empty' => FALSE ) ) );
-    }
-    
-    function index_query_objects( $property, $keyfield, $data ) {
-        $indexarray = array();
-        if ( isset( $data ) && count( $data ) ):
-            foreach ( $data as $object ):
-                $indexarray[ $object->{$keyfield} ][] = $object;
-            endforeach;
-        endif;
-        $this->{$property} = $indexarray;
     }
         
     function val2array( $value ) {

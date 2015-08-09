@@ -39,7 +39,7 @@ class IntelliWidget_Widget extends WP_Widget {
             add_action( 'wp_enqueue_scripts',               array( &$this, 'enqueue_styles' ),          5 );
             add_shortcode( 'intelliwidget',                 array( &$this, 'intelliwidget_shortcode' ) );
         endif;  
-        $this->WP_Widget( 'intelliwidget', $this->iw()->pluginName, $widget_ops, $control_ops );
+        parent::__construct( 'intelliwidget', $this->iw()->pluginName, $widget_ops, $control_ops );
     }
     
     function iw() {

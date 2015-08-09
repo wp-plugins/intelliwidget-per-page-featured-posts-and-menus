@@ -11,7 +11,7 @@ if ( !defined( 'ABSPATH' ) ) exit;
  * @copyright 2014-2015 Lilaea Media LLC
  * @access public
  */
-class Walker_IntelliWidget extends Walker {
+class Walker_IntelliWidget_Posts extends Walker {
 	/**
 	 * @see Walker::$tree_type
 	 * @var string

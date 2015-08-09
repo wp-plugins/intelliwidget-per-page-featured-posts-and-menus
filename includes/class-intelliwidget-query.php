@@ -229,7 +229,8 @@ LEFT JOIN {$wpdb->postmeta} pm2 ON pm2.post_id = p1.ID
 SELECT DISTINCT
     p1.ID,
     p1.post_content, 
-    p1.post_excerpt, 
+    p1.post_excerpt,
+    p1.post_type, 
     COALESCE(NULLIF(TRIM(p1.post_title), ''), " 
     . $this->prep_array( __( 'Untitled', 'intelliwidget' ), $prepargs ) . ") AS post_title,
     COALESCE(NULLIF(pm2.meta_value, ''), p1.post_date) AS post_date,
@@ -279,17 +280,19 @@ LEFT JOIN {$wpdb->postmeta} pm7 ON pm7.post_id = p1.ID
     function prep_array( $value, &$args, $type = 's' ) {
         $values = is_array( $value ) ? $value : explode( ',', $value );
         $placeholders = array();
+        $wildcard = ( 'w' == $type ? '%%' : '' );
         foreach( $values as $val ):
             $placeholders[] = ( 'd' == $type ? '%d' : '%s' );
-            $args[] = trim( $val );
+            $args[] = $wildcard . trim( $val ) . $wildcard;
         endforeach;
         return implode( ',', $placeholders );
     }
     
-    /* post_list_query
+    /**
+     * post_list_query
      * lightweight post query for use in menus
      */
-    function post_list_query( $post_types ) {
+    function post_list_query( $post_types, $limit = 100, $offset = NULL, $search = NULL, $in = array() ) {
         global $wpdb;
         $args = array();
         $query = "
@@ -302,10 +305,19 @@ LEFT JOIN {$wpdb->postmeta} pm7 ON pm7.post_id = p1.ID
         FROM {$wpdb->posts}
             LEFT JOIN {$wpdb->postmeta} pm ON pm.meta_key = '_intelliwidget_map' and pm.post_id = ID 
         WHERE post_type IN (" . $this->prep_array( $post_types, $args ) . ")
-            AND (post_status = 'publish' " . ( current_user_can( 'read_private_posts' ) ? " or post_status = 'private'" : '' ) . ")
+            AND (post_status = 'publish' " . ( current_user_can( 'read_private_posts' ) ? " OR post_status = 'private'" : '' ) . ")
             AND (post_password = '' OR post_password IS NULL)
-        ORDER BY post_type, post_title
         ";
+        if ( $search ) $query .= " AND ( post_title LIKE " . $this->prep_array( $search, 'w' ) . " )
+        ";
+        if ( $in ) $query .= " AND ( ID IN ( " . $this->prep_array( $in, 'd' ) . " ) )
+        ";
+        $query .= " ORDER BY post_type, post_title
+        ";
+        if ( $limit ): 
+            $query .= " LIMIT " . $limit;
+            if ( $offset ) $query .= " OFFSET " . $offset;
+        endif;
         return $wpdb->get_results( $wpdb->prepare( $query, $args ), OBJECT );
     }
     
