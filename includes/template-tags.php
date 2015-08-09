@@ -111,11 +111,11 @@ if ( !function_exists( 'get_the_intelliwidget_excerpt' ) ) {
      * @global <object> $intelliwidget_post
      * @return <string>
      */
-    function get_the_intelliwidget_excerpt() {
+    function get_the_intelliwidget_excerpt( $custom = 1 ) {
         global $this_instance, $intelliwidget_post;
         // use excerpt text if it exists otherwise parse the main content
-        $excerpt = empty( $intelliwidget_post->post_excerpt ) ?
-            get_the_intelliwidget_content() : apply_filters( 'intelliwidget_content', $intelliwidget_post->post_excerpt );
+        $excerpt = ( $custom && !empty( $intelliwidget_post->post_excerpt ) ) ?
+            apply_filters( 'intelliwidget_content', $intelliwidget_post->post_excerpt ) : get_the_intelliwidget_content();
         return apply_filters( 'intelliwidget_trim_excerpt', $excerpt, $this_instance );
     }
 }
@@ -124,8 +124,8 @@ if ( !function_exists( 'the_intelliwidget_excerpt' ) ) {
     /**
      * Display the excerpt for the featured post.
      */
-    function the_intelliwidget_excerpt() {
-        echo get_the_intelliwidget_excerpt();
+    function the_intelliwidget_excerpt( $custom = 1 ) {
+        echo get_the_intelliwidget_excerpt( $custom );
     }
 }
 
@@ -161,15 +161,16 @@ if ( !function_exists( 'get_the_intelliwidget_link' ) ) {
      * @param <integer> $category_id ( optional ) - return category permalink
      * @return <string>
      */
-    function get_the_intelliwidget_link( $post_id = NULL, $link_text = NULL, $category_id = NULL ) {
+    function get_the_intelliwidget_link( $post_id = NULL, $link_text = NULL, $category_id = NULL, $custom = 1 ) {
         global $intelliwidget_post;
         $post_id =  intval( $post_id ) ? $post_id : ( is_object( $intelliwidget_post ) ? $intelliwidget_post->ID : NULL );
         if ( isset( $category_id ) && -1 != $category_id ) $url = get_category_link( $category_id );
         $url     = isset( $url ) ? $url : get_the_intelliwidget_url( $post_id );
         if ( empty( $link_text ) ):
-            $link_text = get_the_intelliwidget_title( $post_id );
+            $link_text = get_the_intelliwidget_title( $custom );
         endif;
-        $title_text = esc_attr( strip_tags( $link_text ) );
+        $title_text = trim( esc_attr( strip_tags( $link_text ) ) );
+        if ( empty ( $title_text ) ) return '';
         $classes = empty( $intelliwidget_post->link_classes ) ? '' :  ' class="' . $intelliwidget_post->link_classes . '"';
         $target  = empty( $intelliwidget_post->link_target ) ? '' : ' target="' . $intelliwidget_post->link_target . '"';
         $content = '<a title="' . $title_text . '" href="' . $url . '"' . $classes . $target . '>' . $link_text .  '</a>';
@@ -185,8 +186,8 @@ if ( !function_exists( 'the_intelliwidget_link' ) ) {
      * @param <strong> $link_text ( optional ) - text inside area tag
      * @param <integer> $category_id ( optional ) - return category permalink
      */
-    function the_intelliwidget_link( $post_id = NULL, $title = NULL ) {
-        echo get_the_intelliwidget_link( $post_id, $title );
+    function the_intelliwidget_link( $post_id = NULL, $title = NULL, $category_id = NULL, $custom = 1 ) {
+        echo get_the_intelliwidget_link( $post_id, $title, $category_id, $custom );
     }
 }
 
@@ -245,9 +246,9 @@ if ( !function_exists( 'get_the_intelliwidget_title' ) ) {
      * @global <object> $intelliwidget_post
      * @return <string>
      */
-    function get_the_intelliwidget_title() {
+    function get_the_intelliwidget_title( $custom = 1 ) {
         global $intelliwidget_post;
-        $title = empty( $intelliwidget_post->alt_title ) ? $intelliwidget_post->post_title : $intelliwidget_post->alt_title;
+        $title = ( $custom && !empty( $intelliwidget_post->alt_title ) ) ? $intelliwidget_post->alt_title : $intelliwidget_post->post_title;
         return $title; //esc_attr( $title );
     }
 }
@@ -256,8 +257,8 @@ if ( !function_exists( 'get_the_intelliwidget_title' ) ) {
      */
 
 if ( !function_exists( 'the_intelliwidget_title' ) ) {
-    function the_intelliwidget_title() {
-        echo get_the_intelliwidget_title();
+    function the_intelliwidget_title( $custom = 1 ) {
+        echo get_the_intelliwidget_title( $custom );
     }
 }
 

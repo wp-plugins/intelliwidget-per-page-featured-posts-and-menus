@@ -146,7 +146,7 @@ class IntelliWidget_Widget extends WP_Widget {
         }
         // remove intelliwidget shortcode to stop endless recursion
         // otherwise, parse shortcodes
-        return do_shortcode( preg_replace( "#\[intelliwidget.*?\]#s", '', $content ) );
+        return do_shortcode( $content ); // preg_replace( "#\[intelliwidget.*?\]#s", '', $content ) );
     }
             
     /**
