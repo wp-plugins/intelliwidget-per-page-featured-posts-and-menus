@@ -3,10 +3,10 @@
 if ( !defined( 'ABSPATH' ) ) exit;
 
 /*
-    Plugin Name: IntelliWidget Featured Posts and Custom Menus
+    Plugin Name: IntelliWidget Per-Page Featured Posts and Custom Menus
     Plugin URI: http://www.lilaeamedia.com/plugins/intelliwidget
     Description: Display custom menus, featured posts, custom post types, metadata and other content on a per-page/post or site-wide basis.
-    Version: 2.2.1
+    Version: 2.2.2.2
     Author: Lilaea Media
     Author URI: http://www.lilaeamedia.com/
     Text Domain: intelliwidget
@@ -155,14 +155,24 @@ class IntelliWidget {
      */
 
     function intelliwidget_shortcode( $atts ) {
-        global $post;
+        global $post, $intelliwidget_post;
+        // prevent recursion
+        if ( is_object( $post ) && is_object( $intelliwidget_post ) && $post->ID == $intelliwidget_post->ID ) return;
+        
+        $thispost = $post;
+        $iwpost = 0;
+        if ( isset( $atts[ 'iwpost' ] ) ):
+            $iwpost = 1;
+            $thispost = $intelliwidget_post;
+        endif;
         // section parameter lets us use page-specific IntelliWidgets in shortcode without all the params
-        if ( is_object( $post ) && !empty( $atts[ 'section' ] ) ):
+        if ( is_object( $thispost ) && !empty( $atts[ 'section' ] ) ):
             $section = intval( $atts[ 'section' ] );
-            $other_post_id = $this->get_meta( $post->ID, '_intelliwidget_', 'post', 'widget_page_id' );
-            $shortcodePostID = $other_post_id ? $other_post_id : $post->ID;
+            $other_post_id = $this->get_meta( $thispost->ID, '_intelliwidget_', 'post', 'widget_page_id' );
+            $shortcodePostID = $other_post_id ? $other_post_id : $thispost->ID;
             $atts = $this->get_meta( $shortcodePostID, '_intelliwidget_data_', 'post', $section );
             if ( empty( $atts ) ): 
+                if ( $iwpost ) $intelliwidget_post = $thispost;
                 return;
             endif;
         else:
@@ -188,6 +198,7 @@ class IntelliWidget {
         // retrieve widget content from buffer
         $content = ob_get_contents();
         ob_end_clean();
+        if ( $iwpost ) $intelliwidget_post = $thispost;
         // return widget content
         return $content;
     }
@@ -284,6 +295,7 @@ class IntelliWidget {
             'sortby'            => 'menu_order',
             'hide_title'        => 0,
             'allterms'          => 0,
+            'same_tax'          => 0,
         ) );
         // backwards compatibility: add content=nav_menu if nav_menu param set
         if ( empty( $instance[ 'content' ] ) && !empty( $instance[ 'nav_menu' ] ) && '' != ( $instance[ 'nav_menu' ] ) ) 
@@ -295,7 +307,7 @@ class IntelliWidget {
     
 }
 
-define( 'INTELLIWIDGET_VERSION', '2.2.1' );
+define( 'INTELLIWIDGET_VERSION', '2.2.2.2' );
 defined( 'LILAEAMEDIA_URL' ) || define( 'LILAEAMEDIA_URL', 'http://www.lilaeamedia.com' );
 define( 'INTELLIWIDGET_DIR', dirname( __FILE__ ) );
 define( 'INTELLIWIDGET_URL', plugin_dir_url( __FILE__ ) );

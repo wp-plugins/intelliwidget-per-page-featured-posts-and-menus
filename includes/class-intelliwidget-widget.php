@@ -13,6 +13,7 @@ if ( !defined( 'ABSPATH' ) ) exit;
 class IntelliWidget_Widget extends WP_Widget {
 
     var $admin;
+    var $recursions = 0;
     /**
      * Constructor
      */
@@ -145,8 +146,12 @@ class IntelliWidget_Widget extends WP_Widget {
             $content = preg_replace( "#\s*<!\-\-nextpage\-\->.*#s", '', $content );
         }
         // remove intelliwidget shortcode to stop endless recursion
+        if ( $this->recursions > 2 ) return $content;
+        $this->recursions++;
         // otherwise, parse shortcodes
-        return do_shortcode( preg_replace( "#\[intelliwidget.*?\]#s", '', $content ) );
+        $content = do_shortcode( $content ); // preg_replace( "#\[intelliwidget.*?\]#s", '', $content ) );
+        $this->recursions--;
+        return $content;
     }
             
     /**
